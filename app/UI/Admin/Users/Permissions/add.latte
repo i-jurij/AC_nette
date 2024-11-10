@@ -1,0 +1,18 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Permissions adding"}
+{var $description = "permissions adding"}
+{var $keywords = "permissions adding"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container text-center">
+    <h2>Permissions adding</h2>
+	<p class="my-3 mx-auto p-2 text-muted">
+		Auto: get permissions list from facade, manual: text input
+	</p>
+    <div class="btn-group" role="group" aria-label="Auto (permissions from models directory) or manual permission adding">
+        <a n:href=":Admin:Users:Permissions:addAuto" class="btn btn-warning">Auto</a>
+        <a n:href=":Admin:Users:Permissions:addManual" class="btn btn-success">Manual</a>
+    </div>
+</div>

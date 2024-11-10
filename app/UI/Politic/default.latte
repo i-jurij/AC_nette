@@ -1,0 +1,15 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Политика обработки персональных данных"}
+{var $description = "Политика обработки персональных данных"}
+{var $keywords = "Политика, обработки, персональных, данных"}
+{var $robots = "INDEX,FOLLOW"}
+
+{block content}
+	{ifset $pages_data}
+        {foreach $pages_data as $string}
+            {$string}
+        {/foreach}
+    {/ifset}
+
+{/block}

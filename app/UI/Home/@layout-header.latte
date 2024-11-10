@@ -1,0 +1,10 @@
+{block header}
+
+<div id="geoLocationDiv"></div>
+
+		<div n:if="isset($client) && $client->isLoggedIn()" style="text-align:right;">
+			<a n:href="Sign:out">Выйти</a>
+		</div>
+    HEADER
+
+{/block}

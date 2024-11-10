@@ -1,0 +1,31 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Page delete"}
+{var $description = "Admin Simple CMS Page delete"}
+{var $keywords = "Admin, SimpleCMS, page, delete"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}	
+ <div class="accordion mb-3" id="accordionpageCreatorInfo">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingPageCreatorInfo">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pageCreatorInfo" aria-expanded="false" aria-controls="pageCreatorInfo">
+          Show/Hide info
+        </button>
+      </h2>
+      <div id="pageCreatorInfo" class="accordion-collapse collapse" aria-labelledby="headingPageCreatorInfo" data-bs-parent="#accordionpageCreatorInfo">
+        <div class="accordion-body">
+          <p>
+              Выберите шаблон страницы для удаления (если его название без расширения не совпадает с "page_alias", например после ручного добавления)<br />
+              Если имя шаблона совпадает с "page_alias", он будет удален автоматически.<br />
+              НЕ УДАЛЯЙТЕ шаблоны adm_templ.php и templ.php, пока не подготовите их замену.<br />
+              Выберите нужную страницу или несколько страниц.<br />
+              Нажмите на кнопку "Delete".<br />
+              Будут удалены записи из базы данных, контроллер, модель, вид, изображение и шаблон.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+page delete

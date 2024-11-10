@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="description" content="{default $description='Description'}{$description}">
+  	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
+	<meta name="Robots" content="{default $robots = 'NOINDEX, NOFOLLOW'}{$robots}">
+  	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="I-Jurij">
+	 <title>{default $title = "Title"}{$title}</title> 
+	<!-- Google Fonts 
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+	-->
+	<link rel="stylesheet" href="{webpack css/main.css}">
+	<link rel="icon" href="{$basePath}/images/favicon.ico">
+
+</head>
+
+<body>
+
+	<div class="header_main">
+		<div n:foreach="$flashes as $flash" class="flash {$flash->type}">
+			<div class="flash_child">{$flash->message}</div>
+		</div>
+		<main class="main_section">
+			<h1 class="mx-auto p1 rounded center shadow bgcontent">{$title}</h1>
+			<div class="center">
+				{include content}	
+			</div>
+		</main>
+	</div>
+
+	<div class="spacer"></div>
+
+	<footer class="main_footer"></footer>
+
+</body>
+</html>

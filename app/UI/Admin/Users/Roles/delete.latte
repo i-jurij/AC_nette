@@ -1,0 +1,39 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Role deleting"}
+{var $description = "Role deleting"}
+{var $keywords = "Role deleting"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Role deleting</h2>
+
+    <form   n:if="($user->isInRole('admin'))" 
+            n:name=formRoleDelete 
+            class="form mt-4 mx-auto" 
+            method="post">
+        	<ul class="error text-warning fst-italic" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+
+            <div class="mb-1 p-3 border rounded">
+                <p>Roles:</p>
+                <div>
+                    {foreach $form[role]->items as $key => $row}
+                        <label n:name="role:$key" class="text-muted border p-2 me-2 mb-2" >
+                            <input type="checkbox" 
+                                n:name="role:$key"
+                                value="{$row['id']}"
+                            >
+                            {$row['role_name']}
+                        </label>
+                    {/foreach}
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError role}</p>
+            </div>  
+
+            <div class="my-2 py-2">
+                <input n:name=deleteRole class="btn btn-primary">
+            </div>
+    </form>
+</div>

@@ -1,0 +1,17 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Roles"}
+{var $description = "Roles"}
+{var $keywords = "Roles"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Roles</h2>
+    <div class="mt-4 text-center">
+        <a class="btn btn-primary" type="button" n:href=":Admin:Users:Roles:add">Add</a>
+        <a class="btn btn-primary" type="button" n:href=":Admin:Users:Roles:delete">Delete</a>
+        <a class="btn btn-primary" type="button" n:href=":Admin:Users:Roles:permissionsAdd">Permissions add</a>
+        <a class="btn btn-primary" type="button" n:href=":Admin:Users:Roles:permissionsDelete">Permissions delete</a>
+    </div>
+</div>

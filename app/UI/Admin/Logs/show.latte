@@ -1,0 +1,45 @@
+{var $title = "Log ".$name}
+{var $description = "Log ".$name}
+{var $keywords = "Log "}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+{if $user->isAllowed('Logs', 'show')}
+    <h2 class="text-center">Log "{$name}"</h2>
+    <br />
+    <link href="{$baseUrl}/assets/js/prism/prism.css" rel="stylesheet" />
+        {ifset $lines}
+            {foreach $lines as $lineNum => $line}
+                <p><code class="language-log">{$lineNum.': '. $line}</code></p>
+            {/foreach}
+        {/ifset}
+    <script src="{$baseUrl}/assets/js/prism/prism.js"></script>
+
+    <div class="pagination btn-toolbar mt-4" role="paginator" aria-label="Paginator for users data">
+		{if  !$paginator->isFirst()}
+			<div class="btn-group me-2" role="group" aria-label="First group">
+				<a n:href="show, $name, 1" class="btn btn-outline-info"><<</a>
+				&nbsp;
+				<a n:href="show, $name, $paginator->page-1" class="btn btn-outline-info"><</a>
+				&nbsp;
+			</div>
+		{/if}
+
+		<div class="btn-group me-2" role="group" aria-label="Second group">
+			<button class="btn btn-outline-info active" aria-current="page">
+                {$paginator->getPage()} from {$paginator->getPageCount()}
+            </button>
+		</div>
+
+		{if !$paginator->isLast()}
+			<div class="btn-group" role="group" aria-label="Third group">
+				&nbsp;
+				<a n:href="show, $name, $paginator->getPage() + 1" class="btn btn-outline-info">></a>
+				&nbsp;
+				<a n:href="show, $name, $paginator->getPageCount()" class="btn btn-outline-info">>></a>
+			</div>
+		{/if}
+	</div>    
+{/if}
+</div>

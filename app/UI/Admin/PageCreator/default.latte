@@ -1,0 +1,18 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Page Creator"}
+{var $description = "Admin Simple CMS Page Creator"}
+{var $keywords = "Admin, SimpleCMS, PageCreator"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}	
+<div class="container">
+<h2 class="text-center">Page Creator</h2>
+<div n:ifset="$currentPageMenu">
+  <div class="text-center">
+    <div class="btn-group" role="group" aria-label="Page editing button group">
+      {include menu from $shared_templates.'menu.latte', $currentPageMenu}
+    </div>
+  </div>
+</div>
+</div>

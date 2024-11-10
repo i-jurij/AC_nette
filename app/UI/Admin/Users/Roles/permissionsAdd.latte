@@ -1,0 +1,112 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Roles permissions updating"}
+{var $description = "Roles permissions updating"}
+{var $keywords = "Roles permissions updating"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Permissions of role adding</h2>
+    <form   n:if="($user->isInRole('admin'))" 
+            n:name=formPermissionsAdd
+            class="form mt-4 mx-auto" 
+            method="post">
+
+<pre>
+{php \json_encode($form[permissions])}
+</pre>
+
+        	<ul class="error text-warning fst-italic" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+
+            <div class="mb-1 p-3 border rounded">
+                <p>Roles:</p>
+                <div>
+                    {foreach $form[role]->items as $key => $row}
+                        <label n:name="role:$key" class="text-muted border p-2 me-2 mb-2" >
+                            <input type="radio" 
+                                n:name="role:$key"
+                                value="{$row['id']}"
+                            >
+                            {$row['role_name']}
+                        </label>
+                    {/foreach}
+                </div> 
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError role}</p>
+            </div> 
+
+            <div class="mb-1 p-3 border rounded">
+                <p>Permissions:</p>
+                <div id="permissions_for_role_add" class="d-none">
+                    {foreach $form[permissions]->items as $resource => $rows}
+                    <div class="mt-4">
+                        <span 
+                            class="text-muted border p-2" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#{$resource}_div" 
+                            role="button"
+                            aria-expanded="false" 
+                            aria-controls="{$resource}_div">
+                            > Resource "{$resource}": 
+                        </span>
+                        <div id="{$resource}_div" class="collapse mt-2 pt-2 ps-4">
+                            {foreach $rows as $data}
+                                <label class="text-muted border p-2 me-2 mb-2" >
+                                    <input type="checkbox" 
+                                        name="permissions[]"
+                                        value="{$data['id']}"
+                                    >
+                                    {$resource}: {$data['action']}
+                                </label>
+                            {/foreach}
+                        </div>
+                    </div>
+                    {/foreach}
+                </div>    
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError permissions}</p>
+            </div>  
+
+            <div class="my-2 py-2">
+                <input n:name=addPermissions class="btn btn-primary">
+            </div>
+    </form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function isset_permissions() { 
+    let rip = JSON.parse({json_encode($roles_isset_permissions)});
+
+    const role = document.querySelectorAll('input[type="radio"][name="role"]');
+    if (role){
+        role.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const pd = document.querySelector('#permissions_for_role_add');
+                
+                pd.classList.remove("d-none");
+                pd.classList.add("d-block");
+                const ps = document.querySelectorAll('input[type="checkbox"]');                        if (ps) {
+                    for (let i = 0, element; element = ps[i]; i++) {
+                        element.checked = false;
+                        element.disabled = false;
+                    }
+                }
+                
+                if (this.checked) {
+                    let val = 'role_'+this.value;
+                    if (Object.hasOwn(rip, val)) {
+                            for (let i = 0, element; element = ps[i]; i++) {
+                                for(let i=0; i<rip[val].length; i++) { 
+                                    if(rip[val][i] == element.value){
+                                        element.checked = true;
+                                        element.disabled = true;
+                                    }  
+                                }  
+                            }
+                    }
+                }
+            });
+        });
+    }
+}, false);
+</script>

@@ -1,0 +1,12 @@
+{*layout '@layout.latte'*}
+{block footer}
+	{include contacts from '@layout-contacts.latte'}
+	<div class="">
+		{if date('Y') != '2024' }
+			2024 - {date('Y') . PHP_EOL}
+		{else}
+			{date('Y') . PHP_EOL}
+		{/if}
+		<br /><small id="mail">Copyright © <a href="https://github.com/i-jurij" >I-Jurij</a></small>
+	</div>	
+{/block}

@@ -1,0 +1,12 @@
+services:
+	- App\Core\RouterFactory::createRouter
+	- App\Core\MyAuthenticator(@database.mysql.explorer)
+	- App\Core\MyAuthorizator(@database.mysql.connection)
+	- App\Model\UserFacade(@database.mysql.explorer)
+	# - App\Model\PageFacade(@database.sqlite.connection)
+
+search:
+	-	in: %appDir%
+		classes:
+			- *Factory
+			- *Facade

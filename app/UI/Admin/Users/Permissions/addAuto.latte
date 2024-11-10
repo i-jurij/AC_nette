@@ -1,0 +1,122 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Permissions adding"}
+{var $description = "permissions adding"}
+{var $keywords = "permissions adding"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container" n:if="is_array($actions)">
+    <h2 class="text-center">Permissions adding</h2>
+
+    <form n:if="($user->isInRole('admin'))" n:name=formPermissionsAddAuto class="form mt-4 mx-auto" style="max-width: 25rem;" >
+        <ul class="error text-warning fst-italic" n:ifcontent>
+            <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+        </ul>
+
+        <div class="mb-1 p-3 border rounded">
+            <p class="pb-2">
+                Resource:
+            </p>
+            
+            <div>
+                {foreach $actions as $resource => $actions_array}
+                    <label n:if="!empty($actions_array)" class="text-muted border m-2 p-2">
+                        <input type="radio" name="resource" id="{$resource}" value="{$resource}" > 
+                        {$resource}
+                    </label>
+                {/foreach}
+            </div>
+        </div> 
+
+        <div class="mb-1 p-3 border rounded">
+            <p class="pb-2">
+                Actions:
+            </p>
+            <div>
+                {foreach $actions as $resource => $actions_array}
+                    <div class="ps-3 d-none checkboxes" id="{$resource}actions">
+                    {foreach $actions_array as $k => $act}
+                        <label class="text-muted m-2 p-2 border" >
+                            <input type="checkbox" name="action[]" value="{$act}" >
+                            {$act}
+                        </label>
+                    {/foreach}
+                    </div>
+                {/foreach}
+            </div>
+            <p class="error text-warning fst-italic" id="action_error_p"></p>
+        </div> 
+
+        <div class="my-2 py-2">
+            <input n:name=addPermissionsAuto class="btn btn-primary">
+            <input type="reset" class="btn btn-secondary" value="Reset" />
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function permissionsAdding() { 
+    function hideAllActions(){
+        const CHE = document.querySelectorAll('.checkboxes');
+        for (const CH of CHE) {
+            CH.classList.add('d-none');
+        }
+    }
+    function uncheckActions(radioElement){
+        if (radioElement.checked) {
+            const EL = document.querySelector('#'+radioElement.id+'actions');
+            const CHS = document.querySelectorAll('input[type="checkbox"]');
+            if (CHS) {
+                CHS.forEach((element) => element.checked = false);
+            }
+            if (EL) {
+                EL.classList.remove('d-none');
+                EL.classList.add('d-block');
+            }
+        }
+    }
+
+    function checkIfActionChoosed(){
+        const SUBM = document.querySelector('input[type="submit"]');
+        if (SUBM){
+            SUBM.addEventListener('click', function(event) {
+                const checkboxGroup = document.querySelectorAll('input[name="action[]"]');
+                const p_err = document.querySelector('#action_error_p');
+                let isChecked = Array.from(checkboxGroup).some(checkbox => checkbox.checked);
+                checkboxGroup[0].setCustomValidity(isChecked ? "" : p_err.innerHTML = "Required!");
+
+                if (!formPermissionsAdd.checkValidity()) {
+                    event.preventDefault();
+                }
+            });
+        }
+    }
+
+    function uncheckResource(){
+        const TDEL = document.querySelectorAll('input[name="resource"]');
+        if (TDEL) {
+            for (const RE of TDEL) {
+                RE.addEventListener('click', function(e) {
+                    hideAllActions();
+                    uncheckActions(RE);
+                });
+            }
+        }
+    }
+    
+    function hideActionsOnReset(){
+        const RES = document.querySelector('input[type="reset"]');
+        if (RES) {
+            RES.addEventListener('click', function(e) {
+                hideAllActions();
+            });
+        }
+    }
+
+    uncheckResource();
+    checkIfActionChoosed();
+    hideActionsOnReset();
+
+});
+</script>

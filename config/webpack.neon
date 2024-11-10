@@ -1,0 +1,11 @@
+extensions:
+	webpack: Contributte\Webpack\DI\WebpackExtension(%debugMode%, %consoleMode%)
+
+webpack:
+    build:
+        directory: %wwwDir%/assets
+        publicPath: assets/
+    devServer:
+        enabled: %debugMode%
+        url: http://localhost:3000/assets
+        timeout: 0.1 # (seconds) default

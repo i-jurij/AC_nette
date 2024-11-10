@@ -1,0 +1,32 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Permissions adding"}
+{var $description = "permissions adding"}
+{var $keywords = "permissions adding"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Permissions adding</h2>
+
+    <form n:if="($user->isInRole('admin'))" n:name=formPermissionsAddManual class="form mt-4 mx-auto" style="max-width: 25rem;" >
+        <ul class="error text-warning fst-italic" n:ifcontent>
+            <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+        </ul>
+
+        <div class="mb-3">
+            <p class="text-muted">Resource:</p>
+            <input n:name="resource" class="w-100" />
+        </div> 
+
+        <div class="mb-3">
+            <p class="text-muted" >Action:</p>
+            <input n:name="actionn" class="w-100" />
+        </div> 
+
+        <div class="my-2 py-2">
+            <input n:name=addPermissionsManual class="btn btn-primary">
+            <input type="reset" class="btn btn-secondary" value="Reset" />
+        </div>
+    </form>
+</div>

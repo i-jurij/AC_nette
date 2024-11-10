@@ -1,0 +1,101 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Logs"}
+{var $description = "Logs"}
+{var $keywords = "Logs"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+{if $user->isAllowed('Logs', 'list')}
+		<table class="table">
+			<thead>
+				<tr>
+				<th scope="col">#</th>
+				<th scope="col">Path</th>
+				<th scope="col">Last modification</th>
+				<th scope="col">Size</th>
+				<th scope="col">Message</th>
+				<th scope="col">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{ifset $logs}
+				<tr>
+					<td colspan="6" class="text-center">
+						<h4 class="d-inline me-4">Logs</h4>
+					</td>
+				</tr>
+				{foreach $logs as $k => $log}
+					<tr>
+					<th scope="row">{$k+1}</th>
+					<td><a n:href="Logs:show $log['name']" >{$log['name']}</a></td>
+					<td>{date('d.m.Y H:i:s', $log['modification_time'])}</td>
+					<td n:class="!empty($log['message']) ? text-danger">{$log['size']}</td>
+					<td n:class="!empty($log['message']) ? text-warning">{$log['message']}</td>
+					<td n:class="!empty($log['message']) ? text-info">
+						<a n:href=":Admin:Logs:clear $log['name']" role="button" class="btn btn-outline-primary">
+							Clear
+						</a>
+					</td>
+					</tr>
+				{/foreach}	
+				{/ifset}
+
+				{ifset $tracys}
+				<tr>
+					<td colspan="6" class="text-center">
+						<h4 class="d-inline me-4">Tracy logs</h4>
+						<a n:href=":Admin:Logs:deleteAll" role="button" class="btn btn-outline-primary">
+							Delete all
+						</a>						
+					</td>
+				</tr>
+
+				{foreach $tracys as $key => $tracy}
+					<tr>
+					<th scope="row">{$key+1}</th>
+					<td><a n:href="Logs:show $tracy['name']" >{$tracy['name']}</a></td>
+					<td>{date('d.m.Y H:i:s', $tracy['modification_time'])}</td>
+					<td n:class="!empty($tracy['message']) ? text-danger">{$tracy['size']}</td>
+					<td n:class="!empty($tracy['message']) ? text-warning">{$tracy['message']}</td>
+					<td n:class="!empty($tracy['message']) ? text-info">
+						<a n:href=":Admin:Logs:delete $tracy['name']" role="button" class="btn btn-outline-primary">
+							Delete
+						</a>
+					</td>
+					</tr>
+				{/foreach}	
+				{/ifset}		
+			</tbody>
+		</table>
+
+		{ifset $tracys}
+			<div class="pagination btn-toolbar mt-4" role="paginator" aria-label="Paginator for users data">
+				{if  !$paginator->isFirst()}
+					<div class="btn-group me-2" role="group" aria-label="First group">
+						<a n:href="default, 1" class="btn btn-outline-info"><<</a>
+						&nbsp;
+						<a n:href="default, $paginator->page-1" class="btn btn-outline-info"><</a>
+						&nbsp;
+					</div>
+				{/if}
+
+				<div class="btn-group me-2" role="group" aria-label="Second group">
+					<button class="btn btn-outline-info active" aria-current="page">
+						{$paginator->getPage()} from {$paginator->getPageCount()}
+					</button>
+				</div>
+
+				{if !$paginator->isLast()}
+					<div class="btn-group" role="group" aria-label="Third group">
+						&nbsp;
+						<a n:href="default, $paginator->getPage() + 1" class="btn btn-outline-info">></a>
+						&nbsp;
+						<a n:href="default, $paginator->getPageCount()" class="btn btn-outline-info">>></a>
+					</div>
+				{/if}
+			</div>    
+		{/ifset}
+
+{/if}	
+{/block}

@@ -1,0 +1,20 @@
+parameters:
+
+application:
+	errorPresenter:
+		4xx: Error:Error4xx
+		5xx: Error:Error5xx
+	mapping: 
+		App\UI\*\**Presenter
+
+latte:
+	strictTypes: yes
+	extensions: 
+
+session:
+	expiration: 14 days
+
+di:
+	export:
+		parameters: no
+		tags: no

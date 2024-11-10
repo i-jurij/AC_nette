@@ -1,0 +1,31 @@
+meta - title, description, keywords, robots <br>
+<div class="accordion mb-3" id="accordionpageCreatorInfo">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingPageCreatorInfo">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#pageCreatorInfo" aria-expanded="false" aria-controls="pageCreatorInfo">
+                Show/Hide info
+            </button>
+        </h2>
+        <div id="pageCreatorInfo" class="accordion-collapse collapse" aria-labelledby="headingPageCreatorInfo" data-bs-parent="#accordionpageCreatorInfo">
+            <div class="accordion-body">
+                <p>
+                    Создание страниц:<br />
+                    Данные для шаблона страницы:<br />
+                    * page_alias(100) - короткое имя для страницы для URL, латиницей, должен иметь уникальное значение,
+                    те не может быть страниц с одинаковым alias, состоит только из букв, цифр, дефисов, подчеркиваний количеством до 100, обязателен;<br />
+                    page_templates(100) - путь к шаблону без public/templates, если шаблон отличается от основного, например "first/templ.php", вес файла до 100КБ ;<br />
+                    * page_title(100) - название страницы;<br />
+                    page_meta_description(255) - описание страницы сайта для отображения в результатах поиска и для SEO;<br />
+                    page_meta_keywords - набор ключевых фраз для страницы;<br />
+                    page_robots - правила для поисковых роботов (https://yandex.ru/support/webmaster/controlling-robot/meta-robots.html);<br />
+                    * page_h1 - заголовок страницы, обычно такой же как title;<br />
+                    * page_img - путь к изображению страницы в меню на главной странице без public/imgs/pages, например "about/about.jpg", вес - до 1МБ, формат - jpg, png, webp;<br />
+                    page_content - html|php содержимое страницы;<br />
+                    * page_access - уровень доступа к странице: admin, moder, user.<br />
+                    * page_admin - 1 для страницы из админки, пусто для обычной.<br />
+                    <small>* - обязательно для заполнения.</small><br /><br />
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

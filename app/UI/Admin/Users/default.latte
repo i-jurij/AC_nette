@@ -1,0 +1,21 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Users"}
+{var $description = "Users"}
+{var $keywords = "Users"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container-fluid">
+	<h2 class="text-center">Users</h2>
+    <div class="m-3 p-3 text-center">
+        <a n:if="$user->isAllowed('User','search')" class="btn btn-secondary" n:href=":Admin:Users:search">Search</a>
+        <a n:if="$user->isAllowed('User','add')" class="btn btn-secondary" n:href=":Admin:Users:add">Add</a>
+        <a class="btn btn-secondary" n:href=":Admin:Users:list">
+            List{if $user->isAllowed('User','update')}, edit, delete{/if}
+        </a>
+    </div>
+
+    {include menu from $shared_templates.'menu.latte', $currentPageMenu}
+</div>
+{/block}

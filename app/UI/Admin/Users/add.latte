@@ -1,0 +1,82 @@
+{var $description = "User add"}
+{var $keywords = "User add"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+    <div>
+        <h2 class="text-center">Adding a user</h2>
+        {*include ../../Accessory/basic_form.latte, form: userAddForm*}
+        <form 
+            n:if="$user->isAllowed('User', 'add')" 
+            n:name=userAddForm 
+            class="form mt-4 mx-auto" 
+            style="max-width: 22rem;"
+            autocomplete="off">
+        	<ul class="error text-warning fst-italic" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+
+            <div class="form-floating mb-1">
+                <input n:name=username size=20 autofocus class="form-control" autocomplete="off">
+                <label n:name=username class="form-label">Username:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError username}</p>
+            </div>
+
+            <div class="form-floating mb-1">
+                <input n:name=password class="form-control" autocomplete="off">
+                <label n:name=password class="form-label">Password:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError password}</p>
+            </div>
+
+            <div class="form-floating mb-1">
+                <input n:name=passwordVerify class="form-control" autocomplete="off">
+                <label n:name=passwordVerify class="form-label">PasswordVerify:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError passwordVerify}</p>
+            </div>
+
+            <div class="form-floating mb-1">
+                <input n:name=phone class="form-control" placeholder="+7 888 999 99 99">
+                <label n:name=phone class="form-label">Phone:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError phone}</p>
+            </div>
+
+            <div class="form-floating mb-1">
+                <input n:name=email class="form-control" placeholder="name@example.com">
+                <label n:name=email class="form-label">Email:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError email}</p>
+            </div> 
+            
+            <div class="mb-1 p-3 border rounded">
+                <label n:name=roles class="pb-2">Roles:</label>
+                    {foreach $form[roles]->items as $role_id => $role_name}
+                        <p class="ps-3">
+                            <label>
+                                <input type="checkbox" name="roles[]" value="{$role_id}">
+                                {$role_name}
+                            </label>
+                        </p>
+                    {/foreach}
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError roles}</p>
+            </div>  
+
+            {*
+            <div class="form-floating mb-1">
+                <input n:name=role class="form-control">
+                <label n:name=role class="form-label">Role:</label>
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError role}</p>
+            </div>
+            *}
+
+            <div class="my-2 py-2">
+                <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+                <label class="form-check-label" for="invalidCheck">
+                    Agree to terms and conditions
+                </label>
+            </div>
+
+            <div class="my-2 py-2">
+                <input n:name=send class="btn btn-primary">
+            </div>
+        </form>
+
+    </div>

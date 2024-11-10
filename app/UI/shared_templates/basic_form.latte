@@ -1,0 +1,16 @@
+<form n:name=$form class="form mx-auto" style="max-width: 22rem;">
+	<ul class="error text-warning fst-italic" n:ifcontent>
+		<li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+	</ul>
+
+	<ul class="errors" n:ifcontent>
+		<li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+	</ul>
+
+	<div n:foreach="$form->getControls() as $input"
+		n:if="$input->getOption(type) !== hidden">
+		{label $input /}<br />
+		{input $input}<br />
+		{inputError $input}<br />
+	</div>
+</form>

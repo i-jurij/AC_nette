@@ -1,0 +1,61 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Role adding"}
+{var $description = "Role adding"}
+{var $keywords = "Role adding"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Role adding</h2>
+
+    <form   n:if="($user->isInRole('admin'))" 
+            n:name=formRoleAdd 
+            class="form mt-4 mx-auto" 
+            method="post">
+        	<ul class="error text-warning fst-italic" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+
+            <div class="mb-4">
+                <label n:name="rolename" class="form-label">
+                    Rolename: 
+                </label>
+                <input n:name="rolename" class="form-control">
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError rolename}</p>
+            </div>
+
+            <div class="mb-1 p-3 border rounded">
+                <p>Permissions:</p>
+                <div>
+                    {foreach $form[permissions]->items as $key => $row}
+                        {var $re = $row['resource']}
+                        <p n:if="((isset($res) && $re != $res) || $iterator->first)" class="mt-4">
+                            <span class="text-muted">
+                                Resource "{$row['resource']}": 
+                            </span>
+                        </p>
+                        <label n:name="permissions:$key" class="text-muted border p-2 me-2 mb-2" >
+                            <input type="checkbox" 
+                                n:name="permissions:$key"
+                                value="{$row['id']}"
+                            >
+                            {$row['resource']}: 
+                                    {if !empty($row['action'])}
+                                        {$row['action']}
+                                    {else}
+                                        All actions
+                                    {/if}
+                        </label>
+                        {var $res = $row['resource']}
+                    {/foreach}
+                </div> 
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError permissions}</p>
+            </div>  
+
+            <div class="my-2 py-2">
+                <input n:name=addRole class="btn btn-primary">
+                <input type="reset" class="btn btn-primary">
+            </div>
+    </form>
+</div>

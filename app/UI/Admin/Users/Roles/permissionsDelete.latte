@@ -1,0 +1,101 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Roles permissions updating"}
+{var $description = "Roles permissions updating"}
+{var $keywords = "Roles permissions updating"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Permissions of roles deleting</h2>
+    <p class="lead text-center">
+        Permissions marked for deletion are not cleared when another role is selected. <br />
+        ALL selected permissions will be transferred.
+    </p>
+
+    <form   n:if="($user->isInRole('admin'))" 
+            n:name=formPermissionsDelete
+            class="form mt-4 mx-auto p-3 border rounded" 
+            method="post">
+
+        	<ul class="error text-warning fst-italic" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+
+            <div class="mb-1">
+                <p>Roles: </p>
+                    <ul class="nav nav-pills" id="myTab" role="tablist">
+                    {foreach $roles as $role}
+                        <li class="nav-item" role="presentation">
+                            <label  n:class="!$iterator->last ? me-2, 'text-muted border p-2'"
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#{$role['role_name']}_{$role['role_id']}" 
+                                    role="tab" 
+                                    aria-controls="{$role['role_name']}_{$role['role_id']}"
+                            >
+                                <input type="radio" name="resource" > 
+                                {$role['role_name']}
+                            </label>
+                        </li>
+                    {/foreach}
+                    </ul>
+            </div> 
+                    
+            <div class="tab-content pt-3">
+                <p>Permissions:</p>
+                <p class="error text-warning fst-italic" id="checkedPermissionsError_p"></p>
+                {foreach $roles as $role}
+                    <div    id="{$role['role_name']}_{$role['role_id']}" 
+                            class="tab-pane fade" 
+                            aria-labelledby="heading{$role['role_id']}">
+                        {foreach $role['permissions'] as $resource => $pia}
+                            <div class="mt-4">
+                                <span 
+                                    class="text-muted border p-2" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#{$role['role_id']}{$resource}_div" 
+                                    role="button"
+                                    aria-expanded="false" 
+                                    aria-controls="{$role['role_id']}{$resource}_div">
+                                    > Resource "{$resource}":
+                                </span>
+                                <div id="{$role['role_id']}{$resource}_div" class="collapse mt-2 ps-4 pt-2">
+                                    {foreach $pia as $ia}
+                                        <label class="text-muted border p-2 me-2 mb-2" >
+                                            <input  type="checkbox" 
+                                                    name="role_permissions[]" 
+                                                    value="{$role['role_id']}_{$ia['permission_id']}"
+                                            />
+                                            {$resource}: {$ia['action']}
+                                        </label>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        {/foreach}
+                    </div>
+                {/foreach}
+            </div>             
+
+            <div class="mt-4">
+                <input n:name=deletePermissions class="btn btn-primary">
+                <input name=deletePermissionsReset type="reset" class="btn btn-primary">
+            </div>
+    </form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function checkedPermissionsDelete() { 
+    const subm = document.querySelector('input[type="submit"][name="deletePermissions"]');
+    if (subm){
+        subm.addEventListener('click', function(event) {
+            const checkboxGroup = document.querySelectorAll('input[name="role_permissions[]"]');
+            const p_err = document.querySelector('#checkedPermissionsError_p');
+            let isChecked = Array.from(checkboxGroup).some(checkbox => checkbox.checked);
+            checkboxGroup[0].setCustomValidity(isChecked ? "" : p_err.innerHTML = "Choose permissions of role for deleting!");
+
+            if (!formPermissionsDelete.checkValidity()) {
+                event.preventDefault();
+            }
+        });
+    }
+}, false);
+</script>

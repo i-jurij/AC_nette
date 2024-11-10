@@ -1,0 +1,32 @@
+<ul class="nav nav-pills" id="myTabChild" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="btn btn-success my-3 me-3" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#home_group_page-tab-pane" aria-controls="home_group_page-tab-pane">Home group page</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="btn btn-danger my-3 me-3" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#admin_group_page-tab-pane" aria-controls="admin_group_page-tab-pane">Admin group page</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabChildContent">
+    <div class="tab-pane fade p-2" id="home_group_page-tab-pane" role="tabpanel" aria-labelledby="home_group_page-tab" tabindex="0">
+        {if !empty($homeTree)}
+            {include pages_tree from $shared_templates.'pages_tree.latte', $homeTree}
+        {else} 
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="parent_page" id="home_parent_page"  value="Home" autocomplete="off">
+                <label class="form-check-label" for="home_parent_page">Home</label>
+            </div>
+        {/if}
+    </div>
+
+    <div class="tab-pane fade p-2" id="admin_group_page-tab-pane" role="tabpanel" aria-labelledby="admin_group_page-tab" tabindex="0">
+        {if !empty($adminTree)}
+            {include pages_tree from $shared_templates.'pages_tree.latte', $adminTree}
+        {else} 
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="parent_page" id="cms_parent_page" value="Admin_Cms" autocomplete="off">
+                <label class="form-check-label" for="cms_parent_page">Admin</label>
+            </div>
+        {/if}
+    </div>
+</div>

@@ -1,0 +1,5 @@
+{block breadcrumbMenuHome}
+	<div n:ifset="$breadcrumb" n:inner-foreach="$breadcrumb as $item" aria-label="breadcrumb">
+        <a n:tag-if="!$iterator->last" n:href="$item['full']">{$item['short']}</a>
+	</div>
+{/block}

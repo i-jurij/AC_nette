@@ -1,0 +1,24 @@
+{define pages_tree, $items}
+<div class="d-flex  flex-wrap align-items-start">
+	{foreach $items as $key => $item}
+        {var $short = rtrim(Nette\Utils\Strings::after($key, ':', -2), ':')}
+		{var $pathValue = str_replace(":", "_", $key)}
+		{if is_array($item) && !empty($item)}
+            <div class="m-2 p-2 border rounded">
+                <div class="form-check form-check-inline">
+					<input type="radio" class="form-check-input" name="parent_page" id="{$pathValue}" value="{$pathValue}" autocomplete="off">
+					<label class="form-check-label" for="{$pathValue}">{$short}</label>
+				</div>
+                <div class="">
+			        {include pages_tree, $item}
+                </div>
+            </div>
+		{elseif is_array($item) && empty($item)}
+			<div class="form-check form-check-inline">
+				<input type="radio" class="form-check-input" name="parent_page" id="{$pathValue}" value="{$pathValue}" autocomplete="off">
+				<label class="form-check-label" for="{$pathValue}">{$short}</label>
+			</div>
+		{/if}
+	{/foreach}
+</div>
+{/define}

@@ -1,0 +1,30 @@
+{block flash}
+    {if !empty($flashes)}
+    <div class="modal flash" role="dialog" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Message:</h5>
+                <button type="button" class="btn-close flash_close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div n:inner-foreach="$flashes as $flash" class="modal-body">
+                <p class="{$flash->type} text-center">{$flash->message}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary flash_close" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    {/if}
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {   
+            let flash = document.querySelector('.modal.flash');     
+            if (flash){
+                const modal = new bootstrap.Modal(flash);
+			    modal.show();
+            }
+		});
+	</script>
+{/block}

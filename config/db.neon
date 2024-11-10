@@ -1,0 +1,14 @@
+database:
+	mysql:
+		dsn: 'mysql:host=127.0.0.1;dbname=AC'
+		user: 'root'
+		password: ''
+		autowired: true
+		options:
+			lazy: yes
+
+	sqlite:
+		dsn: "sqlite:%appDir%/Db/sqlite.db"
+		# autowired: true
+		options:
+			lazy: yes

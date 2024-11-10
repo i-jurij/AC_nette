@@ -1,0 +1,63 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Admin Simple CMS"}
+{var $description = "Admin Simple CMS"}
+{var $keywords = "Keywords of Admin page"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}	
+<form 
+    n:ifset="$data['files']" 
+    method="post" 
+    id="clearCacheForm" 
+    name="clearCacheForm"
+    action="">
+
+    <p n:ifset="$data['size']">
+        Total size is <span class="fw-bold">{$data['size']}</span> in <span class="fw-bold">{count($data['files'])}</span> files.
+        &nbsp
+        <button 
+            type="submit" 
+            class="btn btn-primary" 
+            form="clearCacheForm"
+            formaction="{link :Admin:Cache:clearAll}"
+        >
+            Clear All
+        </button>
+    </p>
+<div class="table-responsive" style="height: 55vh;">
+{foreach $data['files'] as $file}
+	<table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Check</th>
+                <th scope="col">Name</th>
+                <th scope="col">Size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {iterateWhile}
+            <tr id="row-{$iterator->counter}">
+                <th scope="row">{$iterator->counter}</th>
+                <td><input type="checkbox" name="clear_cache[]" value="{$file['file']}"></td>
+                <td>{$file['file']}</td>
+                <td>{$file['size']}</td>
+            </tr>
+            {/iterateWhile true}
+        </tbody>
+	</table>
+{/foreach}
+</div>
+<br>
+<input type="hidden" name="csrf" value="{$csrf}">
+<button 
+    type="submit" 
+    class="btn btn-primary" 
+    form="clearCacheForm"
+    formaction="{link :Admin:Cache:clear}"
+>
+    Clear
+</button>
+<button class="btn btn-secondary" type="reset">Reset</button>
+</form>

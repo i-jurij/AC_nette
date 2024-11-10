@@ -1,0 +1,9 @@
+constants:
+	APPDIR: %appDir%
+	WWWDIR: %wwwDir%
+	SITE_NAME: 'ACNettewww'
+	DEFAULT_IMAGE: 'images/ddd.jpg' # in www folder
+	CACHE_DIR: '../temp/cache'
+routing:
+	# cache: true
+   

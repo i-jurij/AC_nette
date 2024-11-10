@@ -1,0 +1,48 @@
+{block sidebar}
+<style>
+
+.btn_toggle::before {
+  width: 1.25em;
+  line-height: 0;
+  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+  transition: transform .35s ease;
+  transform-origin: .5em 50%;
+}
+
+[data-bs-theme="dark"] .btn_toggle::before {
+  content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255,255,255,.5%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+}
+
+.btn_toggle[aria-expanded="true"] {
+  color: rgba(var(--bs-emphasis-color-rgb), .85);
+}
+.btn_toggle[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
+a.dropdown-toggle {
+   border: none;
+   outline: none;
+   text-decoration: none;
+}
+</style>
+
+<div  class="collapse  show  flex-column align-items-start px-3 pt-2 mh-100 border-end"
+      id="sidebar"
+>
+    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="sidebar_ul_first">
+        {*
+        <li n:ifset="$dirList[':Admin:']">
+          {include menu_sidebar from $shared_templates.'menu_sidebar.latte', $dirList[':Admin:']}
+        </li>
+        *}
+        {if !empty($dirList[':Admin:'][":Admin:PageCreator:"])}
+          <a n:href=":Admin:PageCreator:" class="dropdown-toggle nav-link px-0 align-middle">
+            <span class="">PageCreator</span>
+          </a>
+          <ul class="nav flex-column ms-2 mb-3" id="PageCreator">
+            {include menu_sidebar from $shared_templates.'menu_sidebar.latte', $dirList[':Admin:'][":Admin:PageCreator:"]}
+          </ul>
+        {/if}
+    </ul>
+</div>
+{/block}

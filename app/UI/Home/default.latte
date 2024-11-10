@@ -1,0 +1,57 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Simple CMS"}
+{var $description = "Simple CMS"}
+{var $keywords = "Keywords of main page"}
+{var $robots = "INDEX,FOLLOW"}
+{var $data['content'] = 'CONTENT FOR DEL IN FUTURE'}
+
+{block content}
+	{ifset $pages_data}
+		{foreach $pages_data as $key => $page_data}
+			{var $page_alias = $page_data['alias'] }
+			{var $page_title = $page_data['title'] ?? 'Title '. $key}
+			{var $url = $page_alias ?? ''}
+			{if is_readable('{$basePath}/images/pages/{$page_alias}.jpg')}
+				{var $img_from_db = 'images/pages/{$page_alias}.jpg'}
+			{/if}		
+			{var $img = $img_from_db ?? 'images/ddd.jpg'}
+			{var $page_descr = $page_data['description'] ?? 'Description '. $key}
+			<article class="main_section_article ">
+					<a class="" href="{$baseUrl}/{$url}" >
+						<div class="main_section_article_imgdiv">
+							<img src="{$basePath}/{$img}" alt="Фото {$page_title}" class="main_section_article_imgdiv_img" />
+						</div>
+
+						<div class="main_section_article_content">
+							<h2 class="title is-5 article_title">{$page_title}</h2>
+							<span>{$page_descr}</span>
+						</div>
+					</a>
+			</article>
+		{/foreach}
+	{else}
+		{* output if no data in table pages from db *}	
+		{var $page_title = 'Title'}
+		{var $page_descr = 'Description'}
+		{var $url = ''}
+		{var $img =  'images/ddd.jpg'}
+			{capture $page}
+				<article class="main_section_article ">
+					<a class="" href="{$baseUrl}/{$url}" >
+						<div class="main_section_article_imgdiv">
+							<img src="{$basePath}/{$img}" alt="Фото {$page_title}" class="main_section_article_imgdiv_img" />
+						</div>
+
+						<div class="main_section_article_content">
+							<h2 class="title is-5 article_title">{$page_title}</h2>
+							<span>{$page_descr}</span>
+						</div>
+					</a>
+				</article>
+			{/capture}
+		
+		{$page}{$page}{$page}{$page}
+		{* end output if no data in table pages from db *}	
+	{/ifset}	
+{/block}

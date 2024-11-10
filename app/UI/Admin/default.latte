@@ -1,0 +1,14 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Admin Simple CMS"}
+{var $description = "Admin Simple CMS"}
+{var $keywords = "Keywords of Admin page"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+	{if (!empty($currentPageMenu) && is_array($currentPageMenu))}
+		{include menu from $shared_templates.'menu.latte', $currentPageMenu}
+	{else}
+		Admin main page
+	{/if}
+{/block}
