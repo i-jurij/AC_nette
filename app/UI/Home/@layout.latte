@@ -30,14 +30,15 @@
 		</div>
 	</div>
 
-	<div class="header_main">
+	<!-- header and main -->
+	<div>
 
 		{include header from '@layout-header.latte'}
 		
 		<main class="main_section">
 			{include breadcrumbMenuHome from $shared_templates.'breadcrumb_home.latte'}
 			
-			<!-- <h1 class="m05p05 rounded center shadow bgcontent main_title">{$title}</h1> -->
+			<!-- <h1 class="rounded center shadow bgcontent main_title">{$title}</h1> -->
 			<div class="center">
 				{include content}	
 			</div>
@@ -50,7 +51,7 @@
 		{include footer from '@layout-footer.latte'} 
 	</footer>
 
-	<div !n:if="$user->isLoggedIn()"class="center">
+	<div n:if="!$user->isLoggedIn()"class="center">
 		<a n:href=":Admin:" style="color:var(--bgcolor-content);">-&nbsp;&nbsp;&nbsp;</a>
 	</div>
 	

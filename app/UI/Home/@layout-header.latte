@@ -2,7 +2,7 @@
 
 <div id="geoLocationDiv"></div>
 
-		<div n:if="isset($client) && $client->isLoggedIn()" style="text-align:right;">
+		<div n:if="isset($user) && $user->isLoggedIn()" style="text-align:right;">
 			<a n:href="Sign:out">Выйти</a>
 		</div>
     HEADER

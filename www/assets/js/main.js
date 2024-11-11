@@ -799,7 +799,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**!
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
 /* harmony import */ var nette_forms__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(53);
@@ -823,9 +823,40 @@ function closeFlash() {
     }
 }
 document.addEventListener('DOMContentLoaded', closeFlash());
+
+/* geolocation */
+const gloc = document.getElementById("geoLocationDiv");
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            gloc.innerHTML = "User denied the request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            gloc.innerHTML = "Location information is unavailable."
+            break;
+        case error.TIMEOUT:
+            gloc.innerHTML = "The request to get user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            gloc.innerHTML = "An unknown error occurred."
+            break;
+    }
+}
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        showError(error);
+    }
+}
+
+function showPosition(position) {
+    gloc.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
+}
 })();
 
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
 // extracted by mini-css-extract-plugin
