@@ -20,9 +20,8 @@
 
 <body>
 	<div class="header_main">
-		<div n:foreach="$flashes as $flash" class="flash {$flash->type}">
-			<div class="flash_child">{$flash->message}</div>
-		</div>
+		{include flashNoBootstrap from '../../shared_templates/flashNoBootstrap.latte'}	
+		
 		<main class="main_section">
 			<div class="center">
 				{include content}	

@@ -28,19 +28,6 @@ final class SignPresenter extends \App\UI\Home\BasePresenter
         $form->setHtmlAttribute('id', 'log_in_app')
             ->setHtmlAttribute('class', 'form');
 
-        $form->addGroup('');
-        $form->addCaptcha('captcha', 'Captcha error. Re-enter captcha.');
-
-        $form->addGroup('');
-        $form->addSubmit('send', 'Signin');
-
-        /*
-        $form->addGroup('--- § ---');
-        $url_politic = $this->link(':Politic:');
-        $form->addButton('politic', Html::el('div')->setHtml('<a href="'.$url_politic.'">Политика обработки персональных данных</a>'))
-            ->setHtmlAttribute('class', 'pseudo');
-        */
-
         $form->onSuccess[] = $this->userLogin(...);
 
         return $form;
@@ -89,7 +76,7 @@ final class SignPresenter extends \App\UI\Home\BasePresenter
     private function userLogin(Form $form, \stdClass $data): void
     {
         try {
-            $user->login($data->username, $data->password);
+            $this->getUser()->login($data->username, $data->password);
             $this->restoreRequest($this->backlink);
 
             $this->redirect(':Home:');
