@@ -21,16 +21,7 @@
 <body>
 	<div class="header_main">
 
-		<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash"  id="flash_message">
-			<div class="bgcontent flash_child ">
-				<p class="m2 p2 round {$flash->type}">{$flash->message}</p>
-				<p id="for_button_close_insert">
-					<noscript>
-						<a n:href=':Home:' class="button">Close</a>
-					</noscript>
-				</p>
-			</div>
-		</div>
+		{include flashNoBootstrap from '../../shared_templates/flashNoBootstrap.latte'}	
 
 		<main class="main_section">
 			<div class="center">
