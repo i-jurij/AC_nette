@@ -45,7 +45,12 @@ $client = 'CREATE TABLE IF NOT EXISTS "client"
 		"created_at" TEXT NOT NULL DEFAULT current_timestamp,
 		"updated_at" TEXT NOT NULL DEFAULT current_timestamp
 	)';
-
+$role_client = 'CREATE TABLE IF NOT EXISTS "role_client" 
+	(	
+		"role_id" INTEGER NOT NULL, 
+		"user_id" INTEGER NOT NULL,
+		PRIMARY KEY ("role_id", "user_id")
+	)';
 $page = 'CREATE TABLE IF NOT EXISTS page
 	(	"id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
 		"alias" VARCHAR(100) UNIQUE  ON CONFLICT ROLLBACK NOT NULL,
@@ -72,4 +77,5 @@ $create_sqls = [
     'role_user' => $role_user,
     'page' => $page,
     'client' => $client,
+    'role_client' => $role_client
 ];
