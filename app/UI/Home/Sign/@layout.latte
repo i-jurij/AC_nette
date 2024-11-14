@@ -5,7 +5,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="description" content="{default $description='Description'}{$description}">
   	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
-	<meta name="Robots" content="{default $robots = 'INDEX, FOLLOW'}{$robots}">
+	<meta name="Robots" content="{default $robots = 'NOINDEX, NOFOLLOW'}{$robots}">
   	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="author" content="I-Jurij">
@@ -18,27 +18,12 @@
 
 </head>
 
-<body style="">
-	<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash"  id="flash_message">
-		<div class="bgcontent flash_child ">
-			<p class="m2 p2 round {$flash->type}">{$flash->message}</p>
-			<p id="for_button_close_insert">
-				<noscript>
-					<a n:href=':Home:' class="button">Close</a>
-				</noscript>
-			</p>
+<body>
+	<div class="header_main">
+		<div n:foreach="$flashes as $flash" class="flash {$flash->type}">
+			<div class="flash_child">{$flash->message}</div>
 		</div>
-	</div>
-
-	<!-- header and main -->
-	<div>
-
-		{include header from '@layout-header.latte'}
-		
 		<main class="main_section">
-			{include breadcrumbMenuHome from $shared_templates.'breadcrumb_home.latte'}
-			
-			<!-- <h1 class="rounded center shadow bgcontent main_title">{$title}</h1> -->
 			<div class="center">
 				{include content}	
 			</div>
@@ -47,10 +32,18 @@
 
 	<div class="spacer"></div>
 
-	<footer class="main_footer">
-		{include footer from '@layout-footer.latte'} 
-	</footer>
-	
-	<script src="{webpack js/main.js}"></script>
+	<footer class="main_footer"></footer>
+
+	{block scripts}
+		<script src="{webpack js/main.js}"></script>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {   
+				let captcha = document.querySelector('input[name="captcha[question]"]');     
+				if (captcha){
+					captcha.placeholder = 'Captcha:';
+				}
+			});
+		</script>
+	{/block}
 </body>
 </html>

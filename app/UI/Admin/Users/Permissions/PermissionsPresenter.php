@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace App\UI\Admin\Users\Permissions;
 
 use App\Model\PermissionFacade;
-use App\UI\Accessory\RequireLoggedUser;
 use Nette\Application\UI\Form;
 
 /**
  * @property PermissionsTemplate $template
  */
-final class PermissionsPresenter extends \App\UI\BasePresenter
+final class PermissionsPresenter extends \App\UI\Admin\BasePresenter
 {
-    // Incorporates methods to check user login status
-    use RequireLoggedUser;
-
     public string $backlink;
     protected $user_data;
 

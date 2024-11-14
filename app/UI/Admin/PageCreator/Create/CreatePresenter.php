@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\UI\Admin\PageCreator\Create;
 
 use Nette\Application\UI\Form;
-use Nette\Security\User;
 
-final class CreatePresenter extends \App\UI\BasePresenter
+final class CreatePresenter extends \App\UI\Admin\BasePresenter
 {
-    // Incorporates methods to check user login status
-    use \App\UI\Accessory\RequireLoggedUser;
     use \App\UI\Accessory\LinkFromFileSystem;
 
     public function renderDefault()

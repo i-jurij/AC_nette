@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\UI\Accessory;
 
-use App\Model\UserFacade;
 use Nette\Application\UI\Form;
 // use Nette\Localization\Translator;
 use Nette\Security\User;
@@ -19,8 +18,7 @@ final class FormFactory
      */
     public function __construct(
         // private Translator $translator,
-        private User $user,
-        private UserFacade $userFacade,
+        private User $user
     ) {
     }
 
@@ -58,7 +56,7 @@ final class FormFactory
         $form->addPassword('password', 'Password:')
             ->setHtmlAttribute('placeholder', 'Password:')
             ->setRequired('Password is required.')
-            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', $this->userFacade::PasswordMinLength)
+            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120);
 
         return $form;

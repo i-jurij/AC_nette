@@ -11,9 +11,8 @@ use Nette\Utils\Finder;
 /**
  * @property LogsTemplate $template
  */
-final class LogsPresenter extends \App\UI\BasePresenter
+final class LogsPresenter extends \App\UI\Admin\BasePresenter
 {
-    use \App\UI\Accessory\RequireLoggedUser;
     use \App\UI\Accessory\HumanSize;
     use \App\UI\Accessory\ClearFile;
 

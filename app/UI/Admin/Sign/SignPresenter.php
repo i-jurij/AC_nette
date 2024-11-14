@@ -1,12 +1,12 @@
 <?php
 
-namespace App\UI\Sign;
+namespace App\UI\Admin\Sign;
 
-use App\Model\UserFacade;
 use App\UI\Accessory\FormFactory;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
+use Nette\Security\User;
 use Nette\Utils\Html;
 
 final class SignPresenter extends Nette\Application\UI\Presenter
@@ -19,7 +19,6 @@ final class SignPresenter extends Nette\Application\UI\Presenter
 
     // Dependency injection of form factory and user management facade
     public function __construct(
-        private UserFacade $userFacade,
         private FormFactory $formFactory
     ) {
     }
@@ -27,7 +26,7 @@ final class SignPresenter extends Nette\Application\UI\Presenter
     protected function createComponentSignInForm(): Form
     {
         $form = $this->formFactory->createLoginForm();
-        $form->setHtmlAttribute('id', 'enter_to_admin')
+        $form->setHtmlAttribute('id', 'log_in_app')
             ->setHtmlAttribute('class', 'form');
 
         $form->addGroup('');
@@ -48,6 +47,18 @@ final class SignPresenter extends Nette\Application\UI\Presenter
         return $form;
     }
 
+    private function userLogin(Form $form, \stdClass $data): void
+    {
+        try {
+            $this->getUser()->login($data->username, $data->password);
+            $this->restoreRequest($this->backlink);
+
+            $this->redirect(':Admin:');
+        } catch (Nette\Security\AuthenticationException $e) {
+            $form->addError('Wrong login or password.');
+        }
+    }
+
     public function createComponentSignUpForm()
     {
         $form = $this->formFactory->createLoginForm();
@@ -59,7 +70,7 @@ final class SignPresenter extends Nette\Application\UI\Presenter
             ->setHtmlAttribute('placeholder', 'Confirm password:')
             ->setRequired('Enter password again')
             ->addRule($form::Equal, 'Password mismatch', $form['password'])
-            ->addRule($form::MinLength, 'Minimum password length %d characters', $this->userFacade::PasswordMinLength)
+            ->addRule($form::MinLength, 'Minimum password length %d characters', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120)
             ->setOmitted();
 
@@ -88,34 +99,12 @@ final class SignPresenter extends Nette\Application\UI\Presenter
         return $form;
     }
 
-    private function userLogin(Form $form, \stdClass $data): void
-    {
-        try {
-            $this->getUser()->login($data->username, $data->password);
-            $this->restoreRequest($this->backlink);
-            /*
-            if ($this->getUser()->isInRole('user')) {
-                $this->redirect('Home:');
-            } elseif ($this->getUser()->isInRole('master')
-                || $this->getUser()->isInRole('moder')
-                || $this->getUser()->isInRole('admin')
-            ) {
-                $this->redirect('Admin:');
-            }
-            */
-
-            $this->redirect('Admin:');
-        } catch (Nette\Security\AuthenticationException $e) {
-            $form->addError('Wrong login or password.');
-        }
-    }
-
     private function processSignUpForm(Form $form, \stdClass $data): void
     {
         try {
             // register user
             $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
-            $this->redirect(':Sign:in');
+            $this->redirect(':Admin:Sign:in');
         } catch (Exception $e) {
             $form->addError('Unknown error.');
         }
@@ -125,7 +114,7 @@ final class SignPresenter extends Nette\Application\UI\Presenter
     {
         $this->getUser()->logout(true);
         $this->flashMessage('Log out');
-        $this->redirect('Home:');
+        $this->redirect(':Admin:');
         // $this->forward('Home:');
     }
 }

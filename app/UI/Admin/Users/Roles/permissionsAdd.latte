@@ -73,9 +73,12 @@
             </div>
     </form>
 </div>
+
+{default $rip = $roles_isset_permissions ?? []}
+
 <script>
 document.addEventListener("DOMContentLoaded", function isset_permissions() { 
-    let rip = JSON.parse({json_encode($roles_isset_permissions)});
+    let rip = JSON.parse({json_encode($rip)});
 
     const role = document.querySelectorAll('input[type="radio"][name="role"]');
     if (role){

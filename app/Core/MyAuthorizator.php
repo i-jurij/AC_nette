@@ -9,7 +9,7 @@ use Nette\Database\Connection;
 
 class MyAuthorizator implements Nette\Security\Authorizator
 {
-    public function __construct(private Connection $sqlite)
+    public function __construct(private Connection $db)
     {
     }
 
@@ -42,6 +42,7 @@ class MyAuthorizator implements Nette\Security\Authorizator
 
     private function getRolePermissionData(): array
     {
+        $result = [];
         $query = 'SELECT
                         r.role_name,
                         p.resource,
@@ -55,7 +56,7 @@ class MyAuthorizator implements Nette\Security\Authorizator
                         `permission` AS p
                         ON p.id = rp.permission_id';
 
-        foreach ($this->sqlite->query($query) as $row) {
+        foreach ($this->db->query($query) as $row) {
             $result[] = [
                 'role_name' => $row->role_name,
                 'resource' => $row->resource,

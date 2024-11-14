@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Model\UserFacade;
-// use App\Model\UserTableColumns;
 use Nette;
 use Nette\Database\Explorer;
 use Nette\Security\AuthenticationException;
@@ -13,13 +12,12 @@ use Nette\Security\IIdentity;
 use Nette\Security\Passwords;
 use Nette\Security\SimpleIdentity;
 
-final class MyAuthenticator implements Nette\Security\Authenticator, Nette\Security\IdentityHandler
+class Authenticator implements Nette\Security\Authenticator, Nette\Security\IdentityHandler
 {
     // Dependency injection of database explorer and password utilities
     public function __construct(
-        private Explorer $sqlite,
+        private Explorer $db,
         private Passwords $passwords,
-        // private UserTableColumns $u_T_C,
         private UserFacade $userfacade,
     ) {
     }
@@ -31,13 +29,13 @@ final class MyAuthenticator implements Nette\Security\Authenticator, Nette\Secur
     public function authenticate(string $username, string $password): SimpleIdentity
     {
         // Fetch the user details from the database by username
-        $user = $this->sqlite->table($this->userfacade::TableName)
+        $user = $this->db->table($this->userfacade->table)
             ->where($this->userfacade::ColumnName, $username)
             ->fetch();
 
         // Authentication checks
         if (!$user) {
-            throw new AuthenticationException('The username is incorrect.', $this->userfacade::IdentityNotFound);
+            throw new AuthenticationException('The username is incorrect.', self::IdentityNotFound);
         } elseif (!$this->passwords->verify($password, $user[$this->userfacade::ColumnPasswordHash])) {
             throw new AuthenticationException('The password is incorrect.', self::InvalidCredential);
         } elseif ($this->passwords->needsRehash($user[$this->userfacade::ColumnPasswordHash])) {
@@ -65,7 +63,7 @@ final class MyAuthenticator implements Nette\Security\Authenticator, Nette\Secur
     public function wakeupIdentity(IIdentity $identity): ?SimpleIdentity
     {
         // заменить идентификатор прокси на полный идентификатор, как в authenticate()
-        $row = $this->sqlite->table($this->userfacade::TableName)
+        $row = $this->db->table($this->userfacade->table)
             ->where($this->userfacade::ColumnAuthToken, $identity->getId())
             ->fetch();
         if (!empty($row)) {

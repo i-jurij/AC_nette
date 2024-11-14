@@ -10,32 +10,40 @@ use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 use Nette\Database\UniqueConstraintViolationException;
+use Nette\Http\Request;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
 /**
  * Manages user-related operations such as authentication and adding new users.
  */
-final class UserFacade extends UserTableColumns
+class UserFacade
 {
-    use \App\UI\Accessory\RequireLoggedUser;
+    use \App\UI\Accessory\TableForUserFacade;
 
-    // Minimum password length requirement for users
-    public const PasswordMinLength = 7;
-    protected Selection $table;
+    public string $table;
+    private string $table_role_user;
 
     // Dependency injection of database explorer and password utilities
     public function __construct(
-        public Explorer $sqlite,
+        public Explorer $db,
         private Passwords $passwords,
+        public readonly Request $request,
     ) {
-        $this->table = $this->sqlite->table(self::TableName);
+        $url_path = $this->request->getUrl()->getPath();
+        if ((bool) \mb_stristr($url_path, 'admin')) {
+            $this->table = USER_TABLE;
+            $this->table_role_user = 'role_'.USER_TABLE;
+        } else {
+            $this->table = CLIENT_TABLE;
+            $this->table_role_user = 'role_'.CLIENT_TABLE;
+        }
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function getAllUsersData(): Selection
     {
-        $users_data = $this->table->select($this->getColumns());
+        $users_data = $this->db->table($this->table)->select($this->getColumns());
 
         return $users_data;
     }
@@ -43,7 +51,7 @@ final class UserFacade extends UserTableColumns
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function getUserData($id): ActiveRow
     {
-        $user_data = $this->table->select($this->getColumns())->get($id);
+        $user_data = $this->db->table($this->table)->select($this->getColumns())->get($id);
 
         return $user_data;
     }
@@ -52,8 +60,8 @@ final class UserFacade extends UserTableColumns
     public function deleteUserData($id): void
     {
         try {
-            $this->table->where('id', $id)->delete();
-            $this->sqlite->table('role_user')->where('user_id', $id)->delete();
+            $this->db->table($this->table)->where('id', $id)->delete();
+            $this->db->table($this->table_role_user)->where('user_id', $id)->delete();
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -62,28 +70,28 @@ final class UserFacade extends UserTableColumns
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function countUsers()
     {
-        return $count = count($this->table);
+        return $count = count($this->db->table($this->table));
     }
 
     /**
      * Add a new user to the database.
      * Throws a DuplicateNameException if the username is already taken.
      */
-    public function shortAdd(string $username, string $password): void
+    public function shortAdd(string $username, string $password, string $table): void
     {
         try {
-            $role_admin_id = $this->sqlite->table('role')
+            $role_admin_id = $this->db->table('role')
                 ->select('id')
                 ->where('role_name', 'admin')
                 ->fetch();
-            $row = $this->sqlite->table(self::TableName)->insert([
+            $row = $this->db->table($table)->insert([
                 self::ColumnName => $username,
                 self::ColumnPasswordHash => $this->passwords->hash($password),
                 self::ColumnAuthToken => $this->token(),
             ]);
 
             // insert into users_roles users (first admin user) id, role "admin" id
-            $this->sqlite->table('role_user')->insert([
+            $this->db->table($this->table_role_user)->insert([
                 'user_id' => $row->id,
                 'role_id' => $role_admin_id['id'],
             ]);
@@ -117,12 +125,12 @@ final class UserFacade extends UserTableColumns
     public function add($data): void // object
     {
         try {
-            $new_user = $this->sqlite->table(self::TableName)
+            $new_user = $this->db->table($this->table)
                 ->insert($this->prepareAddFormData($data));
 
             if (\is_array($data->roles)) {
                 foreach ($data->roles as $id) {
-                    $this->sqlite->table('role_user')->insert([
+                    $this->db->table($this->table_role_user)->insert([
                         'user_id' => $new_user->id,
                         'role_id' => $id,
                     ]);
@@ -154,14 +162,14 @@ final class UserFacade extends UserTableColumns
                 }
             }
 
-            $user = $this->sqlite->table(self::TableName);
+            $user = $this->db->table($this->table);
 
             if (!empty($update_data)) {
                 $user->where('id', $id)->update($update_data);
             }
 
             if (!empty($data['roles']) && is_array($data['roles'])) {
-                if ($user->get($id)->related('role_user.user_id')->delete() > 0) {
+                if ($user->get($id)->related($this->table_role_user.'.user_id')->delete() > 0) {
                     unset($user);
                 }
                 $roles = [];
@@ -171,7 +179,7 @@ final class UserFacade extends UserTableColumns
                         'role_id' => $role_id,
                     ];
                 }
-                $this->sqlite->table('role_user')->insert($roles);
+                $this->db->table($this->table_role_user)->insert($roles);
             }
         } catch (Exception $e) {
             throw new Exception();
@@ -187,13 +195,13 @@ final class UserFacade extends UserTableColumns
     {
         $roles_ids = [];
 
-        $roles_ids_sql = $this->sqlite->table('role_user')
+        $roles_ids_sql = $this->db->table($this->table_role_user)
             ->select('role_id')
             ->where('user_id', $user_id);
         foreach ($roles_ids_sql as $role_id) {
             $roles_ids[] = $role_id['role_id'];
         }
-        $roles_sql = $this->sqlite->table('role')
+        $roles_sql = $this->db->table('role')
             ->where('id', $roles_ids);
 
         return $roles_sql;
@@ -237,7 +245,7 @@ final class UserFacade extends UserTableColumns
         $users_data = null;
         $pre_data = $this->prepareSearch($data);
         if (!empty($pre_data)) {
-            $query = $this->table;
+            $query = $this->db->table($this->table);
 
             if (!empty($pre_data[self::ColumnName])) {
                 $username = $pre_data[self::ColumnName];
@@ -263,7 +271,7 @@ final class UserFacade extends UserTableColumns
                     'updated_at' => $user->updated_at,
                 ];
 
-                foreach ($user->related('role_user.user_id') as $row) {
+                foreach ($user->related($this->table_role_user.'.user_id') as $row) {
                     $users_data[$user->id]['roles'][] = $row->ref('role', 'role_id');
                     if (!empty($pre_data['roles'])) {
                         if (!\in_array($row->role_id, $pre_data['roles'])) {

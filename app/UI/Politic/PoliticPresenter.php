@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\UI\Politic;
 
 use Michelf\MarkdownExtra;
-use Nette;
 use Nette\Application\Responses;
 use Nette\Utils\Html;
 
@@ -39,7 +38,6 @@ final class PoliticPresenter extends \App\UI\BasePresenter // \Nette\Application
 }
 class PoliticTemplate extends \App\UI\BaseTemplate
 {
-    public Nette\Security\User $user;
     public string $basePath;
     public string $baseUrl;
     public array $flashes;

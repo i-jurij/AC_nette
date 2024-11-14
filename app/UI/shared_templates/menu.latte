@@ -9,7 +9,7 @@
 			        {include menu, $item}
                 </div>
             </div>
-		{elseif is_array($item) && empty($item)}
+		{elseif is_array($item) && empty($item) && !\mb_stristr($key, 'sign')}
 			<a class="btn btn-secondary m-2" n:href="$key">{$short}</a>
 		{/if}
 	{/foreach}

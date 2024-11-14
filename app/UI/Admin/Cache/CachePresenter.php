@@ -6,17 +6,13 @@ namespace App\UI\Admin\Cache;
 
 use App\UI\Accessory\CacheCleaner;
 use App\UI\Accessory\ErrorFlashMessage;
-use App\UI\Accessory\RequireLoggedUser;
-use Nette\Security\User;
 use Nette\Utils\FileSystem;
 
 /**
  * @property CacheTemplate $template
  */
-final class CachePresenter extends \App\UI\BasePresenter
+final class CachePresenter extends \App\UI\Admin\BasePresenter
 {
-    // Incorporates methods to check user login status
-    use RequireLoggedUser;
     use CacheCleaner;
     use ErrorFlashMessage;
 

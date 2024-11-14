@@ -1,10 +1,9 @@
 {block header}
 
 <div id="geoLocationDiv"></div>
-
-		<div n:if="isset($user) && $user->isLoggedIn()" style="text-align:right;">
-			<a n:href="Sign:out">Выйти</a>
-		</div>
-    HEADER
-
+<header class="p2 center">
+	<a class="button">City</a>
+	<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Enter</a>
+	<a class="button" n:if="isset($user) && $user->isLoggedIn()" n:href=":Home:Sign:out">Logout</a>
+</header>
 {/block}

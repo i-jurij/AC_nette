@@ -6,17 +6,13 @@ namespace App\UI\Admin\Users;
 
 use App\Model\UserFacade;
 use App\UI\Accessory\FormFactory;
-use App\UI\Accessory\RequireLoggedUser;
 use Nette\Application\UI\Form;
 
 /**
  * @property UsersTemplate $template
  */
-final class UsersPresenter extends \App\UI\BasePresenter
+final class UsersPresenter extends \App\UI\Admin\BasePresenter
 {
-    // Incorporates methods to check user login status
-    use RequireLoggedUser;
-
     protected $user_data;
     public $postsearch;
 
@@ -45,7 +41,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
         $this->template->lastPage = $lastPage;
 
         foreach ($users_data as $user) {
-            // $roles[$user->id] = $this->roleWithUserId($this->userfacade->sqlite, $user->id);
+            // $roles[$user->id] = $this->roleWithUserId($this->userfacade->db, $user->id);
             $roles[$user->id] = $this->userfacade->roleWithUserId($user->id);
         }
         $this->template->users_roles = $roles;
@@ -85,13 +81,13 @@ final class UsersPresenter extends \App\UI\BasePresenter
 
         $form->addPassword('password', 'Password:')
             ->setHtmlAttribute('placeholder', 'Password:')
-            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', $this->userfacade::PasswordMinLength)
+            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120);
 
         $form->addPassword('passwordVerify', 'PasswordVerify')
             ->setHtmlAttribute('placeholder', 'Confirm password:')
             ->addRule($form::Equal, 'Несоответствие пароля', $form['password'])
-            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', $this->userfacade::PasswordMinLength)
+            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120)
             ->setOmitted();
 
@@ -104,7 +100,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
         $form->addEmail('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:');
 
-        $roles = $this->userfacade->sqlite->table('role');
+        $roles = $this->userfacade->db->table('role');
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }
@@ -125,7 +121,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
             $this->error('Forbidden', 403);
         }
         $this->template->user_data = $this->userfacade->getUserData($id);
-        // $this->template->user_roles = $this->roleWithUserId($this->userfacade->sqlite, $id);
+        // $this->template->user_roles = $this->roleWithUserId($this->userfacade->db, $id);
         $this->template->user_roles = $this->userfacade->roleWithUserId($id);
     }
 
@@ -188,7 +184,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
             ->setHtmlAttribute('placeholder', 'Confirm password:')
             ->setRequired('Введите пароль ещё раз, чтобы проверить опечатки')
             ->addRule($form::Equal, 'Несоответствие пароля', $form['password'])
-            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', $this->userfacade::PasswordMinLength)
+            ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120)
             ->setOmitted();
 
@@ -200,7 +196,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
         $form->addEmail('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:');
 
-        $roles = $this->userfacade->sqlite->table('role');
+        $roles = $this->userfacade->db->table('role');
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }
@@ -249,7 +245,7 @@ final class UsersPresenter extends \App\UI\BasePresenter
         $form->addText('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:')
             ->setMaxLength(125);
-        $roles = $this->userfacade->sqlite->table('role');
+        $roles = $this->userfacade->db->table('role');
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }

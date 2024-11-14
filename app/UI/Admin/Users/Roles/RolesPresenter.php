@@ -7,14 +7,10 @@ namespace App\UI\Admin\Users\Roles;
 use App\Model\PermissionFacade;
 use App\Model\RoleFacade;
 use App\UI\Accessory\FormFactory;
-use App\UI\Accessory\RequireLoggedUser;
 use Nette\Application\UI\Form;
 
-final class RolesPresenter extends \App\UI\BasePresenter
+final class RolesPresenter extends \App\UI\Admin\BasePresenter
 {
-    // Incorporates methods to check user login status
-    use RequireLoggedUser;
-
     public string $backlink;
     protected $user_data;
 
@@ -134,7 +130,7 @@ final class RolesPresenter extends \App\UI\BasePresenter
     public function actionPermissionsAdd()
     {
         foreach ($this->rf->role_permission as $row) {
-            $this->template->roles_isset_permissions['role_'.$row->role_id][] = $row->permission_id;
+            $this->template->roles_isset_permissions['role_'.$row->role_id][] = $row->permission_id ?? [];
         }
     }
 
@@ -182,6 +178,7 @@ final class RolesPresenter extends \App\UI\BasePresenter
 
     public function actionPermissionsDelete()
     {
+        $roles = [];
         foreach ($this->rf->role as $role) {
             $permissions = [];
             foreach ($role->related('role_permission.role_id') as $role_permission) {
@@ -237,4 +234,10 @@ final class RolesPresenter extends \App\UI\BasePresenter
         }
         $this->redirect(':Admin:');
     }
+}
+
+class RolesTemplate extends \App\UI\Admin\BaseTemplate
+{
+    public array $roles_isset_permissions;
+    public array $roles;
 }

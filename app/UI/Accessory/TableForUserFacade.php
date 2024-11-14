@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\UI\Accessory;
 
-class UserTableColumns
+trait TableForUserFacade
 {
-    // Database table and column names
-    public const TableName = 'user';
     public const ColumnId = 'id';
     public const ColumnName = 'username';
     public const ColumnImage = 'image';
@@ -24,9 +22,6 @@ class UserTableColumns
     {
         $ref = new \ReflectionClass(__CLASS__);
         $column_array = $ref->getConstants();
-        if (isset($column_array['TableName'])) {
-            unset($column_array['TableName']);
-        }
 
         return \implode(', ', $column_array);
     }

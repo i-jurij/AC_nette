@@ -60,17 +60,16 @@ function migrate(object $container, string $path_to_sql_file)
 
 function userAdd(object $container, array $argv)
 {
-    $user_add_to_db = $container->getByType(App\Model\UserFacade::class);
-    $table = $user_add_to_db::TableName;
-    $admin = $user_add_to_db->sqlite->table('role')->select('id')->where('role_name', 'admin')->fetch();
+    $userFacade = $container->getByType(App\Model\UserFacade::class);
+    $admin = $userFacade->db->table('role')->select('id')->where('role_name', 'admin')->fetch();
 
     // check if at least one users with admin role isset
-    $admin_isset = $user_add_to_db->sqlite->table('role_user')->select('count(*)')->where('role_id', $admin['id'])->fetch();
+    $admin_isset = $userFacade->db->table('role_user')->select('count(*)')->where('role_id', $admin['id'])->fetch();
 
     if (empty($admin_isset['count(*)'])) {
         try {
             [,, $username, $password] = $argv;
-            $user_add_to_db->shortAdd($username, $password);
+            $userFacade->shortAdd($username, $password, 'user');
             echo "User $username was added.\n";
             exit(1);
         } catch (App\Model\DuplicateNameException $e) {

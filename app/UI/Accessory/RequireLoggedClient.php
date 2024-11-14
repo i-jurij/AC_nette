@@ -8,13 +8,13 @@ namespace App\UI\Accessory;
  * Trait to enforce user authentication.
  * Redirects unauthenticated users to the sign-in page.
  */
-trait RequireLoggedUser
+trait RequireLoggedClient
 {
     /**
      * Injects the requirement for a logged-in user.
      * Attaches a callback to the startup event of the presenter.
      */
-    public function injectRequireLoggedUser(): void
+    public function RequireLoggedClient(): void
     {
         $this->onStartup[] = function () {
             $user = $this->getUser();
@@ -23,9 +23,9 @@ trait RequireLoggedUser
                 return;
             } elseif ($user->getLogoutReason() === $user::LogoutInactivity) {
                 $this->flashMessage('You have been signed out due to inactivity. Please sign in again.');
-                $this->redirect(':Admin:Sign:in', ['backlink' => $this->storeRequest()]);
+                $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
             } else {
-                $this->redirect(':Admin:Sign:in');
+                $this->redirect(':Home:Sign:in');
             }
         };
     }
