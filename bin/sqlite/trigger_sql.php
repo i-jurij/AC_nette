@@ -33,7 +33,7 @@ $trigger_sqls = [
     'clients' => $clients_updated_at_trigger,
 ];
 */
-foreach (['users', 'pages', 'clients'] as $value) {
+foreach (['user', 'page', 'client'] as $value) {
     $trigger_sqls[$value] = [
         "CREATE TRIGGER update_$value_updated_at
 			AFTER UPDATE ON $value
