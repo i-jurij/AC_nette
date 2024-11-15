@@ -59,12 +59,6 @@ final class FormFactory
             ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120);
 
-        $form->addGroup('');
-        $form->addCaptcha('captcha', 'Captcha error. Re-enter captcha.');
-
-        $form->addGroup('');
-        $form->addSubmit('send', 'Signin');
-
         return $form;
     }
 }

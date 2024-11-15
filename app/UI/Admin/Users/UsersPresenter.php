@@ -117,42 +117,44 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
 
     public function renderEdit(int $id): void
     {
-        if (!$this->getUser()->isAllowed('User', 'update')) {
-            $this->error('Forbidden', 403);
+        if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('User', 'update')) {
+            $this->template->user_data = $this->userfacade->getUserData($id);
+            $this->template->user_roles = $this->userfacade->roleWithUserId($id);
+        } else {
+            $this->flashMessage('You don\'t have permission for this', 'text-warning');
+            $this->redirect(':Admin:');
         }
-        $this->template->user_data = $this->userfacade->getUserData($id);
-        // $this->template->user_roles = $this->roleWithUserId($this->userfacade->db, $id);
-        $this->template->user_roles = $this->userfacade->roleWithUserId($id);
     }
 
     #[Requires(methods: 'POST')]
     public function update(Form $form, $data): void
     {
-        if (!$this->getUser()->isAllowed('User', 'update')) {
-            $this->error('Forbidden', 403);
-        }
-        // update profile throw UserFacade? and show profile again with updated data;
-        try {
-            $id = $data->id;
-            unset($data->id);
-            $update = array_filter((array) $data);
-            if (!empty($update)) {
-                if ($this->getUser()->isInRole('admin') || $this->getUser()->getIdentity()->getId() == $id) {
-                    $this->userfacade->update($id, $update);
-                    $this->flashMessage(\json_encode($update).' User updated', 'text-success');
+        if (($this->getUser()->getId() == $data->id) || $this->getUser()->isAllowed('User', 'update')) {
+            // update profile throw UserFacade? and show profile again with updated data;
+            try {
+                $id = $data->id;
+                unset($data->id);
+                $update = array_filter((array) $data);
+                if (!empty($update)) {
+                    if ($this->getUser()->isInRole('admin') || $this->getUser()->getIdentity()->getId() == $id) {
+                        $this->userfacade->update($id, $update);
+                        $this->flashMessage(\json_encode($update).' User updated', 'text-success');
+                    } else {
+                        $this->flashMessage($this->getUser()->getIdentity()->getId().'/'.$id.'/'.\json_encode($update).'You not permissions for user data updating');
+                    }
                 } else {
-                    $this->flashMessage($this->getUser()->getIdentity()->getId().'/'.$id.'/'.\json_encode($update).'You not permissions for user data updating');
+                    $this->flashMessage('Nothing was updated', 'text-success');
                 }
-            } else {
-                $this->flashMessage('Nothing was updated', 'text-success');
+            } catch (\Exception $e) {
+                $this->flashMessage('Caught Exception!'.PHP_EOL
+                    .'Error message: '.$e->getMessage().PHP_EOL
+                    .'File: '.$e->getFile().PHP_EOL
+                    .'Line: '.$e->getLine().PHP_EOL
+                    .'Error code: '.$e->getCode().PHP_EOL
+                    .'Trace: '.$e->getTraceAsString().PHP_EOL, 'text-danger');
             }
-        } catch (\Exception $e) {
-            $this->flashMessage('Caught Exception!'.PHP_EOL
-                .'Error message: '.$e->getMessage().PHP_EOL
-                .'File: '.$e->getFile().PHP_EOL
-                .'Line: '.$e->getLine().PHP_EOL
-                .'Error code: '.$e->getCode().PHP_EOL
-                .'Trace: '.$e->getTraceAsString().PHP_EOL, 'text-danger');
+        } else {
+            $this->error('Forbidden', 403);
         }
 
         $this->redirect(':Admin:');

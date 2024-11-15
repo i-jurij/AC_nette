@@ -29,6 +29,12 @@ final class SignPresenter extends Nette\Application\UI\Presenter
         $form->setHtmlAttribute('id', 'log_in_app')
             ->setHtmlAttribute('class', 'form');
 
+        $form->addGroup('');
+        $form->addCaptcha('captcha', 'Captcha error. Re-enter captcha.');
+
+        $form->addGroup('');
+        $form->addSubmit('send', 'Signin');
+
         $form->onSuccess[] = $this->userLogin(...);
 
         return $form;
