@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 $path_to_sql_file = 'mysql';
-// $path_to_sql_file = 'sqlite';
 
 function start()
 {

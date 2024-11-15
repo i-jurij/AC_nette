@@ -6,9 +6,3 @@ database:
 		autowired: true
 		options:
 			lazy: yes
-
-	sqlite:
-		dsn: "sqlite:%appDir%/Db/sqlite.db"
-		# autowired: true
-		options:
-			lazy: yes
