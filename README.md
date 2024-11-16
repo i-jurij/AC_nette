@@ -79,13 +79,24 @@ Application use three main routes: "Home", "Sign" and "Admin".
 Other routes as in Nette Framework: "Home::Pages::OtherPresenters::method", "Admin::Pages::OtherPresenters::method".   
 
 ### Models
-`PagesFacade` - get data from table pages (for menu at main page).  
-`MyAuthenticator` - get user data (name, roles and other)   
+`RoleFacade` - get data from table pages (for menu at main page).  
 `PermissionFacade` - add, edit, delete permissions   
 `UserFacade` - add, edit, delete users   
 
 ### Accessory  
 `RequireLoggedUser` - trait for page that need autentication (in user not logged - redirect to sign in)  
+
+### Authentication   
+Use Nette\Security\User with my simple App\Core\Authenticator with Nette Coockie Storage, but   
+in App\Bootstrap.php logic for set storage and table into db was added   
+
+### Authorization
+ACL   
+roles, permissions (resource, action)
+user -> array roles   
+role -> array permissions   
+permission is resource and action  
+App\Core\MyAuthorizator check permissions.  
 
 ### Admin page and menu creating
 #### Nav menu

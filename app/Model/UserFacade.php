@@ -10,7 +10,6 @@ use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 use Nette\Database\UniqueConstraintViolationException;
-use Nette\Http\Request;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
@@ -24,22 +23,10 @@ class UserFacade
     public string $table;
     private string $table_role_user;
 
-    // Dependency injection of database explorer and password utilities
     public function __construct(
         public Explorer $db,
         private Passwords $passwords,
-        // public readonly Request $request,
     ) {
-        /*
-        $url_path = $this->request->getUrl()->getPath();
-        if ((bool) \mb_stristr($url_path, 'admin')) {
-            $this->table = USER_TABLE;
-            $this->table_role_user = 'role_'.USER_TABLE;
-        } else {
-            $this->table = CLIENT_TABLE;
-            $this->table_role_user = 'role_'.CLIENT_TABLE;
-        }
-        */
         $this->table = TABLE;
         $this->table_role_user = 'role_'.TABLE;
     }
