@@ -2,12 +2,7 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Core\Authenticator(@database.mysql.explorer)
 	- App\Core\MyAuthorizator(@database.mysql.connection)
-	- 
-		create: App\Model\UserFacade(@database.mysql.explorer)
-		autowired: self
-	- 
-		create: App\Model\ClientFacade(@database.mysql.explorer)
-		autowired: self
+	- App\Model\UserFacade(@database.mysql.explorer)
 	# - App\Model\PageFacade(@database.sqlite.connection)
 
 search:
