@@ -23,7 +23,7 @@ $user = 'CREATE TABLE IF NOT EXISTS `user`
 		`phone_verified` TINYINT DEFAULT 0,
 		`email` TEXT UNIQUE DEFAULT null, 
 		`email_verified` TINYINT DEFAULT 0, 
-		`auth_token` TEXT, 
+		`auth_token` TEXT NOT NULL, 
 		`created_at` TIMESTAMP NOT NULL
                            DEFAULT CURRENT_TIMESTAMP,
 		`updated_at` TIMESTAMP NOT NULL
@@ -47,7 +47,7 @@ $client = 'CREATE TABLE IF NOT EXISTS `client`
 		`phone_verified` TINYINT DEFAULT 0,
 		`email` TEXT UNIQUE DEFAULT null, 
 		`email_verified` TINYINT DEFAULT 0, 
-		`auth_token` TEXT, 
+		`auth_token` TEXT NOT NULL, 
 		`created_at` TIMESTAMP NOT NULL
                            DEFAULT CURRENT_TIMESTAMP,
 		`updated_at` TIMESTAMP NOT NULL

@@ -28,8 +28,9 @@ class UserFacade
     public function __construct(
         public Explorer $db,
         private Passwords $passwords,
-        public readonly Request $request,
+        // public readonly Request $request,
     ) {
+        /*
         $url_path = $this->request->getUrl()->getPath();
         if ((bool) \mb_stristr($url_path, 'admin')) {
             $this->table = USER_TABLE;
@@ -38,6 +39,9 @@ class UserFacade
             $this->table = CLIENT_TABLE;
             $this->table_role_user = 'role_'.CLIENT_TABLE;
         }
+        */
+        $this->table = TABLE;
+        $this->table_role_user = 'role_'.TABLE;
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]

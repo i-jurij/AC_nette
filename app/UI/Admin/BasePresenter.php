@@ -14,7 +14,6 @@ abstract class BasePresenter extends \App\UI\BasePresenter
     use \App\UI\Accessory\RequireLoggedUser;
 
     protected array $dirList;
-    public \Nette\Http\SessionSection $section;
 
     public function __construct()
     {

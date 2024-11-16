@@ -4,6 +4,11 @@
 <header class="p2 center">
 	<a class="button">City</a>
 	<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Enter</a>
-	<a class="button" n:if="isset($user) && $user->isLoggedIn()" n:href=":Home:Sign:out">Logout</a>
+
+	<span>{$user->getIdentity()->username}</span>
+	<a class="button" n:if="isset($user) && $user->isLoggedIn()" n:href=":Home:Sign:out">
+		Logout
+	</a>
+
 </header>
 {/block}

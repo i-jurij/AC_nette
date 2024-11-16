@@ -33,6 +33,17 @@ class Bootstrap
         $configurator->addConfig($rootDir.'/config/own.neon');
         */
 
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+        $cur_url = $_SERVER['REQUEST_URI'];
+        $cur_full_url = $protocol.$_SERVER['HTTP_HOST'].$cur_url;
+        $check = filter_var($cur_full_url, FILTER_VALIDATE_URL);
+
+        if ($check && (bool) \mb_stristr($check, 'admin')) {
+            $configurator->addConfig($rootDir.'/config/auth_user.neon');
+        } else {
+            $configurator->addConfig($rootDir.'/config/auth_client.neon');
+        }
+
         return $configurator;
     }
 }

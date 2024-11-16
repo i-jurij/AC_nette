@@ -35,12 +35,12 @@ a.dropdown-toggle {
           {include menu_sidebar from $shared_templates.'menu_sidebar.latte', $dirList[':Admin:']}
         </li>
         *}
-        {if !empty($dirList[':Admin:'][":Admin:PageCreator:"])}
-          <a n:href=":Admin:PageCreator:" class="dropdown-toggle nav-link px-0 align-middle">
-            <span class="">PageCreator</span>
+        {if !empty($dirList[':Admin:'][":Admin:CMS:"])}
+          <a n:href=":Admin:CMS:" class="dropdown-toggle nav-link px-0 align-middle">
+            <span class="">CMS</span>
           </a>
-          <ul class="nav flex-column ms-2 mb-3" id="PageCreator">
-            {include menu_sidebar from $shared_templates.'menu_sidebar.latte', $dirList[':Admin:'][":Admin:PageCreator:"]}
+          <ul class="nav flex-column ms-2 mb-3" id="CMS">
+            {include menu_sidebar from $shared_templates.'menu_sidebar.latte', $dirList[':Admin:'][":Admin:CMS:"]}
           </ul>
         {/if}
     </ul>
