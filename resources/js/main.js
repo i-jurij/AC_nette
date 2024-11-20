@@ -7,6 +7,20 @@ window.Nette = netteForms;
 // document.addEventListener('DOMContentLoaded', naja.initialize.bind(naja));
 netteForms.initOnLoad();
 
+//script for load script into head of the page
+import { loadScript } from './loadScript.js';
+
+// for city getting from GeoPlugin
+import { geoplugin_url, city_from_geoplugin } from './cityFromGeoPlugin.js';
+// for city getting from Yandex Map API
+// import { ymap_url, city_from_ymap } from './cityFromYmap.js';
+
+
+//////////////////////////////////////////
+// descriptive part
+/////////////////////////////////////////
+
+/* for close flash message from presenter */
 function closeFlash() {
     let fbci = document.querySelector('#for_button_close_insert')
     if (fbci) {
@@ -16,35 +30,18 @@ function closeFlash() {
         };
     }
 }
-document.addEventListener('DOMContentLoaded', closeFlash());
 
-/* geolocation */
-const gloc = document.getElementById("geoLocationDiv");
-function showError(error) {
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            gloc.innerHTML = "User denied the request for Geolocation."
-            break;
-        case error.POSITION_UNAVAILABLE:
-            gloc.innerHTML = "Location information is unavailable."
-            break;
-        case error.TIMEOUT:
-            gloc.innerHTML = "The request to get user location timed out."
-            break;
-        case error.UNKNOWN_ERROR:
-            gloc.innerHTML = "An unknown error occurred."
-            break;
-    }
-}
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-        showError(error);
+//////////////////////////////////////////
+// part to be performed
+/* <!-- js for esc on modal --> */
+document.onkeydown = function (event) {
+    if (event.key == "Escape") {
+        var mods = document.querySelectorAll('.modal > [type=checkbox]');
+        [].forEach.call(mods, function (mod) { mod.checked = false; });
     }
 }
 
-function showPosition(position) {
-    gloc.innerHTML = "Latitude: " + position.coords.latitude +
-        "<br>Longitude: " + position.coords.longitude;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    closeFlash();
+    loadScript({ url: geoplugin_url, callback: city_from_geoplugin });
+});

@@ -23,10 +23,9 @@ abstract class BasePresenter extends \App\UI\BasePresenter
 
     public function beforeRender()
     {
-        $this->template->breadcrumb = $this->getBC();
+        parent::beforeRender();
         $this->template->dirList = $this->dirList;
         $this->template->currentPageMenu = $this->getKeyValueRec(end($this->template->breadcrumb)['full'], $this->dirList);
-        $this->template->shared_templates = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR;
     }
 }
 

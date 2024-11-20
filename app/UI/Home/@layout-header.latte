@@ -1,14 +1,155 @@
 {block header}
+{default $city_from_back = 'Местоположение'}
 
 <div id="geoLocationDiv"></div>
-<header class="p2 center">
-	<a class="button">City</a>
-	<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Enter</a>
+<header class="p1 flexx justify-between content-center">
 
-	<span n:if="!!$user->getIdentity()">{$user->getIdentity()->username}</span>
-	<a class="button" n:if="isset($user) && $user->isLoggedIn()" n:href=":Home:Sign:out">
-		Logout
-	</a>
+	<div class="">
+		<label for="modal_1" class="pseudo button">
+			<span class="mr1">&#128205;</span>
+			<span id="location"onclick="getLoc()" >
+				{$city_from_back}&ensp;&#8250;
+			</span>
+		</label>
 
+		<div class="modal">
+			<input id="modal_1" type="checkbox" />
+			<label for="modal_1" class="overlay "></label>
+			<article class="">
+				<header class="bgcolor">
+					<h3>Выбор местоположения</h3>
+					<label for="modal_1" class="close">&times;</label>
+				</header>
+				<section class="content bgcontent" id="clients_place_message"></section>
+				<footer class="bgcontent" >
+					<a 
+						class="button" 
+						style="visibility: visible;"
+						id="shoose_clients_place" 
+						href="#">Выбрать</a>
+					<label for="modal_1" class="button dangerous">
+						Cancel
+					</label>
+				</footer>
+			</article>
+		</div>
+	</div>
+
+	<div >
+		<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Enter</a>
+		<a class="pseudo button" n:if="!!$user->getIdentity()" href="#profile">
+			{$user->getIdentity()->username}
+		</a>
+		<a class="button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
+			Logout
+		</a>
+	</div>
 </header>
+
+
+{* <!-- js for city on button with id="location" from YandexMap API--> *}
+{* <script src="https://api-maps.yandex.ru/2.1/?apikey=62e46ec4-c446-4e02-b257-50b67d420173&lang=ru_RU"
+  type="text/javascript">
+  </script> 
+<script>
+let city = {$city_from_back};
+if (city == 'Местоположение'){
+	ymaps.ready(init);
+
+	function init() {
+		ymaps.geolocation.get({
+			provider: 'auto', // auto - либо от браузера, либо по IP
+		}).then(function (result) {
+			coords = result.geoObjects.get(0).geometry.getCoordinates();
+			ymaps.geocode(
+				coords,
+				{ results: 1 }
+				).then(function (res) {
+					var location = res.geoObjects.get(0);
+					const x = document.getElementById("location");
+					const clients_place_message = document.getElementById("clients_place_message");
+					const button_shoose_place = document.getElementById("shoose_clients_place");
+					const checkbox_modal_window = document.getElementById('modal_1');
+
+					city = location.getLocalities();
+
+					if (x && city.length > 0){
+						x.innerHTML = city + "  &#8250";
+						clients_place_message.innerHTML = 'Ваше местоположение: ' + city + '. Если нет - выберите его, нажав на кнопку "Выбрать"';
+						checkbox_modal_window.checked = true;
+					} 
+					if (x && city.length == 0) {
+						if (clients_place_message){
+							clients_place_message.innerHTML = 'Ваше местоположение неизвестно. Выберите его, нажав на кнопку "Выбрать"';
+							checkbox_modal_window.checked = true;
+
+							function blink_elem (elem) {
+								count=0;
+								var x=setInterval(function(){
+									elem.style.visibility = (elem.style.visibility == 'visible' ? 'hidden' : 'visible');
+									if(count >= 5) {
+										clearInterval(x);
+										elem.style.visibility == 'visible';
+										elem.focus();
+									} 
+									count++;
+								}, 500);
+							}	
+
+							blink_elem (button_shoose_place);												
+						}
+						
+					}
+
+				}
+			);
+		});
+	}
+}
+</script>
+*}
+
+
+{*  <!-- js for city on button with id="location" from GeoPlugin -->  *}
+{*
+<script language="JavaScript" src="http://www.geoplugin.net/javascript.gp" type="text/javascript"></script>
+<script language="Javascript"> 
+let city = {$city_from_back};
+if (city == 'Местоположение'){
+	const x = document.getElementById("location");
+	city = geoplugin_city();
+	const clients_place_message = document.getElementById("clients_place_message");
+	const button_shoose_place = document.getElementById("shoose_clients_place");
+	const checkbox_modal_window = document.getElementById('modal_1');
+
+	if (x && city.length > 0){
+		x.innerHTML = city + "  &#8250";
+		clients_place_message.innerHTML = 'Ваше местоположение: ' + city + '. </br>Если нет - выберите его, нажав на кнопку "Выбрать"';
+		checkbox_modal_window.checked = true;
+	} 
+	if (x && city.length == 0) {
+		if (clients_place_message){
+			clients_place_message.innerHTML = 'Ваше местоположение неизвестно. </br>Выберите его, нажав на кнопку "Выбрать"';
+			checkbox_modal_window.checked = true;
+
+			function blink_elem (elem) {
+				count=0;
+				var x=setInterval(function(){
+					elem.style.visibility = (elem.style.visibility == 'visible' ? 'hidden' : 'visible');
+					if(count >= 5) {
+						clearInterval(x);
+						elem.style.visibility == 'visible';
+						elem.focus();
+					} 
+					count++;
+				}, 500);
+			}	
+
+			blink_elem (button_shoose_place);												
+		}				
+	}
+}
+</script>
+*}
+
 {/block}
