@@ -14,7 +14,7 @@ class Ip
         }
     }
 
-    public function getIp()
+    public static function getIp(): array
     {
         $ip = '';
         $ipAll = []; // networks IP

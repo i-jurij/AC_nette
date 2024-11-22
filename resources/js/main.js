@@ -10,11 +10,15 @@ netteForms.initOnLoad();
 //script for load script into head of the page
 import { loadScript } from './loadScript.js';
 
-// for city getting from GeoPlugin
-import { geoplugin_url, city_from_geoplugin } from './cityFromGeoPlugin.js';
-// for city getting from Yandex Map API
-// import { ymap_url, city_from_ymap } from './cityFromYmap.js';
 
+// for coordinates getting from html5 geolocation
+import { getCoordinates } from './geo/getCoordinates.js';
+
+// for city getting from GeoPlugin
+import { geoplugin_url, city_from_geoplugin_ip } from './geo/cityFromGeoPluginIp.js';
+
+// for city getting from Yandex Map API v2
+//import { ymap_url, city_from_ymap } from './geo/cityFromYmap2.js';
 
 //////////////////////////////////////////
 // descriptive part
@@ -43,5 +47,12 @@ document.onkeydown = function (event) {
 
 document.addEventListener('DOMContentLoaded', () => {
     closeFlash();
-    loadScript({ url: geoplugin_url, callback: city_from_geoplugin });
+
+    let coord = getCoordinates();
+    if (typeof coord === "undefined") {
+        loadScript({ url: geoplugin_url, callback: city_from_geoplugin_ip });
+        //loadScript({ url: ymap_url, callback: city_from_ymap });
+    } else {
+
+    }
 });

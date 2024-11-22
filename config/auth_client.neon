@@ -2,7 +2,7 @@ security:
     authentication:
         cookieName: clientId 
         #cookieDomain: 'example.com'   # (string|domain)
-        #cookieSamesite: None          # (Strict|Lax|None) defaults to Lax
+        cookieSamesite: Strict          # (Strict|Lax|None) defaults to Lax
 
 constants:
     TABLE: 'client'

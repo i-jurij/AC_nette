@@ -26,10 +26,23 @@ trait Breadcrumb
     public function getBC(): array
     {
         $httpRequest = $this->getHttpRequest();
+        $url_host = $httpRequest->getUrl()->host;
         $url_path = trim($httpRequest->getUrl()->path, " \/");
-        $site_root = SITE_NAME.Strings::after(trim(WWWDIR, " \/"), SITE_NAME, 1);
+
+        if ($url_host === SITE_NAME) {
+            $site_root = SITE_NAME;
+        } else {
+            $site_root = SITE_NAME.Strings::after(trim(WWWDIR, " \/"), SITE_NAME, 1);
+        }
+
         // request path without site root path
-        $url_path_relative = trim(Strings::after($url_path, $site_root, 1), " \/");
+        $upr = Strings::after($url_path, $site_root, 1);
+        if (!empty($upr)) {
+            $url_path_relative = trim(Strings::after($url_path, $site_root, 1), " \/");
+        } else {
+            $url_path_relative = '';
+        }
+
         $controls_method_param = explode('/', $url_path_relative);
         $pre_controls = explode('.', array_shift($controls_method_param));
         $method = $this->upperAfterDash(array_shift($controls_method_param));
