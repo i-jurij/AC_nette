@@ -1,0 +1,20 @@
+{block flash_for_home}
+    <div n:if="!empty($flashes)" class="modal"  id="flash_message">
+		<input id="modal_1" type="checkbox" checked/>
+		<label for="modal_1" class="overlay "></label>
+		<article class="">
+			<header class="bgcolor">
+				<p>&nbsp;</p>
+				<label for="modal_1" class="close">&times;</label>
+			</header>
+			<section class="content bgcontent flash_child " n:inner-foreach="$flashes as $flash">
+				<p class="p2 {$flash->type}">{$flash->message}</p>
+			</section>
+			<footer class="bgcontent" >
+				<label for="modal_1" class="button">
+					Close
+				</label>
+			</footer>
+		</article>
+	</div>
+</div>

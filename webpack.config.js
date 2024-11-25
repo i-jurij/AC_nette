@@ -21,6 +21,10 @@ module.exports = {
         devMiddleware: {
             publicPath: '/assets/'
         },
+        server: {
+            type: "https",
+            options: {},
+        },
         port: 3000,
         headers: {
             "Access-Control-Allow-Origin": "*",

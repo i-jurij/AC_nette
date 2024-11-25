@@ -1,12 +1,28 @@
 {block flashNoBootstrap}
-		<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash"  id="flash_message">
-			<div class="bgcontent flash_child ">
-				<p class="m2 p2 round {$flash->type}">{$flash->message}</p>
-				<p id="for_button_close_insert">
-					<noscript>
-						<a n:href=':Admin:' class="button">Close</a>
-					</noscript>
-				</p>
-			</div>
+	<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash"  id="flash_message">
+		<div class="bgcontent flash_child ">
+			<p class="m2 p2 round {$flash->type}">{$flash->message}</p>
+			<p id="for_button_close_insert">
+				<noscript>
+					<a n:href=':Admin:' class="button">Close</a>
+				</noscript>
+			</p>
 		</div>
+	</div>
+
+<script>
+	/* for close flash message from presenter */
+	function closeFlash() {
+		let fbci = document.querySelector('#for_button_close_insert')
+		if (fbci) {
+			fbci.innerHTML = '<button id="close_flash_message">Close</button>';
+			close_flash_message.onclick = function () {
+				flash_message.remove();
+			};
+		}
+	}
+	document.addEventListener('DOMContentLoaded', () => {
+		closeFlash();
+	});
+</script>
 {/block}

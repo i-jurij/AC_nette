@@ -7,5 +7,5 @@ webpack:
         publicPath: assets/
     devServer:
         enabled: %debugMode%
-        url: http://localhost:3000/assets
+        url: https://localhost:3000/assets
         timeout: 0.1 # (seconds) default

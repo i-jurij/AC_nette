@@ -9,9 +9,12 @@ class Ip
     public static function get(): string
     {
         global $_SERVER;
+        $ip = '';
         if (filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
-            return trim($_SERVER['REMOTE_ADDR']);
+            $ip = trim($_SERVER['REMOTE_ADDR']);
         }
+
+        return $ip;
     }
 
     public static function getIp(): array

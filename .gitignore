@@ -2,4 +2,4 @@
 /vendor
 /log
 /temp
-/config/yandex_api.neon
+/config/yandex_api.js

@@ -258,14 +258,14 @@ textarea:valid {
 }
 
 .flash_child {
-    /*flex: 1 1 auto; */
+    /*flex: 1 1 auto; 
     width: 90%;
     padding: 1rem;
-    margin: 1rem auto;
+    margin: 1rem auto; */
     text-align: center;
     vertical-align: middle;
-    border-radius: var(--radius);
-    box-shadow: var(--boxshadow);
+    /* border-radius: var(--radius);
+    box-shadow: var(--boxshadow); */
     color: var(--color-button);
     text-shadow: none;
 }

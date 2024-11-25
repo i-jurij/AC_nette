@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\UI\Home;
 
-use App\UI\Accessory\GeoPlugin;
 use App\UI\Accessory\Ip;
 use App\UI\Accessory\IsBot;
 
@@ -16,30 +15,26 @@ abstract class BasePresenter extends \App\UI\BasePresenter
         // get location of page visitor
         // Фильтруем ботов, чтобы не было лишних запросов к API
         if (!IsBot::check()) {
-            // //////////////////////////////////////
-            // city from GeoPlugin.com //
-            /*
-            $geoplugin = new GeoPlugin();
-            $geoplugin->lang = 'ru';
-            // locate the IP (get country, city and many other things)
-            // $geoplugin->locate(ip: '77.51.199.15');
-            $geoplugin->locate();
-            $city_name = $geoplugin->city ?? null;
-            */
-            // //////////////////////////////////////
-
-            // /////////////////////////////////////
             // city from SypexGeo.com //
-            $ip = (!empty(Ip::getIp()['ip'])) ? Ip::getIp()['ip'] : false;
+            $ip = (!empty(Ip::getIp()['ip'])) ? Ip::getIp()['ip'] : '';
 
             if ((bool) $ip && $ip != '127.0.0.1') {
-                $geo = json_decode(file_get_contents('http://api.sypexgeo.net/json/'.$_SERVER['REMOTE_ADDR']), true);
-                $city_name = $geo['city']['name_ru'] ?? null;
+                if (\filter_var(\ini_get('allow_url_fopen'), \FILTER_VALIDATE_BOOLEAN)) {
+                    $json = file_get_contents('http://api.sypexgeo.net/json/'.$ip);
+                    if ($json !== false) {
+                        $geo = json_decode($json, true);
+                        $city_name = $geo['city']['name_ru'] ?? null;
+                        $region = $geo['region']['name_ru'] ?? null;
+                    }
+                }
             }
 
             // ////////////////////////////////////
             if (isset($city_name)) {
                 $this->template->city_from_back = $city_name;
+            }
+            if (isset($region)) {
+                $this->template->region = $region;
             }
         }
     }
@@ -48,4 +43,5 @@ abstract class BasePresenter extends \App\UI\BasePresenter
 class BaseTemplate extends \App\UI\BaseTemplate
 {
     public string $city_from_back;
+    public string $region;
 }
