@@ -20,15 +20,15 @@
 					<h3>Выбор местоположения</h3>
 					<label for="modal_1" class="close">&times;</label>
 				</header>
-				<section class="content bgcontent" id="clients_place_message">
-					<p n:if="!empty($city_from_back)">{$city_from_back}</p>
-					<p n:if="!empty($region)">{$region}</p>
+				<section class="content bgcontent" id="clients_location_message">
+					<p n:if="!empty($city_from_back)" id="p_city">{$city_from_back}</p>
+					<p n:if="!empty($region)" id="p_region">{$region}</p>
 				</section>
 				<footer class="bgcontent" >
 					<a 
 						class="button" 
 						style="visibility: visible;"
-						id="shoose_clients_place" 
+						id="shoose_location" 
 						href="#">Выбрать</a>
 					<label for="modal_1" class="button dangerous">
 						Cancel

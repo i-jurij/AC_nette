@@ -82,7 +82,7 @@ class UserFacade
             ]);
 
             // insert into users_roles users (first admin user) id, role "admin" id
-            $this->db->table($this->table_role_user)->insert([
+            $this->db->table('role_'.$table)->insert([
                 'user_id' => $row->id,
                 'role_id' => $role_admin_id['id'],
             ]);

@@ -306,7 +306,7 @@ span.error {
 }
 
 .main_section {
-    margin: 1 rem;
+    margin: 1rem;
     padding: 1rem;
     border-radius: var(--radius);
     background-color: var(--bgcolor);
@@ -318,8 +318,7 @@ span.error {
 }
 
 .main_footer {
-    margin: 2rem auto 2rem auto;
-    padding: 2rem auto 2rem auto;
+    margin: 2rem auto;
     text-align: center;
 }
 

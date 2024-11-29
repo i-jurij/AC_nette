@@ -19,18 +19,23 @@ function start()
 
 function migrate(object $container, string $path_to_sql_file)
 {
+    $db = $container->getByName('database.'.$path_to_sql_file.'.connection');
+
     $begin_path_to_sql_files = APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.$path_to_sql_file.DIRECTORY_SEPARATOR;
     $path_db_create = \realpath($begin_path_to_sql_files.'create_db.php');
     $path_create = \realpath($begin_path_to_sql_files.'create_sql.php');
     $path_insert = \realpath($begin_path_to_sql_files.'insert_sql.php');
     $path_trigger = \realpath($begin_path_to_sql_files.'trigger_sql.php');
 
-    $db = $container->getByName('database.'.$path_to_sql_file.'.connection');
+    $geo = [
+        0 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'okrugRF.sql'),
+        1 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'regionRF.sql'),
+        2 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'citiesRF.sql'),
+    ];
+
     $reflection = $db->getReflection();
 
     try {
-        $db->beginTransaction();
-
         if (include $path_create) {
             foreach ($create_sqls as $key => $sql) {
                 $check_table = $reflection->hasTable($key);
@@ -46,15 +51,28 @@ function migrate(object $container, string $path_to_sql_file)
                 }
             }
         }
-        // });
-        $db->commit();
+
+        // geoLocSQL
+        for ($i = 0; $i <= 2; ++$i) {
+            if ($geo[$i] != false) {
+                $commands = file_get_contents($geo[$i]);
+            } else {
+                echo 'Wrong path for geo sql file "'.$geo[$i].'"'.".\n";
+            }
+
+            if (isset($commands) && $commands != false) {
+                $db->query($commands);
+            } else {
+                echo 'No file get contents for geo sql file "'.$geo[$i].'"'.".\n";
+            }
+        }
+
         echo "Migrate was executed. Database and table was created.\n";
-        exit(1);
     } catch (Exception $e) {
-        $db->rollback();
         echo "Error: '.$e.'.\n";
-        exit(1);
     }
+
+    exit(1);
 }
 
 function userAdd(object $container, array $argv)

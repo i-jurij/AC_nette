@@ -6,7 +6,6 @@ netteForms.initOnLoad();
 import { geoLocation } from './geo/geoLocation.js';
 geoLocation();
 
-
 /* <!-- js for esc on modal (in Home part of site that based on PicnicCSS) --> */
 document.onkeydown = function (event) {
     if (event.key == "Escape") {
