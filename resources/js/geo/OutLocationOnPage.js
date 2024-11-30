@@ -7,36 +7,21 @@ export function outLocation({ city, adress }) {
     if (city_elem && city) {
         city_elem.innerHTML = city + "&ensp;&#8250;";
         let adr = '';
-        if (adress && adress.includes(city)) {
+        if (adress && adress.includes(city + ' ')) {
             adr = '<div class="my2">' + adress + '</div>';
-        } else if (adress && !adress.includes(city)) {
+        } else if (adress && !adress.includes(city + ' ')) {
             adr = '<div class="mt2">' + city + '</div><div class="mb2">' + adress + '</div>';
         } else {
-            '<div class="my2">' + city + '.</div>'
+            adr = '<div class="my2">' + city + '.</div>'
         }
 
         clients_place_message.innerHTML = 'Ваше местоположение: ' + adr + ' Если нет - выберите его, нажав на кнопку "Выбрать"';
-        checkbox_modal_window.checked = true;
+        // checkbox_modal_window.checked = true;
     }
     if (city_elem && !city) {
         if (clients_place_message) {
             clients_place_message.innerHTML = 'Ваше местоположение неизвестно. </br>Выберите его, нажав на кнопку "Выбрать"';
             checkbox_modal_window.checked = true;
-
-            function blink_elem(elem) {
-                let count = 0;
-                var x = setInterval(function () {
-                    elem.style.visibility = (elem.style.visibility == 'visible' ? 'hidden' : 'visible');
-                    if (count >= 5) {
-                        clearInterval(x);
-                        elem.style.visibility == 'visible';
-                        elem.focus();
-                    }
-                    count++;
-                }, 500);
-            }
-
-            blink_elem(button_shoose_place);
         }
     }
 }

@@ -17,6 +17,7 @@ abstract class BasePresenter extends \App\UI\BasePresenter
         if (!IsBot::check()) {
             // city from SypexGeo.com //
             $ip = (!empty(Ip::getIp()['ip'])) ? Ip::getIp()['ip'] : '';
+            // $ip = '2.63.182.224';
 
             if ((bool) $ip && $ip != '127.0.0.1') {
                 if (\filter_var(\ini_get('allow_url_fopen'), \FILTER_VALIDATE_BOOLEAN)) {

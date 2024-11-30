@@ -18,9 +18,9 @@ final class PermissionFacade
     use RequireLoggedUser;
     public Selection $table;
 
-    public function __construct(public Explorer $sqlite)
+    public function __construct(public Explorer $db)
     {
-        $this->table = $this->sqlite->table('permission');
+        $this->table = $this->db->table('permission');
     }
 
     public function actionListFromModelDir(): array
@@ -91,9 +91,9 @@ final class PermissionFacade
                 }
             } elseif (is_string($data['action'])) {
                 $insert = [
-                        'resource' => $data['resource'],
-                        'action' => $data['action'],
-                    ];
+                    'resource' => $data['resource'],
+                    'action' => $data['action'],
+                ];
             }
 
             $this->table->insert($insert);

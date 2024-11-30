@@ -1,7 +1,7 @@
 {block header}
 {default $city_from_back = 'Местоположение'}
+{default $region = ''}
 
-<div id="geoLocationDiv"></div>
 <header class="p1 flexx justify-between content-center">
 
 	<div class="">
@@ -17,7 +17,7 @@
 			<label for="modal_1" class="overlay "></label>
 			<article class="">
 				<header class="bgcolor">
-					<h3>Выбор местоположения</h3>
+					<h3>&nbsp;</h3>
 					<label for="modal_1" class="close">&times;</label>
 				</header>
 				<section class="content bgcontent" id="clients_location_message">
@@ -25,13 +25,54 @@
 					<p n:if="!empty($region)" id="p_region">{$region}</p>
 				</section>
 				<footer class="bgcontent" >
-					<a 
-						class="button" 
-						style="visibility: visible;"
-						id="shoose_location" 
-						href="#">Выбрать</a>
+					{*<button 
+						id="shoose_location">
+						Выбрать
+					</button>
+					*}
+					<label for="modal_2" class="button" id="shoose_location">
+						Выбрать
+					</label>
+					
 					<label for="modal_1" class="button dangerous">
-						Cancel
+						Закрыть
+					</label>
+				</footer>
+			</article>
+		</div>
+
+		<div class="modal">
+			<input id="modal_2" type="checkbox" />
+			<label for="modal_2" class="overlay "></label>
+			<article class="">
+				<header class="bgcolor">
+					<h3>&nbsp;</h3>
+					<label for="modal_2" class="close">&times;</label>
+				</header>
+				<section class="content bgcontent" id="">
+					
+					<input type="text" name="city_search_input" id="city_search_input" placeholder="Поиск">
+
+						<select id="shoose_district" class="select mb1">
+							<option>Округ</option>
+						</select>
+
+						<select id="shoose_region" class="select mb1" disabled>
+							<option>Регион (область)</option>
+						</select>
+
+						<select id="shoose_city" class="select" disabled>
+							<option>Город</option>
+						</select>
+
+				</section>
+				<footer class="bgcontent" >
+					<button id="save_city" >
+						Выбрать
+					</button>
+					
+					<label for="modal_2" class="button dangerous">
+						Закрыть
 					</label>
 				</footer>
 			</article>
@@ -49,4 +90,8 @@
 	</div>
 </header>
 
+<script>
+	let city_from_back = {$city_from_back};
+	let region_from_back = {$region};
+</script>
 {/block}

@@ -13,7 +13,6 @@
 }
 
 :root {
-    color-scheme: light dark;
     --biggest-fontsize: 2rem;
     --big-fontsize: 1.5rem;
     --base-fontsize: 1.125rem;
@@ -22,65 +21,31 @@
     --smallest-fontsize: 0.75rem;
     --micro-fontsize: 0.625rem;
     --radius: 0.4rem;
-}
+    --bgcolor: #126c04;
+    --bgcolor-content: #2a3428;
+    --button-bgcolor: #126c04;
+    --button-color: #d3e4bb;
+    --button-active-bgcolor: #000000;
+    --button-active-color: #9eb183;
+    --button-disabled-color: black;
+    --input_bgcolor: rgb(0, 0, 0);
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bgcolor: #126c04;
-        --bgcolor-content: #2a3428;
-        --bgcolor-button: #126c04;
-        --color-button: #d3e4bb;
-        --bgcolor-button-active: #000000;
-        --color-button-active: #9eb183;
-        --input_bgcolor: black;
+    --fontcolor-light: #c0ccb9;
+    --fontcolor-dark: #1CBADF;
 
-        --button-disabled-color: black;
-        --fontcolor-light: #c0ccb9;
-        --fontcolor-dark: #1CBADF;
+    --fontshadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
+    --boxshadow: rgba(0, 0, 0, 0.6) 0px 2px 2px 0px, rgba(0, 0, 0, 0.6) 0px 3px 1px -2px, rgba(0, 0, 0, 0.6) 0px 1px 5px 0px;
+    --boxshadow-active: rgba(0, 0, 0, 0.24) 1px 3px 3px 1px, rgba(0, 0, 0, 0.3) 1px 4px 2px -3px, rgba(0, 0, 0, 0.2) 1px 2px 6px 1px;
 
-        --fontshadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
-        --boxshadow: rgba(0, 0, 0, 0.6) 0px 2px 2px 0px, rgba(0, 0, 0, 0.6) 0px 3px 1px -2px, rgba(0, 0, 0, 0.6) 0px 1px 5px 0px;
-        --boxshadow-active: rgba(0, 0, 0, 0.24) 1px 3px 3px 1px, rgba(0, 0, 0, 0.3) 1px 4px 2px -3px, rgba(0, 0, 0, 0.2) 1px 2px 6px 1px;
+    --date_time_item_back: #535353;
+    --date_time_item_back-active: #9F091F;
+    --date_time_item_back-disabled: #353941;
+    --date_time_item_color-disabled: #676767;
 
-        --date_time_item_back: #535353;
-        --date_time_item_back-active: #9F091F;
-        --date_time_item_back-disabled: #353941;
-        --date_time_item_color-disabled: #676767;
+    --table-bgcolor1: #282C34;
+    --table-bgcolor2: #161B23;
 
-        --table-bgcolor1: #282C34;
-        --table-bgcolor2: #161B23;
-
-        --table-border: 1px solid #000;
-    }
-}
-
-@media (prefers-color-scheme: light) {
-    :root {
-        --bgcolor: rgb(56, 133, 27);
-        --bgcolor-content: rgb(244, 246, 243);
-        --bgcolor-button: rgb(56, 133, 27);
-        --color-button: rgba(245, 243, 246, 1);
-        --bgcolor-button-active: rgb(33, 102, 12);
-        --color-button-active: rgb(251, 249, 248);
-        --input_bgcolor: white;
-
-        --button-disabled-color: rgb(212, 212, 212);
-        --fontcolor-light: #37a030;
-        --fontcolor-dark: #1CBADF;
-
-        --fontshadow: 1px 1px 1px rgba(255, 255, 255, 0.99);
-        --boxshadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
-        --boxshadow-active: rgba(0, 0, 0, 0.24) 1px 3px 3px 1px, rgba(0, 0, 0, 0.3) 1px 4px 2px -3px, rgba(0, 0, 0, 0.2) 1px 2px 6px 1px;
-
-        --date_time_item_back: #E5E5E5;
-        --date_time_item_back-active: #C3C9DF;
-        --date_time_item_back-disabled: #ECECEC;
-        --date_time_item_color-disabled: #A9A0A0;
-
-        --table-bgcolor1: #fff;
-        --table-bgcolor2: #F7F7F7;
-        --table-border: 1px solid #C4C4C4;
-    }
+    --table-border: 1px solid #000;
 }
 
 /* base */
@@ -127,8 +92,8 @@ h1,
 
 button,
 .button {
-    background: var(--bgcolor-button);
-    color: var(--color-button, white);
+    background: var(--button-bgcolor);
+    color: var(--button-color, white);
     box-shadow: var(--boxshadow);
     overflow: hidden;
 }
@@ -139,8 +104,8 @@ button:focus,
 .button:focus,
 button:active,
 .button:active {
-    background-color: var(--bgcolor-button-active);
-    color: var(--color-button-active, white);
+    background-color: var(--button-active-bgcolor);
+    color: var(--button-active-color, white);
     box-shadow: var(--boxshadow);
 }
 
@@ -191,15 +156,21 @@ textarea:valid {
 
 .select {
     /* width: 100%; */
-    border: 1px solid #999;
+    border: 1px solid #353535;
     border-radius: var(--radius);
-    padding-left: 5px;
-    padding: 10px;
     font-size: var(--base-fontsize);
     font-family: inherit;
     color: inherit;
     background-color: var(--input_bgcolor);
-    background-image: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'), linear-gradient(to bottom, #464747 0%, #000000 100%);
+    background-repeat: no-repeat, repeat;
+    background-position: right .7em top 50%, 0 0;
+    background-size: .65em auto, 100%;
+    /* background-image: none; */
+}
+
+.select:disabled {
+    color: var(--date_time_item_color-disabled);
 }
 
 .select>option {
@@ -266,7 +237,7 @@ textarea:valid {
     vertical-align: middle;
     /* border-radius: var(--radius);
     box-shadow: var(--boxshadow); */
-    color: var(--color-button);
+    color: var(--button-color);
     text-shadow: none;
 }
 

@@ -664,10 +664,9 @@ function outLocation({ city, adress }) {
                 let count = 0;
                 var x = setInterval(function () {
                     elem.style.visibility = (elem.style.visibility == 'visible' ? 'hidden' : 'visible');
-                    if (count >= 5) {
+                    if (count > 5) {
                         clearInterval(x);
                         elem.style.visibility == 'visible';
-                        elem.focus();
                     }
                     count++;
                 }, 500);
@@ -700,8 +699,12 @@ async function locationFromYandexGeocoder(yapikey, { long, lat }, format = 'json
         let name = json.response.GeoObjectCollection.featureMember[0].GeoObject.name;
         let description = json.response.GeoObjectCollection.featureMember[0].GeoObject.description;
 
-        outLocation({ city: name, adress: description });
-        localStorage.setItem('locality', JSON.stringify({ city: name, adress: description }));
+        if (name && description) {
+            outLocation({ city: name, adress: description });
+            localStorage.setItem('locality', JSON.stringify({ city: name, adress: description }));
+        } else {
+            console.error('No location data in responce from geocode-maps.yandex.ru');
+        }
         //return { city: name, adress: description };
     } catch (error) {
         console.error(error.message);
@@ -782,10 +785,11 @@ function geoLocation() {
                         localStorage.setItem('locality', JSON.stringify({ city: city, adress: region }));
                     }
                 } else {
-                    console.error('ERROR! Element with id "location" not exist.')
-                    outLocation({ city: '', adress: '' });
+                    console.error('ERROR! Element with id "location" is empty.')
                 }
             }
+        } else {
+            console.error('ERROR! Element with id "location" not exist.')
         }
     });
 }
@@ -797,6 +801,8 @@ netteForms_default().initOnLoad();
 
 
 geoLocation();
+
+
 
 /* <!-- js for esc on modal (in Home part of site that based on PicnicCSS) --> */
 document.onkeydown = function (event) {

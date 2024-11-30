@@ -8,7 +8,7 @@ use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
 use Nette\Utils\Html;
 
-final class SignPresenter extends \App\UI\Home\BasePresenter
+final class SignPresenter extends \App\UI\BasePresenter
 {
     /**
      * Stores the previous page hash to redirect back after successful login.
