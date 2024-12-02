@@ -644,155 +644,211 @@ function outLocation({ city, adress }) {
     if (city_elem && city) {
         city_elem.innerHTML = city + "&ensp;&#8250;";
         let adr = '';
-        if (adress && adress.includes(city)) {
+        if (adress && adress.includes(city + ' ')) {
             adr = '<div class="my2">' + adress + '</div>';
-        } else if (adress && !adress.includes(city)) {
+        } else if (adress && !adress.includes(city + ' ')) {
             adr = '<div class="mt2">' + city + '</div><div class="mb2">' + adress + '</div>';
         } else {
-            '<div class="my2">' + city + '.</div>'
+            adr = '<div class="my2">' + city + '.</div>'
         }
 
         clients_place_message.innerHTML = 'Ваше местоположение: ' + adr + ' Если нет - выберите его, нажав на кнопку "Выбрать"';
-        checkbox_modal_window.checked = true;
+        // checkbox_modal_window.checked = true;
     }
     if (city_elem && !city) {
         if (clients_place_message) {
             clients_place_message.innerHTML = 'Ваше местоположение неизвестно. </br>Выберите его, нажав на кнопку "Выбрать"';
             checkbox_modal_window.checked = true;
-
-            function blink_elem(elem) {
-                let count = 0;
-                var x = setInterval(function () {
-                    elem.style.visibility = (elem.style.visibility == 'visible' ? 'hidden' : 'visible');
-                    if (count > 5) {
-                        clearInterval(x);
-                        elem.style.visibility == 'visible';
-                    }
-                    count++;
-                }, 500);
-            }
-
-            blink_elem(button_shoose_place);
         }
     }
 }
 
-;// ./config/yandex_api.js
-const yapikey = '62e46ec4-c446-4e02-b257-50b67d420173';
-;// ./resources/js/geo/locationFromYandexGeocoder.js
+;// ./resources/js/geo/localStorage.js
+function getLocality() {
+    return JSON.parse(localStorage.getItem('locality'));
+}
 
+function setLocality({ city, adress = '', id = '' }) {
+    let data_object = { city, adress, id };
+    localStorage.setItem('locality', JSON.stringify(data_object));
+}
 
-async function locationFromYandexGeocoder(yapikey, { long, lat }, format = 'json', kind = 'locality', results = 1) {
-    const url = "https://geocode-maps.yandex.ru/1.x/?apikey=" + yapikey + "&geocode=" + long + "," + lat + "&format=" + format + "&results=" + results + "&kind=" + kind;
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const json = await response.json();
-
-        let name = json.response.GeoObjectCollection.featureMember[0].GeoObject.name;
-        let description = json.response.GeoObjectCollection.featureMember[0].GeoObject.description;
-
-        if (name && description) {
-            outLocation({ city: name, adress: description });
-            localStorage.setItem('locality', JSON.stringify({ city: name, adress: description }));
-        } else {
-            console.error('No location data in responce from geocode-maps.yandex.ru');
-        }
-        //return { city: name, adress: description };
-    } catch (error) {
-        console.error(error.message);
-    }
+function removeLocality() {
+    localStorage.removeItem("locality");
 }
 ;// ./resources/js/geo/geoLocation.js
 
-// for city getting from Yandex Map API
+
+// for city getting from Yandex Geocoder from browser navigator geolocation
+// import { getLoc } from './browserNavigator.js'
 
 
 
-//-------- part to be performed on the page ---------------------
-
-function getLoc() {
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(getCoords, showError, positionOption);
-        } else {
-            console.warning("WARNING! Geolocation is not supported by this browser.");
-        }
-    }
-
-    let positionOption = { timeout: 5000, /* maximumAge: 24 * 60 * 60, /* enableHighAccuracy: true */ };
-
-    function getCoords(position) {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        let longLat = { long: longitude, lat: latitude };
-
-        locationFromYandexGeocoder(yapikey, longLat);
-    }
-
-    function showError(error) {
-        outLocation({ city: '', adress: '' });
-
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                console.error("ERROR! User denied the request for Geolocation.")
-                break;
-            case error.POSITION_UNAVAILABLE:
-                console.error("ERROR! Location information is unavailable.")
-                break;
-            case error.TIMEOUT:
-                console.error("ERROR! The request to get user location timed out.")
-                break;
-            case error.UNKNOWN_ERROR:
-                console.error("ERROR! An unknown error occurred.")
-                break;
-        }
-    }
-
-    getLocation();
-}
 
 function geoLocation() {
     document.addEventListener('DOMContentLoaded', () => {
         // search in localstorage keeped data with user location
-        let locality = JSON.parse(localStorage.getItem('locality'));
+        //let locality = JSON.parse(localStorage.getItem('locality'));
+        let locality = getLocality();
 
-        // если на странице есть эемент с id="location" и 
-        // если его содержимое равно "Местоположение" (значит на сервере положение не было определено),
-        // определим местоположение
-        let city_elem = document.getElementById("location");
-        if (city_elem) {
-            let city = city_elem.innerHTML;
+        const substring = "Местоположение";
 
-            const substring = "Местоположение";
-
-            if (locality) {
-                outLocation({ city: locality.city, adress: locality.adress });
-            } else {
-                if (city) {
-                    if (city.includes(substring)) {
-                        getLoc();
-                    } else {
-                        let region = (document.getElementById('p_region')) ? document.getElementById('p_region').innerHTML : '';
-                        outLocation({ city: city, adress: region });
-                        localStorage.setItem('locality', JSON.stringify({ city: city, adress: region }));
-                    }
-                } else {
-                    console.error('ERROR! Element with id "location" is empty.')
-                }
-            }
+        if (locality) {
+            outLocation({ city: locality.city, adress: locality.adress });
         } else {
-            console.error('ERROR! Element with id "location" not exist.')
+            if (city_from_back) {
+                if (city_from_back.includes(substring)) {
+                    // getLoc();
+                    outLocation({ city: '', adress: '' });
+                } else {
+                    let region = region_from_back ?? '';
+                    outLocation({ city: city_from_back, adress: region });
+                    setLocality({ city: city_from_back, adress: region });
+                }
+            } else {
+                console.error('ERROR! Element with id "location" is empty.')
+            }
         }
     });
 }
+;// ./resources/js/geo/fromDB.js
+
+
+
+function districtOut(districts) {
+    let inner = '<option value="" id="empty_district">Округ</option>';
+
+    for (const key of Object.keys(districts)) {
+        // console.log(district[key]['id'] + ' ' + district[key]['name'])
+        inner = inner + '<option value="' + districts[key]['id'] + '">' + districts[key]['name'] + '</option>'
+    }
+    let shoose_district = document.querySelector('#shoose_district');
+    if (shoose_district) {
+        shoose_district.innerHTML = inner;
+    }
+    let shoose_region = document.querySelector('#shoose_region');
+    if (shoose_region) {
+        shoose_region.innerHTML = '<option value="">Регион</option>';
+    }
+    let shoose_city = document.querySelector('#shoose_city');
+    if (shoose_city) {
+        shoose_city.innerHTML = '<option value="">Город</option>';
+    }
+}
+
+function regionOut(regions) {
+    let inner = '<option value="" id="empty_region">Регион</option>';
+    for (const key of Object.keys(regions)) {
+        inner = inner + '<option value="' + regions[key]['id'] + '">' + regions[key]['name'] + '</option>'
+    }
+    let shoose_region = document.querySelector('#shoose_region');
+    if (shoose_region) {
+        shoose_region.disabled = false;
+        shoose_region.innerHTML = inner;
+    }
+    let shoose_city = document.querySelector('#shoose_city');
+    if (shoose_city) {
+        shoose_city.innerHTML = '<option value="">Город</option>';
+    }
+}
+
+function cityOut(cities) {
+    let inner = '<option value="" id="empty_city">Город</option>';
+    for (const key of Object.keys(cities)) {
+        inner = inner + '<option value="' + cities[key]['id'] + '">' + cities[key]['name'] + '</option>'
+    }
+    let shoose_city = document.querySelector('#shoose_city');
+    if (shoose_city) {
+        shoose_city.disabled = false;
+        shoose_city.innerHTML = inner;
+    }
+
+}
+
+function hideLocationModal() {
+    const mod_1 = document.getElementById('modal_1');
+    mod_1.checked = false;
+}
+
+function locationOut() {
+    hideLocationModal();
+
+    fetch('home.geo/get-all/', {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(responce => responce.json())
+        .then(locations => {
+            let districts = locations['district'];
+            districtOut(districts);
+
+            let shoose_district = document.querySelector('#shoose_district');
+            if (shoose_district) {
+                shoose_district.addEventListener('change', function () {
+                    document.querySelector('#empty_district').remove();
+                    let district_id = this.value;
+                    let district_text = this.options[this.selectedIndex].text;
+
+                    if (district_id) {
+                        let regions0 = districts[district_id];
+                        if (regions0) {
+                            let regions = regions0['regions'];
+                            regionOut(regions);
+
+                            let shoose_region = document.querySelector('#shoose_region');
+                            if (shoose_region) {
+                                shoose_region.addEventListener('change', function () {
+                                    document.querySelector('#empty_region').remove();
+                                    let region_id = this.value;
+                                    let region_text = this.options[this.selectedIndex].text;
+                                    if (region_id) {
+                                        let cities0 = regions[region_id];
+                                        if (cities0) {
+                                            let cities = cities0['cities'];
+                                            if (cities) {
+                                                cityOut(cities);
+                                            }
+                                        }
+
+                                        let shoose_city = document.querySelector('#shoose_city');
+                                        if (shoose_city) {
+                                            shoose_city.addEventListener('change', function () {
+                                                document.querySelector('#empty_city').remove();
+                                                let city_id = this.value;
+                                                let city_text = this.options[this.selectedIndex].text;
+
+                                                let save_city = document.querySelector('#save_city');
+                                                if (save_city) {
+                                                    save_city.addEventListener('click', function () {
+                                                        //let opt_adress = region_text + ' ' + district_text;
+                                                        let opt_adress = region_text;
+                                                        setLocality({ city: city_text, adress: opt_adress, id: city_id });
+                                                        outLocation({ city: city_text, adress: opt_adress });
+                                                        const show_city_select = document.getElementById('show_city_select');
+                                                        if (show_city_select) {
+                                                            show_city_select.checked = false;
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                })
+            }
+        });
+}
+
+function fromDB() {
+    let shoose_location = document.querySelector('#shoose_location');
+    if (shoose_location) {
+        shoose_location.addEventListener('click', locationOut)
+    }
+};
 ;// ./resources/js/main.js
 
 window.Nette = (netteForms_default());
@@ -803,6 +859,9 @@ netteForms_default().initOnLoad();
 geoLocation();
 
 
+fromDB();
+
+// reread data from db with regions or city data of executors or customers from city of localstorage
 
 /* <!-- js for esc on modal (in Home part of site that based on PicnicCSS) --> */
 document.onkeydown = function (event) {

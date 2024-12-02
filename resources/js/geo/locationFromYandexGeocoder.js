@@ -1,4 +1,5 @@
 import { outLocation } from './OutLocationOnPage.js'
+import { setLocality } from './localStorage.js'
 
 export async function locationFromYandexGeocoder(yapikey, { long, lat }, format = 'json', kind = 'locality', results = 1) {
     const url = "https://geocode-maps.yandex.ru/1.x/?apikey=" + yapikey + "&geocode=" + long + "," + lat + "&format=" + format + "&results=" + results + "&kind=" + kind;
@@ -19,7 +20,7 @@ export async function locationFromYandexGeocoder(yapikey, { long, lat }, format 
 
         if (name && description) {
             outLocation({ city: name, adress: description });
-            localStorage.setItem('locality', JSON.stringify({ city: name, adress: description }));
+            setLocality({ city: name, adress: description });
         } else {
             console.error('No location data in responce from geocode-maps.yandex.ru');
         }

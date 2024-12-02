@@ -9,6 +9,8 @@ geoLocation();
 import { fromDB } from './geo/fromDB.js';
 fromDB();
 
+// reread data from db with regions or city data of executors or customers from city of localstorage
+
 /* <!-- js for esc on modal (in Home part of site that based on PicnicCSS) --> */
 document.onkeydown = function (event) {
     if (event.key == "Escape") {

@@ -43,7 +43,7 @@ class GeoPlugin
     public $currency = 'USD';
 
     // the default language
-    public $lang = 'en';
+    public $lang = 'ru';
     /*
     supported languages:
     de

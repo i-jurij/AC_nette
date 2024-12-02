@@ -1,6 +1,9 @@
-function districtOut(locations) {
-    let inner = '<option value="">Округ</option>';
-    let districts = locations['district']
+import { outLocation } from './OutLocationOnPage.js'
+import { setLocality } from './localStorage.js'
+
+function districtOut(districts) {
+    let inner = '<option value="" id="empty_district">Округ</option>';
+
     for (const key of Object.keys(districts)) {
         // console.log(district[key]['id'] + ' ' + district[key]['name'])
         inner = inner + '<option value="' + districts[key]['id'] + '">' + districts[key]['name'] + '</option>'
@@ -19,9 +22,8 @@ function districtOut(locations) {
     }
 }
 
-function regionOut(locations, district_id) {
-    let inner = '<option value="">Регион</option>';
-    let regions = locations['district'][district_id]['regions'];
+function regionOut(regions) {
+    let inner = '<option value="" id="empty_region">Регион</option>';
     for (const key of Object.keys(regions)) {
         inner = inner + '<option value="' + regions[key]['id'] + '">' + regions[key]['name'] + '</option>'
     }
@@ -36,9 +38,8 @@ function regionOut(locations, district_id) {
     }
 }
 
-function cityOut(locations, district_id, region_id) {
-    let cities = locations['district'][district_id]['regions'][region_id]['cities'];
-    let inner = '<option value="">Город</option>';
+function cityOut(cities) {
+    let inner = '<option value="" id="empty_city">Город</option>';
     for (const key of Object.keys(cities)) {
         inner = inner + '<option value="' + cities[key]['id'] + '">' + cities[key]['name'] + '</option>'
     }
@@ -48,12 +49,6 @@ function cityOut(locations, district_id, region_id) {
         shoose_city.innerHTML = inner;
     }
 
-}
-
-
-function saveToLocalStorage() {
-
-    alert('save')
 }
 
 function hideLocationModal() {
@@ -71,34 +66,72 @@ function locationOut() {
     })
         .then(responce => responce.json())
         .then(locations => {
-            //console.log(locations);
-            districtOut(locations);
+            let districts = locations['district'];
+            districtOut(districts);
 
             let shoose_district = document.querySelector('#shoose_district');
             if (shoose_district) {
                 shoose_district.addEventListener('change', function () {
-                    let district_id = this.value;
-                    console.info(district_id)
-                    if (district_id) {
-                        regionOut(locations, district_id);
-                        let shoose_region = document.querySelector('#shoose_region');
-                        if (shoose_region) {
-                            shoose_region.addEventListener('change', function () {
-                                let region_id = this.value;
-                                if (region_id) {
-                                    cityOut(locations, district_id, region_id);
+                    let options_empty_district = document.querySelector('#empty_district');
+                    if (options_empty_district) {
+                        options_empty_district.remove();
+                    }
 
-                                    let shoose_city = document.querySelector('#shoose_city');
-                                    if (shoose_city) {
-                                        shoose_city.addEventListener('change', function () {
-                                            let save_city = document.querySelector('#save_city');
-                                            if (save_city) {
-                                                save_city.addEventListener('click', saveToLocalStorage)
-                                            }
-                                        });
+                    let district_id = this.value;
+                    let district_text = this.options[this.selectedIndex].text;
+
+                    if (district_id) {
+                        let regions0 = districts[district_id];
+                        if (regions0) {
+                            let regions = regions0['regions'];
+                            regionOut(regions);
+
+                            let shoose_region = document.querySelector('#shoose_region');
+                            if (shoose_region) {
+                                shoose_region.addEventListener('change', function () {
+                                    let options_empty_region = document.querySelector('#empty_region');
+                                    if (options_empty_region) {
+                                        options_empty_region.remove();
                                     }
-                                }
-                            })
+                                    let region_id = this.value;
+                                    let region_text = this.options[this.selectedIndex].text;
+                                    if (region_id) {
+                                        let cities0 = regions[region_id];
+                                        if (cities0) {
+                                            let cities = cities0['cities'];
+                                            if (cities) {
+                                                cityOut(cities);
+                                            }
+                                        }
+
+                                        let shoose_city = document.querySelector('#shoose_city');
+                                        if (shoose_city) {
+                                            shoose_city.addEventListener('change', function () {
+                                                let options_empty_city = document.querySelector('#empty_city');
+                                                if (options_empty_city) {
+                                                    options_empty_city.remove();
+                                                }
+                                                let city_id = this.value;
+                                                let city_text = this.options[this.selectedIndex].text;
+
+                                                let save_city = document.querySelector('#save_city');
+                                                if (save_city) {
+                                                    save_city.addEventListener('click', function () {
+                                                        //let opt_adress = region_text + ' ' + district_text;
+                                                        let opt_adress = region_text;
+                                                        setLocality({ city: city_text, adress: opt_adress, id: city_id });
+                                                        outLocation({ city: city_text, adress: opt_adress });
+                                                        const show_city_select = document.getElementById('show_city_select');
+                                                        if (show_city_select) {
+                                                            show_city_select.checked = false;
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }
+                                })
+                            }
                         }
                     }
                 })
