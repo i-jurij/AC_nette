@@ -1,7 +1,6 @@
 import { outLocation } from './OutLocationOnPage.js'
 
-// for city getting from Yandex Geocoder from browser navigator geolocation
-// import { getLoc } from './browserNavigator.js'
+import { getLoc } from './browserNavigator.js'
 
 import { setLocality } from './localStorage.js'
 import { getLocality } from './localStorage.js'
@@ -19,8 +18,8 @@ export function geoLocation() {
         } else {
             if (city_from_back) {
                 if (city_from_back.includes(substring)) {
-                    // getLoc();
-                    outLocation({ city: '', adress: '' });
+                    getLoc();
+                    //outLocation({ city: '', adress: '' });
                 } else {
                     let region = region_from_back ?? '';
                     outLocation({ city: city_from_back, adress: region });

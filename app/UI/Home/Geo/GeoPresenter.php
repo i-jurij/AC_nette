@@ -39,4 +39,10 @@ final class GeoPresenter extends \App\UI\BasePresenter
     {
         $this->sendJson($this->geo->city($id));
     }
+
+    public function actionLocationFromCoord($long_lat)
+    {
+        // $this->sendJson($this->geo->fromCoord($long_lat));
+        $this->sendJson(['city' => 'city', 'adress' => 'addr']);
+    }
 }

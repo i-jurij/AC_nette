@@ -4,12 +4,12 @@ export function outLocation({ city, adress }) {
     const button_shoose_place = document.getElementById("shoose_location");
     const checkbox_modal_window = document.getElementById('modal_1');
 
-    if (city_elem && city) {
+    if (city_elem && city && typeof city == 'string') {
         city_elem.innerHTML = city + "&ensp;&#8250;";
         let adr = '';
-        if (adress && adress.includes(city + ' ')) {
+        if (typeof adress == 'string' && adress && adress.includes(city + ' ')) {
             adr = '<div class="my2">' + adress + '</div>';
-        } else if (adress && !adress.includes(city + ' ')) {
+        } else if (typeof adress == 'string' && adress && !adress.includes(city + ' ')) {
             adr = '<div class="mt2">' + city + '</div><div class="mb2">' + adress + '</div>';
         } else {
             adr = '<div class="my2">' + city + '.</div>'

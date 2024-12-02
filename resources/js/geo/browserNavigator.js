@@ -1,16 +1,19 @@
+// for city getting from Yandex Geocoder from browser navigator geolocation
 import { yapikey } from "../../../config/yandex_api.js"
 import { locationFromYandexGeocoder } from './locationFromYandexGeocoder.js';
+
 import { outLocation } from './OutLocationOnPage.js'
+import { setLocality } from './localStorage.js'
 
 // get location from browser geolocation and yandex geocoder
 // required user permission for geolocation
-export function getLoc() {
-    function getLocation() {
+export async function getLoc() {
+    async function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(getCoords, showError, positionOption);
         } else {
             outLocation({ city: '', adress: '' });
-            alert("WARNING! Geolocation is not supported by this browser.");
+            console.warn("WARNING! Geolocation is not supported by this browser.");
         }
     }
 
@@ -19,9 +22,8 @@ export function getLoc() {
     function getCoords(position) {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-        let longLat = { long: longitude, lat: latitude };
 
-        locationFromYandexGeocoder(yapikey, longLat);
+        return { long: longitude, lat: latitude };
     }
 
     function showError(error) {
@@ -43,5 +45,28 @@ export function getLoc() {
         }
     }
 
-    getLocation();
+    function outSave({ city, adress, id }) {
+        outLocation({ city, adress });
+        setLocality({ city, adress, id });
+    }
+
+    function checkResponce(obj) {
+        if (typeof obj === 'object' && 'city' in obj && obj.city != '' && obj.city != 'undefined' && typeof obj.city == 'string') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //const coord = await getLocation();
+    const coord = { long: 33.610202, lat: 44.614292 };
+
+    fetch('home.geo/location-from-coord/' + coord.long + '_' + coord.lat, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(response => checkResponce(response) ? outSave(response) : locationFromYandexGeocoder(yapikey, coord))
+        .catch(error => console.log(error));
+
 }
