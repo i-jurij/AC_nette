@@ -65,4 +65,44 @@ final class Geo
 
         return $res ?? [];
     }
+
+    public function fromCoord($long_lat)
+    {
+        $locality = [];
+        if (!empty($long_lat) && \is_string($long_lat)) {
+            list($long, $lat) = explode('_', trim($long_lat));
+            $area = (1 / 111) * 100; // ~100km (1° ~ 111 км, 1 км = 1 / 111 = 0,009009009009009°.)
+
+            $lat_dist_minus = (float) $lat - $area;
+            $lat_dist_plus = (float) $lat + $area;
+            $long_dist_minus = (float) $long - $area;
+            $long_dist_plus = (float) $long + $area;
+
+            $params0 = [$lat_dist_minus, $lat_dist_plus, $long_dist_minus, $long_dist_plus];
+
+            $query = 'SELECT `city`, `adress`, `id`
+                                    FROM (
+                                            SELECT `id`, `city`, `adress`, `distance`
+                                                FROM (
+                                                        SELECT `gc`.`id`, `gc`.`name` AS city, `r`.`name` AS adress,
+                                                            ACOS(SIN(PI()*gc.latitude/180.0)*SIN(PI()*?/180.0)
+                                                                +COS(PI()*gc.latitude/180.0)*COS(PI()*?/180.0)
+                                                                *COS(PI()*?/180.0-PI()*gc.longitude/180.0))*6371 AS distance
+                                                        FROM `geo_city` AS gc
+                                                        INNER JOIN `geo_regions` AS r ON `r`.`id` = `gc`.`region_id`
+                                                        WHERE gc.latitude BETWEEN ? AND ?
+                                                        AND gc.longitude BETWEEN ? AND ?
+                                                ) AS subquery
+                                            ORDER BY distance
+                                            LIMIT 5
+                                    ) AS limited
+                                    ORDER BY distance
+                                    LIMIT 1;';
+            $params = [(float) $lat, (float) $lat, (float) $long, ...$params0];
+
+            $locality = $this->db->fetch($query, ...$params);
+        }
+
+        return $locality;
+    }
 }

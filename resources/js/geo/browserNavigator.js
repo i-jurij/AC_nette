@@ -23,7 +23,16 @@ export async function getLoc() {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
 
-        return { long: longitude, lat: latitude };
+        let coord = { long: longitude, lat: latitude };
+
+        fetch('home.geo/location-from-coord/' + coord.long + '_' + coord.lat, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(response => checkResponce(response) ? outSave(response) : locationFromYandexGeocoder(yapikey, coord))
+            .catch(error => console.error(error));
     }
 
     function showError(error) {
@@ -57,16 +66,5 @@ export async function getLoc() {
             return false;
         }
     }
-    //const coord = await getLocation();
-    const coord = { long: 33.610202, lat: 44.614292 };
-
-    fetch('home.geo/location-from-coord/' + coord.long + '_' + coord.lat, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(response => checkResponce(response) ? outSave(response) : locationFromYandexGeocoder(yapikey, coord))
-        .catch(error => console.log(error));
-
+    getLocation();
 }
