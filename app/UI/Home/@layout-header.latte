@@ -80,12 +80,12 @@
 	</div>
 
 	<div >
-		<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Enter</a>
+		<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>
 		<a class="pseudo button" n:if="!!$user->getIdentity()" href="#profile">
 			{$user->getIdentity()->username}
 		</a>
 		<a class="button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
-			Logout
+			Выйти
 		</a>
 	</div>
 </header>

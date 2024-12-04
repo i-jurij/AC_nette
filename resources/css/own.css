@@ -276,14 +276,6 @@ span.error {
     box-shadow: var(--boxshadow);
 }
 
-.main_section {
-    margin: 1rem;
-    padding: 1rem;
-    border-radius: var(--radius);
-    background-color: var(--bgcolor);
-    width: 100%;
-}
-
 .main_title {
     font-size: var(--big-fontsize);
 }
