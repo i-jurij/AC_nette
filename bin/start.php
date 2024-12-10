@@ -30,7 +30,7 @@ function migrate(object $container, string $path_to_sql_file)
     $geo = [
         0 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'okrugRF.sql'),
         1 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'regionRF.sql'),
-        2 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'citiesRF.sql'),
+        2 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'citiesRFwithCoord.sql'),
     ];
 
     $reflection = $db->getReflection();
