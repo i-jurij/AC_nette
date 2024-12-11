@@ -75,17 +75,22 @@ module.exports = {
         ],
     },
     optimization: {
+        minimize: true,
         minimizer: [
             new CssMinimizerPlugin({
                 parallel: true,
+                /* 
+                /// for cssnano ///
                 minimizerOptions: {
-                    preset: [
-                        "default",
-                        {
-                            discardComments: { removeAll: true },
+                    preset: ['default', {
+                        discardComments: {
+                            removeAll: true,
                         },
-                    ],
+                    }]
                 },
+                /// end for cssnano ///
+                */
+                minify: CssMinimizerPlugin.cleanCssMinify,
             }),
         ],
     },
