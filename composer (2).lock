@@ -146,12 +146,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/i-jurij/geolocation2.git",
-                "reference": "b592702e616dd27488f0d9e38b4f388e516b5219"
+                "reference": "9721495bb9885d0469e223030b29b15158416c08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/i-jurij/geolocation2/zipball/b592702e616dd27488f0d9e38b4f388e516b5219",
-                "reference": "b592702e616dd27488f0d9e38b4f388e516b5219",
+                "url": "https://api.github.com/repos/i-jurij/geolocation2/zipball/9721495bb9885d0469e223030b29b15158416c08",
+                "reference": "9721495bb9885d0469e223030b29b15158416c08",
                 "shasum": ""
             },
             "default-branch": true,
@@ -175,7 +175,7 @@
                 "source": "https://github.com/i-jurij/geolocation2/tree/main",
                 "issues": "https://github.com/i-jurij/geolocation2/issues"
             },
-            "time": "2024-12-26T17:51:12+00:00"
+            "time": "2024-12-26T14:25:46+00:00"
         },
         {
             "name": "latte/latte",

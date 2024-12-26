@@ -685,7 +685,7 @@ function html() {
 	});
 };
 ;// ./vendor/i-jurij/geolocation2/src/js/geo/choiceToBackend.js
-function choiceToBackend_saveToBackend(city_text, region_text, city_id) {
+function saveToBackend(city_text, region_text, city_id) {
     const formData = new FormData();
 
     formData.set("city_id", city_id);
@@ -761,47 +761,10 @@ function setAllLocality(data_array) {
     localStorage.setItem('all_locality', JSON.stringify(data_array));
 }
 
-;// ./vendor/i-jurij/geolocation2/src/js/geo/locationFromYandexGeocoder.js
-
-
-
-async function locationFromYandexGeocoder(yapikey, { long, lat }, format = 'json', kind = 'locality', results = 1) {
-    const url = "https://geocode-maps.yandex.ru/1.x/?apikey=" + yapikey + "&geocode=" + long + "," + lat + "&format=" + format + "&results=" + results + "&kind=" + kind;
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Response status from geocode-maps.yandex.ru: ${response.status}`);
-        }
-
-        const json = await response.json();
-
-        let jr = json.response;
-        if (jr) {
-            let name = jr.GeoObjectCollection.featureMember[0].GeoObject.name;
-            let description = jr.GeoObjectCollection.featureMember[0].GeoObject.description;
-
-            if (name && description) {
-                outLocation({ city: name, adress: description });
-                setLocality({ city: name, adress: description });
-                saveToBackend(name, description, '');
-            } else {
-                outLocation({ city: '', adress: '' });
-                console.error('No location data in responce from geocode-maps.yandex.ru');
-            }
-        }
-    } catch (error) {
-        outLocation({ city: '', adress: '' });
-        console.error(error.message);
-    }
-}
 ;// ./vendor/i-jurij/geolocation2/src/js/geo/browserNavigator.js
 // for city getting from Yandex Geocoder from browser navigator geolocation
 //import { yapikey } from "../config/yapikey.js"
+
 
 
 
@@ -825,15 +788,6 @@ async function getLoc() {
         }
     }
 
-    function yandexGeo(yandexapikey, long_lat_object) {
-        if (yandexapikey) {
-            locationFromYandexGeocoder(yandexapikey, long_lat_object);
-        } else {
-            outLocation({ city: '', adress: '' });
-            console.warn("WARNING! Yandex API key is undefined");
-        }
-    }
-
     let positionOption = { timeout: 5000, /* maximumAge: 24 * 60 * 60, /* enableHighAccuracy: true */ };
 
     async function getCoords(position) {
@@ -852,9 +806,9 @@ async function getLoc() {
         //const data = response.clone();
         const json = await response.json();
         try {
-            checkResponce(json) ? outSave(json) : yandexGeo(yapikey, coord)
+            checkResponce(json) ? outSave(json) : outSave({ city: '', adress: '' }) // locationFromYandexGeocoder(yapikey, coord)
         } catch (error) {
-            yandexGeo(yapikey, coord);
+            outSave({ city: '', adress: '' }) // locationFromYandexGeocoder(yapikey, coord);
             console.warn(`API response is not JSON.`, error);
         }
     }
@@ -918,7 +872,7 @@ function geoLoc() {
         if (locality) {
             outLocation({ city: locality.city, adress: locality.adress });
             if (city_from_back && !city_from_back.includes(locality.city)) {
-                choiceToBackend_saveToBackend(locality.city, locality.adress, '');
+                saveToBackend(locality.city, locality.adress, '');
             }
         } else {
             if (city_from_back) {
@@ -2025,7 +1979,7 @@ function sc_common(city_text, region_text, city_id) {
     setLocality({ city: city_text, adress: opt_adress, id: city_id });
     outLocation({ city: city_text, adress: opt_adress });
     //sending city data to the server by fetch request
-    choiceToBackend_saveToBackend(city_text, region_text, city_id);
+    saveToBackend(city_text, region_text, city_id);
 
     const show_city_select = document.getElementById('show_city_select');
     if (show_city_select) {
