@@ -135,19 +135,19 @@ textarea {
 }
 
 .flash_child .info {
-    background-color: rgb(46, 35, 205);
+    color: rgb(46, 35, 205);
 }
 
 .flash_child .success {
-    background-color: rgb(20, 121, 54);
+    color: rgb(20, 121, 54);
 }
 
 .flash_child .warning {
-    background-color: rgb(255, 115, 0);
+    color: rgb(255, 115, 0);
 }
 
 .flash_child .error {
-    background-color: rgb(181, 0, 0);
+    color: rgb(181, 0, 0);
 }
 
 ul.error,

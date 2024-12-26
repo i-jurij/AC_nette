@@ -4,45 +4,20 @@ declare(strict_types=1);
 
 namespace App\UI\Home\Geo;
 
-use App\Model\Geo;
-use Nette\Database\Connection;
-
 /**
  * @property GeoTemplate $template
  */
 final class GeoPresenter extends \App\UI\BasePresenter
 {
-    protected Geo $geo;
-
-    // public function __construct(public Explorer $db)
-    public function __construct(public Connection $db)
+    public function actionFromCoord(): void
     {
-        $this->geo = new Geo($this->db);
+        $fromCoord = new \Geolocation\Php\Fetchcontroller();
+        $this->sendJson($fromCoord->fromCoord());
     }
 
-    public function actionGetAll()
+    public function actionFromDb(): void
     {
-        $this->sendJson($this->geo->getAll());
-    }
-
-    public function actionDistrict()
-    {
-        $this->sendJson($this->geo->district());
-    }
-
-    public function actionRegion($id)
-    {
-        $this->sendJson($this->geo->region($id));
-    }
-
-    public function actionCity($id)
-    {
-        $this->sendJson($this->geo->city($id));
-    }
-
-    // $id = long_lat from request (eg 44.000000_33.000000)
-    public function actionLocationFromCoord($id)
-    {
-        $this->sendJson($this->geo->fromCoord($id));
+        $fromDb = new \Geolocation\Php\Fetchcontroller();
+        $this->sendJson($fromDb->getAll());
     }
 }
