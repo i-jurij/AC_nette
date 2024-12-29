@@ -872,7 +872,11 @@ function geoLoc() {
         if (locality) {
             outLocation({ city: locality.city, adress: locality.adress });
             if (city_from_back && !city_from_back.includes(locality.city)) {
-                saveToBackend(locality.city, locality.adress, '');
+                let city_id = '';
+                if (locality.id) {
+                    city_id = locality.id;
+                }
+                saveToBackend(locality.city, locality.adress, city_id);
             }
         } else {
             if (city_from_back) {
@@ -1960,7 +1964,7 @@ function cityOutAndSave(regions) {
     }
 }
 
-function touchOrCkick() {
+function touchOrClick() {
     const isMobile = navigator.userAgent.toLowerCase().match(/mobile/i);
     const isTablet = navigator.userAgent.toLowerCase().match(/tablet/i);
     const isAndroid = navigator.userAgent.toLowerCase().match(/android/i);
@@ -1990,7 +1994,7 @@ function sc_common(city_text, region_text, city_id) {
 function saveCity(city_text, region_text, city_id) {
     let save_city = document.querySelector('#save_city');
     if (save_city) {
-        save_city.addEventListener(touchOrCkick(), sc_common(city_text, region_text, city_id));
+        save_city.addEventListener(touchOrClick(), sc_common(city_text, region_text, city_id));
     }
 }
 
