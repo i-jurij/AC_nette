@@ -29,10 +29,15 @@ final class SignPresenter extends \App\UI\BasePresenter
             ->setHtmlAttribute('class', 'form');
 
         $form->addGroup('');
-        $form->addCaptcha('captcha', 'Captcha error. Re-enter captcha.');
+        $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
 
         $form->addGroup('');
-        $form->addSubmit('send', 'Signin');
+        $form->addSubmit('send', 'Войти');
+
+        $form->addGroup('--- ✍ ---');
+        $url_reg = $this->link('Sign:up');
+        $form->addButton('register', Html::el('div')
+            ->setHtml('<a href="'.$url_reg.'">Зарегистрироваться</a>'));
 
         $form->onSuccess[] = $this->userLogin(...);
 
@@ -41,32 +46,25 @@ final class SignPresenter extends \App\UI\BasePresenter
 
     public function createComponentSignUpForm()
     {
-        $form = $this->formFactory->createLoginForm();
+        $form = $this->formFactory->create();
 
         $form->setHtmlAttribute('id', 'signup')
             ->setHtmlAttribute('class', 'form');
 
-        $form->addPassword('passwordVerify', '')
-            ->setHtmlAttribute('placeholder', 'Confirm password:')
-            ->setRequired('Enter password again')
-            ->addRule($form::Equal, 'Password mismatch', $form['password'])
-            ->addRule($form::MinLength, 'Minimum password length %d characters', PASSWORD_MIN_LENGTH)
-            ->setMaxLength(120)
-            ->setOmitted();
-
+        $form->addGroup('');
         $form->addEmail('email', '')
             ->setHtmlAttribute('placeholder', 'Email:');
 
         $form->addGroup('');
-        $form->addCaptcha('captcha', 'Captcha error. Re-enter captcha.');
+        $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
 
         $form->addGroup('');
-        $form->addSubmit('send', 'Signup');
+        $form->addSubmit('send', 'Зарегистрироваться');
 
         $form->addGroup('--- 🔓 ---');
         $url_reg = $this->link('Sign:in');
         $form->addButton('register', Html::el('div')
-            ->setHtml('<a href="'.$url_reg.'">Login</a>'));
+            ->setHtml('<a href="'.$url_reg.'">Войти</a>'));
 
         $form->addGroup('--- § ---');
         $url_politic = $this->link(':Politic:');
@@ -105,9 +103,8 @@ final class SignPresenter extends \App\UI\BasePresenter
     public function actionOut(): void
     {
         $this->getUser()->logout(true);
-        $this->flashMessage('Log out');
+        // $this->flashMessage('Log out');
         $this->redirect(':Home:');
-        // $this->forward('Home:');
     }
 }
 

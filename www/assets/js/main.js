@@ -637,7 +637,9 @@ var netteForms_default = /*#__PURE__*/__webpack_require__.n(netteForms);
 ;// ./vendor/i-jurij/geolocation2/src/js/geo/html.js
 function hideModal(id) {
 	const mod_1 = document.getElementById(id);
-	mod_1.checked = false;
+	if (mod_1) {
+		mod_1.checked = false;
+	}
 }
 
 function html() {
@@ -1900,7 +1902,9 @@ function cityOut(cities) {
 
 function fromDB_hideModal(id) {
     const mod_1 = document.getElementById(id);
-    mod_1.checked = false;
+    if (mod_1) {
+        mod_1.checked = false;
+    }
 }
 
 function regionOutAndCityOutAndSave(districts) {

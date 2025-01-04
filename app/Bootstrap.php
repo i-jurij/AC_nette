@@ -42,7 +42,7 @@ class Bootstrap
 
         $check = ((bool) $cur_full_url) ? filter_var($cur_full_url, FILTER_VALIDATE_URL) : false;
 
-        if ($check && (bool) \mb_stristr($check, 'admin')) {
+        if ($check && (bool) \mb_stristr($check, '/admin')) {
             $configurator->addConfig($rootDir.'/config/auth_user.neon');
         } else {
             $configurator->addConfig($rootDir.'/config/auth_client.neon');

@@ -18,16 +18,16 @@ h2,
 h3,
 h4 {
     font-family: 'title', cursive;
-    color: var(--fontcolor-light, red);
+    color: var(--fontcolor-light, white);
 }
 
 a {
-    font-size: var(--base-fontsize);
+    font-size: var(--base-fontsize, 1rem);
 }
 
 h1,
 .h1 {
-    font-size: var(--biggest-fontsize);
+    font-size: var(--biggest-fontsize, 2rem);
 }
 
 .pseudo {
@@ -36,7 +36,7 @@ h1,
 
 button,
 .button {
-    background: var(--button-bgcolor);
+    background: var(--button-bgcolor, Green);
     color: var(--button-color, white);
     box-shadow: var(--boxshadow);
     overflow: hidden;
@@ -48,15 +48,15 @@ button:focus,
 .button:focus,
 button:active,
 .button:active {
-    background-color: var(--button-active-bgcolor);
+    background-color: var(--button-active-bgcolor, rgb(0, 155, 0));
     color: var(--button-active-color, white);
     box-shadow: var(--boxshadow);
 }
 
 button:disabled,
 .button:disabled {
-    background-color: var(--bgcolor-content);
-    color: var(--button-disabled-color);
+    background-color: var(--bgcolor-content, rgb(44, 46, 43));
+    color: var(--button-disabled-color, DimGrey);
     box-shadow: var(--boxshadow);
 }
 
@@ -69,21 +69,21 @@ input[type="password"],
 textarea {
     display: inline-block;
     margin: 1rem auto;
-    background: var(--input_bgcolor);
+    background: var(--input_bgcolor, rgb(19, 29, 17));
     background-clip: padding-box;
     font-family: inherit;
-    font-size: var(--base-fontsize);
+    font-size: var(--base-fontsize, 1rem);
     border: 1px solid #999;
-    border-radius: var(--radius);
+    border-radius: var(--radius, 5px);
     width: 100%;
 }
 
 .bgcontent {
-    background-color: var(--bgcolor-content);
+    background-color: var(--bgcolor-content, rgb(44, 46, 43));
 }
 
 .bgcolor {
-    background-color: var(--bgcolor);
+    background-color: var(--bgcolor, Green);
 }
 
 .shadow {
@@ -91,7 +91,7 @@ textarea {
 }
 
 .round {
-    border-radius: var(--radius);
+    border-radius: var(--radius, 5px);
 }
 
 .spacer {
@@ -104,7 +104,7 @@ textarea {
     bottom: 0;
     right: 0;
     left: 0;
-    background-color: var(--bgcolor);
+    background-color: var(--bgcolor, black);
     overflow: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -130,16 +130,16 @@ textarea {
     vertical-align: middle;
     /* border-radius: var(--radius);
     box-shadow: var(--boxshadow); */
-    color: var(--button-color);
+    color: var(--button-color, white);
     text-shadow: none;
 }
 
 .flash_child .info {
-    color: rgb(46, 35, 205);
+    color: rgb(71, 60, 232);
 }
 
 .flash_child .success {
-    color: rgb(20, 121, 54);
+    color: rgb(55, 192, 101);
 }
 
 .flash_child .warning {
@@ -147,14 +147,14 @@ textarea {
 }
 
 .flash_child .error {
-    color: rgb(181, 0, 0);
+    color: rgb(239, 36, 36);
 }
 
 ul.error,
 span.error {
     margin: 1rem auto;
     padding: 0;
-    background-color: var(--bgcolor-content);
+    background-color: var(--bgcolor-content, black);
     list-style: none;
     color: red;
 }
@@ -164,18 +164,23 @@ span.error {
     max-width: 22rem;
     margin: 1rem auto 0 auto;
     padding: 1rem;
-    background-color: var(--bgcolor-content);
-    border-radius: var(--radius);
+    background-color: var(--bgcolor-content, black);
+    border-radius: var(--radius, 5px);
     box-shadow: var(--boxshadow);
 }
 
 .main_title {
-    font-size: var(--big-fontsize);
+    font-size: var(--big-fontsize, 1.5rem);
 }
 
 .main_footer {
     margin: 2rem auto;
     text-align: center;
+}
+
+.netteFormsModal {
+    background-color: var(--bgcolor-content, black);
+    color: var(--fontcolor-light, white);
 }
 
 /* ----------- resolution up to 620px ----------------- */
