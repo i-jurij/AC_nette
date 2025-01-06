@@ -1,6 +1,6 @@
 {
-	"name": "ijurij/oswc2",
-	"description": "Simple CMS on nette",
+	"name": "ijurij/acnette",
+	"description": "AC site on nette",
 	"keywords": [
 		"cms",
 		"nette"
@@ -15,6 +15,10 @@
 	"repositories": [
 		{
 			"url": "https://github.com/i-jurij/geolocation2.git",
+			"type": "vcs"
+		},
+		{
+			"url": "https://github.com/i-jurij/phone-control.git",
 			"type": "vcs"
 		}
 	],

@@ -6,6 +6,9 @@ namespace App\UI\Accessory;
 
 final class PhoneNumber
 {
+    public const PHONE_REGEX = "(\+?7|8)?\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?";
+    // SNG numbers // protected const PHONE_REGEX = "^((8|\+374|\+994|\+995|\+375|\+7|\+380|\+38|\+996|\+998|\+993)[\- ]?)?\(?\d{3,5}\)?[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}(([\- ]?\d{1})?[\- ]?\d{1})?$";
+
     public static function toDb($sPhone)
     {
         if (!isset($sPhone)) {
@@ -33,5 +36,14 @@ final class PhoneNumber
         } else {
             return $sPhone;
         }
+    }
+
+    public static function isValid($sPhone, $regex = self::PHONE_REGEX): bool
+    {
+        if (preg_match('/'.$regex.'/', $sPhone)) {
+            return true;
+        }
+
+        return false;
     }
 }

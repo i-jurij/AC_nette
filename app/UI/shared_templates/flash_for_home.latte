@@ -8,7 +8,7 @@
 				<label for="modal_flash_message" class="close">&times;</label>
 			</header>
 			<section class="content bgcontent flash_child " n:inner-foreach="$flashes as $flash">
-				<p class="py2 {$flash->type}">{$flash->message}</p>
+				<p class="py1 bg-black {$flash->type}">{$flash->message}</p>
 			</section>
 			<footer class="bgcontent" >
 				<label for="modal_flash_message" class="button">

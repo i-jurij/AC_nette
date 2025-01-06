@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be41ad5acad954c049747633a72959e0",
+    "content-hash": "f71f1fb2f8fb1330c9573c4d8764c022",
     "packages": [
         {
             "name": "contributte/webpack",

@@ -27,7 +27,7 @@ class UserFacade
         public Explorer $db,
         private Passwords $passwords,
     ) {
-        $this->table = TABLE;
+        $this->table = ''.TABLE;
         $this->table_role_user = 'role_'.TABLE;
     }
 
@@ -93,16 +93,23 @@ class UserFacade
 
     protected function prepareAddFormData($data)
     {
-        if (!empty($data->email)) {
-            Validators::assert($data->email, 'email');
+        if (!empty($data->email) && Validators::isEmail($data->email)) {
+            $email = $data->email;
         }
+        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$/', $data->username)) {
+            $username = $data->username;
+        }
+        if (!empty($data->phone) && PhoneNumber::isValid($data->phone)) {
+            $phone = PhoneNumber::toDb($data->phone);
+        }
+
         // $email = !empty($data->email) ? $data->email : $data->username.'@'.$data->username.'.com';
         $data_array = [
             self::ColumnName => $data->username,
             self::ColumnPasswordHash => $this->passwords->hash($data->password),
             self::ColumnImage => $data->image ?? null,
-            self::ColumnPhone => PhoneNumber::toDb($data->phone) ?? null,
-            self::ColumnEmail => $data->email ?? null,
+            self::ColumnPhone => $phone ?? null,
+            self::ColumnEmail => $email ?? null,
             self::ColumnAuthToken => $this->token(),
             // self::ColumnCreatedAt => $created_at,
             // self::ColumnUpdatedAt => $updated_at,
@@ -113,12 +120,40 @@ class UserFacade
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function add($data): void // object
+    public function add($data): string // object
     {
-        try {
-            $new_user = $this->db->table($this->table)
-                ->insert($this->prepareAddFormData($data));
+        $prepared_data = $this->prepareAddFormData($data);
 
+        if (empty($prepared_data[self::ColumnName])) {
+            return 'Имя пользователя должно состоять только из букв, цифр, подчеркиваний и дефисов.';
+        }
+
+        try {
+            $t = $this->db->table($this->table);
+
+            $new_user = $t->insert($prepared_data);
+
+            // check if $data->roles === 'client' from Home:SignPresenter
+            // then check if role "client" isset in db table "role"
+            // then if isset get id of role "client"
+            // else put role "client" to db table and get id
+            // then put it to table "role_user"
+            if (is_string($data->roles) && $data->roles === 'client') {
+                $role = $this->db->table('role');
+                $role_client_check = $role->where('role_name', 'client');
+                if (!empty($role_client_check->id)) {
+                    $role_id = $role_client_check->id;
+                } else {
+                    $role_client_add = $role->insert(['role_name' => 'client']);
+                    $role_id = $role_client_add->id;
+                }
+
+                $this->db->table($this->table_role_user)->insert([
+                    'user_id' => $new_user->id,
+                    'role_id' => $role_id,
+                ]);
+            }
+            // check if is_array($data->roles) from Admin:UserPresenter
             if (\is_array($data->roles)) {
                 foreach ($data->roles as $id) {
                     $this->db->table($this->table_role_user)->insert([
@@ -127,13 +162,13 @@ class UserFacade
                     ]);
                 }
             }
-            // email or sms to new user with auth_token for verification
-            // $this->email->to()->text('form with links to verification cli or accessory);
-        } catch (Exception $e) {
-            throw new Exception();
-        }
 
-        // return $new_user;
+            return 'ok';
+        } catch (UniqueConstraintViolationException $e) {
+            return 'Пользователь с таким номером телефона уже существует.';
+        } catch (Nette\Database\DriverException $e) {
+            return 'Ошибка при регистрации: '.$e->getMessage();
+        }
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]

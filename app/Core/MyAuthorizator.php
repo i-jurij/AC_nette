@@ -24,9 +24,11 @@ class MyAuthorizator implements Nette\Security\Authorizator
             'resource' => $resource,
             'action' => null,
         ];
+
         if (\in_array($res, $this->getRolePermissionData())) {
             return true;
         }
+
         $res_act = [
             'role_name' => $role,
             'resource' => $resource,
@@ -63,6 +65,15 @@ class MyAuthorizator implements Nette\Security\Authorizator
                 'action' => $row->action,
             ];
         }
+
+        // here can add permissions to result as
+        /*
+         $result[] = [
+                'role_name' => 'client',
+                'resource' => 'client_resource',
+                'action' => 'all',
+            ];
+        */
 
         return $result;
     }

@@ -1,10 +1,12 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     entry: {
         main: ['./resources/js/main.js', './resources/css/main.css'],
+        netteForms: ['nette-forms/src/assets/netteForms.js'],
         admin: ['./resources/js/admin.js', './resources/css/admin.css'],
     },
     mode: (process.env.NODE_ENV === 'production') ? 'production' : 'development',
@@ -77,6 +79,15 @@ module.exports = {
     optimization: {
         minimize: true,
         minimizer: [
+            new TerserPlugin({
+                parallel: true,
+                terserOptions: {
+                    compress: {
+                        drop_console: true,
+                    },
+                    mangle: true,
+                },
+            }),
             new CssMinimizerPlugin({
                 parallel: true,
                 /* 

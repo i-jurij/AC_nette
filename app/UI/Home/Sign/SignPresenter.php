@@ -2,7 +2,9 @@
 
 namespace App\UI\Home\Sign;
 
+use App\Model\UserFacade;
 use App\UI\Accessory\FormFactory;
+use App\UI\Accessory\PhoneNumber;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
@@ -18,13 +20,14 @@ final class SignPresenter extends \App\UI\BasePresenter
 
     // Dependency injection of form factory and user management facade
     public function __construct(
-        private FormFactory $formFactory
+        private FormFactory $formFactory,
+        protected UserFacade $userfacade,
     ) {
     }
 
     protected function createComponentSignInForm(): Form
     {
-        $form = $this->formFactory->createLoginForm();
+        $form = $this->formFactory->createHomeLoginForm();
         $form->setHtmlAttribute('id', 'log_in_app')
             ->setHtmlAttribute('class', 'form');
 
@@ -46,14 +49,10 @@ final class SignPresenter extends \App\UI\BasePresenter
 
     public function createComponentSignUpForm()
     {
-        $form = $this->formFactory->create();
+        $form = $this->formFactory->createHomeLoginForm();
 
         $form->setHtmlAttribute('id', 'signup')
             ->setHtmlAttribute('class', 'form');
-
-        $form->addGroup('');
-        $form->addEmail('email', '')
-            ->setHtmlAttribute('placeholder', 'Email:');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
@@ -77,6 +76,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         return $form;
     }
 
+    #[Requires(methods: 'POST', sameOrigin: true)]
     private function userLogin(Form $form, \stdClass $data): void
     {
         try {
@@ -89,15 +89,31 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
     }
 
+    #[Requires(methods: 'POST', sameOrigin: true)]
     private function processSignUpForm(Form $form, \stdClass $data): void
     {
-        try {
-            // register user
-            $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
-            $this->redirect(':Home:Sign:in');
-        } catch (Exception $e) {
-            $form->addError('Unknown error.');
+        if (PhoneNumber::isValid($data->phone)) {
+            $data->username = PhoneNumber::toDb($data->phone);
+            $data->roles = 'client';
+            $new_user = $this->userfacade->add($data);
+            if (is_string($new_user)) {
+                if ($new_user == 'ok') {
+                    $this->flashMessage('Вы зарегистрированы', 'success');
+                } else {
+                    $this->flashMessage($new_user, 'error');
+                    $this->redirect(':Home:Sign:up');
+                }
+            } else {
+                $this->flashMessage('Неизвестная ошибка. Повторите позже.', 'error');
+                $this->redirect(':Home:Sign:up');
+            }
+        } else {
+            $this->flashMessage('Неверный формат телефонного номера.', 'error');
+            $this->redirect(':Home:Sign:up');
         }
+
+        // $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
+        $this->redirect(':Home:Sign:in');
     }
 
     public function actionOut(): void

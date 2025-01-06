@@ -96,7 +96,8 @@ final class SignPresenter extends Nette\Application\UI\Presenter
     {
         try {
             // register user
-            $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
+            // $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
+            $this->flashMessage('For now only site admin can to register user.', 'info');
             $this->redirect(':Admin:Sign:in');
         } catch (Exception $e) {
             $form->addError('Unknown error.');
