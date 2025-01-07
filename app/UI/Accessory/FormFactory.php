@@ -33,7 +33,9 @@ final class FormFactory
                 ->addRule($form::Pattern, 'Введен неправильный номер', PhoneNumber::PHONE_REGEX);
         });
         $this->form->addPhone('phone', 'Телефон:')
-            ->setHtmlAttribute('placeholder', 'Телефон:')
+            ->setHtmlType('tel')
+            ->setHtmlAttribute('placeholder', '+7 999 333 22 22')
+            ->setHtmlAttribute('id', 'user_phone_input')
             ->setRequired('Телефон обязателен.');
     }
 

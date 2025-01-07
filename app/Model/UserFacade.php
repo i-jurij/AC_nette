@@ -87,7 +87,7 @@ class UserFacade
                 'role_id' => $role_admin_id['id'],
             ]);
         } catch (UniqueConstraintViolationException $e) {
-            throw new DuplicateNameException();
+            // throw new DuplicateNameException();
         }
     }
 
@@ -96,16 +96,18 @@ class UserFacade
         if (!empty($data->email) && Validators::isEmail($data->email)) {
             $email = $data->email;
         }
+
         if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$/', $data->username)) {
             $username = $data->username;
         }
+
         if (!empty($data->phone) && PhoneNumber::isValid($data->phone)) {
             $phone = PhoneNumber::toDb($data->phone);
         }
 
         // $email = !empty($data->email) ? $data->email : $data->username.'@'.$data->username.'.com';
         $data_array = [
-            self::ColumnName => $data->username,
+            self::ColumnName => $username ?? $phone,
             self::ColumnPasswordHash => $this->passwords->hash($data->password),
             self::ColumnImage => $data->image ?? null,
             self::ColumnPhone => $phone ?? null,
@@ -120,17 +122,17 @@ class UserFacade
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function add($data): string // object
+    public function add($data): string
     {
         $prepared_data = $this->prepareAddFormData($data);
 
         if (empty($prepared_data[self::ColumnName])) {
-            return 'Имя пользователя должно состоять только из букв, цифр, подчеркиваний и дефисов.';
+            return 'Имя пользователя не указано или содержит недопустимые символы.';
         }
 
+        $this->db->beginTransaction();
         try {
             $t = $this->db->table($this->table);
-
             $new_user = $t->insert($prepared_data);
 
             // check if $data->roles === 'client' from Home:SignPresenter
@@ -138,21 +140,25 @@ class UserFacade
             // then if isset get id of role "client"
             // else put role "client" to db table and get id
             // then put it to table "role_user"
-            if (is_string($data->roles) && $data->roles === 'client') {
+
+            if ($data->roles === 'client') {
                 $role = $this->db->table('role');
-                $role_client_check = $role->where('role_name', 'client');
+                $role_client_check = $role->where('role_name', 'client')->fetch();
+
                 if (!empty($role_client_check->id)) {
                     $role_id = $role_client_check->id;
                 } else {
                     $role_client_add = $role->insert(['role_name' => 'client']);
                     $role_id = $role_client_add->id;
                 }
-
-                $this->db->table($this->table_role_user)->insert([
-                    'user_id' => $new_user->id,
-                    'role_id' => $role_id,
-                ]);
+                if (isset($role_id)) {
+                    $this->db->table($this->table_role_user)->insert([
+                        'user_id' => $new_user->id,
+                        'role_id' => $role_id,
+                    ]);
+                }
             }
+
             // check if is_array($data->roles) from Admin:UserPresenter
             if (\is_array($data->roles)) {
                 foreach ($data->roles as $id) {
@@ -162,12 +168,19 @@ class UserFacade
                     ]);
                 }
             }
+            $this->db->commit();
 
             return 'ok';
         } catch (UniqueConstraintViolationException $e) {
-            return 'Пользователь с таким номером телефона уже существует.';
+            $this->db->rollBack();
+            \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
+
+            return 'Пользователь с таким именем (номером телефона) уже существует.';
         } catch (Nette\Database\DriverException $e) {
-            return 'Ошибка при регистрации: '.$e->getMessage();
+            $this->db->rollBack();
+            \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
+
+            return 'Ошибка при регистрации. Повторите позже.';
         }
     }
 
@@ -309,6 +322,23 @@ class UserFacade
         }
 
         return $users_data;
+    }
+
+    public function searchBy($field, $data, $strict = true): ?ActiveRow
+    {
+        $like = ' LIKE ?';
+        $pro = '%';
+
+        if ($strict) {
+            $like = '';
+            $pro = '';
+        }
+        if ($field === 'phone') {
+            $data = PhoneNumber::toDb($data);
+        }
+        $query = $this->db->table($this->table);
+
+        return $query->where($field.$like, $pro.$data.$pro)->fetch();
     }
 }
 

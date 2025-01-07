@@ -7,3 +7,57 @@
 <div class="mb2">
     {control signUpForm}
 </div>
+
+<script n:syntax="double">
+let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
+
+function fetchRequest(phone) {
+    const formData = new FormData();
+    formData.set("phone", phone);
+
+    return {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json'
+        },
+        body: formData,
+    };
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const phone_elem = document.getElementById("user_phone_input");
+    if (phone_elem){
+        phone_elem.addEventListener('change',
+            function () {
+                const reg = /(\+7|8)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+                let message_el = document.getElementById("check_phone_message");
+                let user_phone_pre = phone_elem.value;
+                let user_phone = user_phone_pre.replace(/[^0-9]/g, '');
+
+                if (reg.test(user_phone)){
+                    fetch(url_for_check_phone_in_db, fetchRequest(user_phone))
+                    .then((response) => response.ok === true ? response.json() : false)
+                    .then(check => {
+                        if (check > 0){
+                            if (message_el) {
+                                message_el.remove();
+                            } 
+                            let pel = document.createElement("p");
+                            pel.setAttribute("id", "check_phone_message");
+                            pel.setAttribute("class", "red");
+                            pel.innerHTML = '<small>Пользователь с таким номером уже зарегистрирован.</small>';
+                            phone_elem.parentNode.insertBefore(pel, phone_elem);
+                            //phone_elem.parentNode.insertBefore(pel, phone_elem.nextSibling);
+                        } else {
+                            if (message_el) {
+                                message_el.remove();
+                            }
+                        }
+                    });
+                }
+            }
+        )
+    }
+});
+</script>

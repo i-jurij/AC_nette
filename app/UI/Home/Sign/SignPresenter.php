@@ -47,6 +47,25 @@ final class SignPresenter extends \App\UI\BasePresenter
         return $form;
     }
 
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    private function userLogin(Form $form, \stdClass $data): void
+    {
+        try {
+            if (!empty($data->username)) {
+                $this->getUser()->login($data->username, $data->password);
+            }
+            if (!empty($data->phone)) {
+                $this->getUser()->login(PhoneNumber::toDb($data->phone), $data->password);
+            }
+
+            $this->restoreRequest($this->backlink);
+
+            $this->redirect(':Home:');
+        } catch (Nette\Security\AuthenticationException $e) {
+            $form->addError('Wrong login or password.');
+        }
+    }
+
     public function createComponentSignUpForm()
     {
         $form = $this->formFactory->createHomeLoginForm();
@@ -77,43 +96,16 @@ final class SignPresenter extends \App\UI\BasePresenter
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    private function userLogin(Form $form, \stdClass $data): void
-    {
-        try {
-            $this->getUser()->login($data->username, $data->password);
-            $this->restoreRequest($this->backlink);
-
-            $this->redirect(':Home:');
-        } catch (Nette\Security\AuthenticationException $e) {
-            $form->addError('Wrong login or password.');
-        }
-    }
-
-    #[Requires(methods: 'POST', sameOrigin: true)]
     private function processSignUpForm(Form $form, \stdClass $data): void
     {
-        if (PhoneNumber::isValid($data->phone)) {
-            $data->username = PhoneNumber::toDb($data->phone);
-            $data->roles = 'client';
-            $new_user = $this->userfacade->add($data);
-            if (is_string($new_user)) {
-                if ($new_user == 'ok') {
-                    $this->flashMessage('Вы зарегистрированы', 'success');
-                } else {
-                    $this->flashMessage($new_user, 'error');
-                    $this->redirect(':Home:Sign:up');
-                }
-            } else {
-                $this->flashMessage('Неизвестная ошибка. Повторите позже.', 'error');
-                $this->redirect(':Home:Sign:up');
-            }
+        $data->roles = 'client';
+        $res = $this->userfacade->add($data);
+        if ($res === 'ok') {
+            $this->flashMessage('Вы зарегистрированы', 'success');
+            $this->redirect(':Home:Sign:in');
         } else {
-            $this->flashMessage('Неверный формат телефонного номера.', 'error');
-            $this->redirect(':Home:Sign:up');
+            $form->addError($res);
         }
-
-        // $this->flashMessage('На ваш электронный адрес выслано письмо. Для завершения регистрации следуйте инструкции в письме.', 'info');
-        $this->redirect(':Home:Sign:in');
     }
 
     public function actionOut(): void
@@ -121,6 +113,18 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->getUser()->logout(true);
         // $this->flashMessage('Log out');
         $this->redirect(':Home:');
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionCheckPhoneInDb(): void
+    {
+        $httpRequest = $this->getHttpRequest();
+        $phone = $httpRequest->getPost('phone');
+        $res = $this->userfacade->searchBy('phone', $phone);
+        if (!empty($res->id)) {
+            $this->sendJson(1);
+        }
+        $this->sendJson(0);
     }
 }
 
