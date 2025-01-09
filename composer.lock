@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/i-jurij/nette_form_captcha.git",
-                "reference": "c7254172b6d71b2430db95dfcc749124ac4f4eda"
+                "reference": "666ec0c17a6b02259e7b2367444a4aaae0e5f931"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/i-jurij/nette_form_captcha/zipball/c7254172b6d71b2430db95dfcc749124ac4f4eda",
-                "reference": "c7254172b6d71b2430db95dfcc749124ac4f4eda",
+                "url": "https://api.github.com/repos/i-jurij/nette_form_captcha/zipball/666ec0c17a6b02259e7b2367444a4aaae0e5f931",
+                "reference": "666ec0c17a6b02259e7b2367444a4aaae0e5f931",
                 "shasum": ""
             },
             "require": {
@@ -154,7 +154,7 @@
                 "source": "https://github.com/i-jurij/nette_form_captcha/tree/main",
                 "issues": "https://github.com/i-jurij/nette_form_captcha/issues"
             },
-            "time": "2025-01-09T11:33:52+00:00"
+            "time": "2025-01-09T14:54:15+00:00"
         },
         {
             "name": "latte/latte",

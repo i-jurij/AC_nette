@@ -3,7 +3,8 @@ extensions:
     
 captcha:
     autoload: yes
-    type: image # question # or numeric | image
-    questions:
+    type: image # question | numeric | image
+    bgcolor: '255, 255, 255, 50' # Only for type = image 
+    questions: # only for type question
         "Question 1?": "1"
         "Question 2?": "2"
