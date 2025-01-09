@@ -1,0 +1,1 @@
+import { geoLocation } from '../../vendor/i-jurij/geolocation2/src/js/geolocation2.js';

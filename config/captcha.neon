@@ -1,12 +1,9 @@
 extensions:
-	captcha: 
-		NgatNgay\NetteFormCaptcha\DI\CaptchaExtension
-
+    captcha: NFCaptcha\DI\CaptchaExtension
+    
 captcha:
-	autoload: yes
-	type: numeric # numeric | text | image
-	questions:
-		"Fatherland of bush elephant?": "Africa"
-		"Fatherland of forest elephant?": "Africa"
-		"Country of asian elephant?": "India"
-		"Number &pi;?": "3.141592"    
+    autoload: yes
+    type: image # question # or numeric | image
+    questions:
+        "Question 1?": "1"
+        "Question 2?": "2"

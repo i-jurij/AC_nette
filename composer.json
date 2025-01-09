@@ -18,7 +18,7 @@
 			"type": "vcs"
 		},
 		{
-			"url": "https://github.com/i-jurij/phone-control.git",
+			"url": "https://github.com/i-jurij/nette_form_captcha.git",
 			"type": "vcs"
 		}
 	],
@@ -39,8 +39,8 @@
 		"tracy/tracy": "^2.10",
 		"contributte/webpack": "^2.3",
 		"michelf/php-markdown": "^2.0",
-		"ngatngay/nette-form-captcha": "dev-master",
-		"i-jurij/geolocation2": "dev-main"
+		"i-jurij/geolocation2": "dev-main",
+		"i-jurij/nette_form_captcha": "dev-main"
 	},
 	"require-dev": {
 		"nette/tester": "^2.5",

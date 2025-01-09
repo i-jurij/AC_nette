@@ -6,12 +6,14 @@ const TerserPlugin = require("terser-webpack-plugin");
 module.exports = {
     entry: {
         main: ['./resources/js/main.js', './resources/css/main.css'],
-        netteForms: ['nette-forms/src/assets/netteForms.js'],
+        geolocation: ['./resources/js/geolocation.js'],
+        netteForms: ['./resources/js/netteforms.js'],
+        maskito: ['./resources/js/maskito.js'],
         admin: ['./resources/js/admin.js', './resources/css/admin.css'],
     },
     mode: (process.env.NODE_ENV === 'production') ? 'production' : 'development',
     resolve: {
-        extensions: ['*', '.js', '.jsx']
+        extensions: ['.*', '.js', '.jsx']
     },
     output: {
         path: path.join(__dirname, 'www', 'assets'),

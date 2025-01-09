@@ -20,11 +20,11 @@
     "webpack-dev-server": "^5.0.4"
   },
   "dependencies": {
+    "@maskito/phone": "^3.2.1",
     "all": "^0.0.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "nette-forms": "^3.3.6",
-    "oswc2_styles": "github:i-jurij/oswc2_styles",
-    "phone-control": "^1.0.0"
+    "oswc2_styles": "github:i-jurij/oswc2_styles"
   }
 }
