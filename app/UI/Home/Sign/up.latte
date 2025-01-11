@@ -4,8 +4,58 @@
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
-<div class="mb2">
-    {control signUpForm}
+{*<div class="mb2 flexx one two-900">*}
+<div class="mb2 md-flex items-start mx-auto" style="max-width: 50rem;">
+    {*control signUpForm*}
+    <form n:name=signUpForm class="form">
+        <ul class="errors" n:ifcontent>
+            <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+        </ul>
+
+        <div>
+            {label phone}Телефон:{input phone}{/label}
+            <span class=error n:ifcontent>{inputError phone}</span>
+        </div>
+        <div>
+            {label password}Пароль:{input password}{/label}
+            <span class=error n:ifcontent>{inputError password}</span>
+        </div>
+        
+        <div id="type_of_client">
+            <span>Вы регистрируетесь как:</span><br>
+            {foreach $form[type_of_client]->items as $key => $label}
+                {label type_of_client:$key, class: [button, pseudo]}
+                    {input type_of_client:$key}
+                    <span class="checkable">{$label}</span>
+                {/label}
+            {/foreach}
+        </div>
+
+        <div class="my3">
+            <span n:foreach="$form['captcha']->getControls() as $key => $contr">
+                {$contr->getLabel()}
+                {$contr->getControl()}
+            </span>
+            
+            <span class="error" n:ifcontent>
+                <small n:foreach="$form['captcha']->getErrors() as $error">{$error}</small>
+            </span>
+        </div>
+
+
+        <div class="my3">
+            {input send}
+        </div>
+    </form>
+
+    <div class="form">
+        <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
+        <p>
+            <a n:href=':Home:Sign:in' class="button">Войти</a>
+            <a n:href=':Home:' class="button">На главную</a>
+        </p>
+    </div>
+
 </div>
 
 <script n:syntax="double">
@@ -26,33 +76,22 @@ function fetchRequest(phone) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const phone_elem = document.getElementById("user_phone_input");
-    if (phone_elem){
+    const phone_elem = window.Main.phone_elem;
+    if (phone_elem){ 
         phone_elem.addEventListener('change',
             function () {
-                const reg = /(\+7|8)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
-                let message_el = document.getElementById("check_phone_message");
-                let user_phone_pre = phone_elem.value;
-                let user_phone = user_phone_pre.replace(/[^0-9]/g, '');
-
-                if (reg.test(user_phone)){
-                    fetch(url_for_check_phone_in_db, fetchRequest(user_phone))
+                //const reg = /(\+7|8)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+                const reg = /(\+?7)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+                let user_phone_pre = phone_elem.value;                
+                if (reg.test(user_phone_pre)){
+                    let user_phone_in_db = user_phone_pre.replace(/[^0-9]/g, '');
+                    fetch(url_for_check_phone_in_db, fetchRequest(user_phone_in_db))
                     .then((response) => response.ok === true ? response.json() : false)
                     .then(check => {
                         if (check > 0){
-                            if (message_el) {
-                                message_el.remove();
-                            } 
-                            let pel = document.createElement("p");
-                            pel.setAttribute("id", "check_phone_message");
-                            pel.setAttribute("class", "red");
-                            pel.innerHTML = '<small>Пользователь с таким номером уже зарегистрирован.</small>';
-                            phone_elem.parentNode.insertBefore(pel, phone_elem);
-                            //phone_elem.parentNode.insertBefore(pel, phone_elem.nextSibling);
-                        } else {
-                            if (message_el) {
-                                message_el.remove();
-                            }
+                            let error_text = '<p>Пользователь с таким номером уже зарегистрирован.</p>\
+                                <p>Нажмите "Забыли пароль?", чтобы восстановить доступ.</p>';
+                            window.Main.jsModaFlash(error_text, window.Main.elements);
                         }
                     });
                 }

@@ -34,7 +34,7 @@ final class FormFactory
         });
         $this->form->addPhone('phone', 'Телефон:')
             ->setHtmlType('tel')
-            ->setHtmlAttribute('placeholder', '+7 999 333 22 22')
+            ->setHtmlAttribute('placeholder', '☎ +7 999 333 22 22') // 📱
             ->setHtmlAttribute('id', 'user_phone_input')
             ->setRequired('Телефон обязателен.');
     }
@@ -42,7 +42,7 @@ final class FormFactory
     private function nameAdd()
     {
         $this->form->addText('username', 'Имя:')
-            ->setHtmlAttribute('placeholder', 'Имя:')
+            ->setHtmlAttribute('placeholder', '👤 Имя:')
             ->setRequired('Имя обязательно.')
             ->addRule($this->form::MinLength, 'Имя длиной не менее %d символов', 3)
             ->addRule($this->form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$')
@@ -52,7 +52,7 @@ final class FormFactory
     private function passwordAdd()
     {
         $this->form->addPassword('password', 'Пароль:')
-            ->setHtmlAttribute('placeholder', 'Пароль:')
+            ->setHtmlAttribute('placeholder', '🔒 Пароль:')
             ->setRequired('Пароль обязателен.')
             ->addRule($this->form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120);

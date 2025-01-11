@@ -37,10 +37,15 @@ final class SignPresenter extends \App\UI\BasePresenter
         $form->addGroup('');
         $form->addSubmit('send', 'Войти');
 
-        $form->addGroup('--- ✍ ---');
-        $url_reg = $this->link('Sign:up');
+        $form->addGroup('--- 👤 ---');
+        $url_reg = $this->link(':Home:Sign:up');
         $form->addButton('register', Html::el('div')
             ->setHtml('<a href="'.$url_reg.'">Зарегистрироваться</a>'));
+
+        $form->addGroup('--- 🔓 ---');
+        $url_restore = $this->link(':Home:Sign:restore');
+        $form->addButton('restore', Html::el('div')
+            ->setHtml('<a href="'.$url_restore.'">Забыли пароль?</a>'));
 
         $form->onSuccess[] = $this->userLogin(...);
 
@@ -68,27 +73,7 @@ final class SignPresenter extends \App\UI\BasePresenter
 
     public function createComponentSignUpForm()
     {
-        $form = $this->formFactory->createHomeLoginForm();
-
-        $form->setHtmlAttribute('id', 'signup')
-            ->setHtmlAttribute('class', 'form');
-
-        $form->addGroup('');
-        $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
-
-        $form->addGroup('');
-        $form->addSubmit('send', 'Зарегистрироваться');
-
-        $form->addGroup('--- 🔓 ---');
-        $url_reg = $this->link('Sign:in');
-        $form->addButton('register', Html::el('div')
-            ->setHtml('<a href="'.$url_reg.'">Войти</a>'));
-
-        $form->addGroup('--- § ---');
-        $url_politic = $this->link(':Politic:');
-        $form->addButton('politic', Html::el('div')
-            ->setHtml('<a href="'.$url_politic.'">Политика обработки персональных данных</a>'))
-            ->setHtmlAttribute('class', 'pseudo');
+        $form = (new Signupform($this->formFactory))->get();
 
         $form->onSuccess[] = $this->processSignUpForm(...);
 
