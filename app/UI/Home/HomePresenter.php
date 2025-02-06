@@ -22,16 +22,15 @@ final class HomePresenter extends BasePresenter
         ) {
             $city = filter_var($httpRequest->getPost('city'), FILTER_SANITIZE_SPECIAL_CHARS);
             $region = filter_var($httpRequest->getPost('region'), FILTER_SANITIZE_SPECIAL_CHARS);
-            $city_id = filter_var($httpRequest->getPost('city_id'), FILTER_SANITIZE_SPECIAL_CHARS) ?? '';
+
             $location = [
                 'city' => $city,
                 'region' => $region,
-                'id' => $city_id,
             ];
             // code for saving user location to server
             // code for getting data by location
             // $this->sendJson($this->model->getData);
-            $data .= $city.'<br>Content after city choice';
+            $data .= $city.'<br>'.$region.'<br>Content after city choice';
         }
 
         $this->sendJson($data);

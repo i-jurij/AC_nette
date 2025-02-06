@@ -23,6 +23,7 @@ final class PoliticPresenter extends \App\UI\BasePresenter // \Nette\Application
             $politic_arr = [Html::el('div')
                 ->setAttribute('class', 'mx-auto mt2 p3 rounded center shadow bgcontent')
                 ->appendAttribute('style', 'columns', 'auto 30em')
+                ->appendAttribute('style', 'column-rule', 'thin inset green')
                 ->appendAttribute('style', 'column-gap', '2em')
                 ->appendAttribute('style', 'text-align', 'justify')
                 ->addHtml($my_html)];

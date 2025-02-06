@@ -29,7 +29,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         $form = $this->formFactory->createHomeLoginForm();
         $form->setHtmlAttribute('id', 'log_in_app')
-            ->setHtmlAttribute('class', 'form');
+            ->setHtmlAttribute('class', 'form center');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');

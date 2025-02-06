@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d43f7636c54b0f7d60efaf44289eed5",
+    "content-hash": "dc979688f532805387e5fdd8fafcf566",
     "packages": [
         {
             "name": "contributte/webpack",
@@ -84,41 +84,41 @@
             "time": "2024-01-05T12:59:56+00:00"
         },
         {
-            "name": "i-jurij/geolocation2",
+            "name": "i-jurij/geolocation",
             "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/i-jurij/geolocation2.git",
-                "reference": "a1115a4f8720d7fe18440272c95fda38ed8fb013"
+                "url": "https://github.com/i-jurij/geolocation.git",
+                "reference": "0154c5703fd8cf55482d92b398e9035a0674b2f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/i-jurij/geolocation2/zipball/a1115a4f8720d7fe18440272c95fda38ed8fb013",
-                "reference": "a1115a4f8720d7fe18440272c95fda38ed8fb013",
+                "url": "https://api.github.com/repos/i-jurij/geolocation/zipball/0154c5703fd8cf55482d92b398e9035a0674b2f0",
+                "reference": "0154c5703fd8cf55482d92b398e9035a0674b2f0",
                 "shasum": ""
             },
             "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Geolocation\\Php\\": "src/php/",
-                    "Geolocation\\Php\\Lib\\": "src/php/lib/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Tests\\": "Tests/"
+                    "Ijurij\\Geolocation\\": "src/"
                 }
             },
             "license": [
                 "Apache-2.0"
             ],
-            "description": "PHP class for geolocation.",
+            "authors": [
+                {
+                    "name": "I-Jurij",
+                    "email": "yjurij@gmail.com"
+                }
+            ],
+            "description": "PHP class for geolocation",
             "support": {
-                "source": "https://github.com/i-jurij/geolocation2/tree/main",
-                "issues": "https://github.com/i-jurij/geolocation2/issues"
+                "source": "https://github.com/i-jurij/geolocation/tree/main",
+                "issues": "https://github.com/i-jurij/geolocation/issues"
             },
-            "time": "2025-01-08T11:43:24+00:00"
+            "time": "2025-02-04T19:57:06+00:00"
         },
         {
             "name": "i-jurij/nette_form_captcha",
@@ -392,16 +392,16 @@
         },
         {
             "name": "nette/bootstrap",
-            "version": "v3.2.4",
+            "version": "v3.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/bootstrap.git",
-                "reference": "4876d25955b4164d714bc17c265f664f6594685b"
+                "reference": "91d08432cb33d6c08d58b215c769d04f20580624"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/bootstrap/zipball/4876d25955b4164d714bc17c265f664f6594685b",
-                "reference": "4876d25955b4164d714bc17c265f664f6594685b",
+                "url": "https://api.github.com/repos/nette/bootstrap/zipball/91d08432cb33d6c08d58b215c769d04f20580624",
+                "reference": "91d08432cb33d6c08d58b215c769d04f20580624",
                 "shasum": ""
             },
             "require": {
@@ -467,9 +467,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/bootstrap/issues",
-                "source": "https://github.com/nette/bootstrap/tree/v3.2.4"
+                "source": "https://github.com/nette/bootstrap/tree/v3.2.5"
             },
-            "time": "2024-06-18T22:13:57+00:00"
+            "time": "2024-11-14T00:49:46+00:00"
         },
         {
             "name": "nette/caching",
@@ -609,16 +609,16 @@
         },
         {
             "name": "nette/database",
-            "version": "v3.2.5",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/database.git",
-                "reference": "3f9e12a5488615194d1e1d093c982cc07a85be68"
+                "reference": "cb825ac1cffe1ede98388a9c4e6c4445c26b961d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/database/zipball/3f9e12a5488615194d1e1d093c982cc07a85be68",
-                "reference": "3f9e12a5488615194d1e1d093c982cc07a85be68",
+                "url": "https://api.github.com/repos/nette/database/zipball/cb825ac1cffe1ede98388a9c4e6c4445c26b961d",
+                "reference": "cb825ac1cffe1ede98388a9c4e6c4445c26b961d",
                 "shasum": ""
             },
             "require": {
@@ -678,22 +678,22 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/database/issues",
-                "source": "https://github.com/nette/database/tree/v3.2.5"
+                "source": "https://github.com/nette/database/tree/v3.2.6"
             },
-            "time": "2024-12-18T19:13:21+00:00"
+            "time": "2025-01-12T15:33:57+00:00"
         },
         {
             "name": "nette/di",
-            "version": "v3.2.3",
+            "version": "v3.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "9b9bfb43dac31c7804b2c8900217046cc0ca3307"
+                "reference": "57f923a7af32435b6e4921c0adbc70c619625a17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/9b9bfb43dac31c7804b2c8900217046cc0ca3307",
-                "reference": "9b9bfb43dac31c7804b2c8900217046cc0ca3307",
+                "url": "https://api.github.com/repos/nette/di/zipball/57f923a7af32435b6e4921c0adbc70c619625a17",
+                "reference": "57f923a7af32435b6e4921c0adbc70c619625a17",
                 "shasum": ""
             },
             "require": {
@@ -751,9 +751,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/di/issues",
-                "source": "https://github.com/nette/di/tree/v3.2.3"
+                "source": "https://github.com/nette/di/tree/v3.2.4"
             },
-            "time": "2024-10-05T03:14:33+00:00"
+            "time": "2025-01-10T04:57:37+00:00"
         },
         {
             "name": "nette/forms",
@@ -834,16 +834,16 @@
         },
         {
             "name": "nette/http",
-            "version": "v3.3.1",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/http.git",
-                "reference": "5f8f07d4242cb48c6b33d89daa3ea6ddf9668cfc"
+                "reference": "3e2587b34beb66f238f119b12fbb4f0b9ab2d6d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/http/zipball/5f8f07d4242cb48c6b33d89daa3ea6ddf9668cfc",
-                "reference": "5f8f07d4242cb48c6b33d89daa3ea6ddf9668cfc",
+                "url": "https://api.github.com/repos/nette/http/zipball/3e2587b34beb66f238f119b12fbb4f0b9ab2d6d1",
+                "reference": "3e2587b34beb66f238f119b12fbb4f0b9ab2d6d1",
                 "shasum": ""
             },
             "require": {
@@ -909,9 +909,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/http/issues",
-                "source": "https://github.com/nette/http/tree/v3.3.1"
+                "source": "https://github.com/nette/http/tree/v3.3.2"
             },
-            "time": "2024-11-04T16:30:18+00:00"
+            "time": "2025-01-12T16:27:57+00:00"
         },
         {
             "name": "nette/mail",
@@ -1685,7 +1685,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "i-jurij/geolocation2": 20,
+        "i-jurij/geolocation": 20,
         "i-jurij/nette_form_captcha": 20
     },
     "prefer-stable": false,

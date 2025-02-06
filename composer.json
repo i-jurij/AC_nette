@@ -1,5 +1,5 @@
 {
-	"name": "ijurij/acnette",
+	"name": "i-jurij/acnette",
 	"description": "AC site on nette",
 	"keywords": [
 		"cms",
@@ -14,7 +14,7 @@
 	],
 	"repositories": [
 		{
-			"url": "https://github.com/i-jurij/geolocation2.git",
+			"url": "https://github.com/i-jurij/geolocation.git",
 			"type": "vcs"
 		},
 		{
@@ -39,7 +39,7 @@
 		"tracy/tracy": "^2.10",
 		"contributte/webpack": "^2.3",
 		"michelf/php-markdown": "^2.0",
-		"i-jurij/geolocation2": "dev-main",
+		"i-jurij/geolocation": "dev-main",
 		"i-jurij/nette_form_captcha": "dev-main"
 	},
 	"require-dev": {

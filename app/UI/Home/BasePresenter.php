@@ -9,9 +9,10 @@ abstract class BasePresenter extends \App\UI\BasePresenter
     public function beforeRender()
     {
         parent::beforeRender();
-        $view = new \Geolocation\Php\View();
-        $this->template->geo = $view->htmlOut();
-        $this->template->location = $view->location;
+        $geo = new \Ijurij\Geolocation\Geolocation();
+
+        $this->template->geo = $geo->run();
+        $this->template->location = $geo->getLocality();
     }
 }
 

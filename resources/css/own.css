@@ -112,7 +112,7 @@ span.error {
 .form {
     width: 100%;
     max-width: 24rem;
-    margin: 1rem auto 0 auto;
+    /* margin: 1rem auto 0 auto; */
     padding: 1rem;
     background-color: var(--bgcolor-content, black);
     border-radius: var(--radius, 5px);

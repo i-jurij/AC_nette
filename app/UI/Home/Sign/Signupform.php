@@ -17,14 +17,7 @@ final class Signupform
         $form = $this->formFactory->createHomeLoginForm();
 
         $form->setHtmlAttribute('id', 'signupform')
-            ->setHtmlAttribute('class', 'form');
-
-        $form->addGroup('');
-        $type_of_client = [
-            'customer' => 'Заказчик',
-            'executor' => 'Исполнитель',
-        ];
-        $input = $form->addRadioList('type_of_client', 'Вы регистрируетесь как:', $type_of_client);
+            ->setHtmlAttribute('class', 'form mb2 mr2 center');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');

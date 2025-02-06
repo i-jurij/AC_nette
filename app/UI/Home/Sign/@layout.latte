@@ -18,22 +18,12 @@
 
 </head>
 
-<body>
-	<div class="header_main">
-
-		{* include flashNoBootstrap from '../../shared_templates/flashNoBootstrap.latte' *}	
+<body class="md-flex items-center">
+	
+	<div class="flex-auto md-flex items-center">
 		{include flash_for_home from $shared_templates.'flash_for_home.latte'}
-
-		<main class="main_section">
-			<div class="center">
-				{include content}	
-			</div>
-		</main>
+		{include content}	
 	</div>
-
-	<div class="spacer"></div>
-
-	<footer class="main_footer"></footer>
 
 	{block scripts}
 		<script src="{webpack js/netteForms.js}"></script>

@@ -4,13 +4,12 @@
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
-{*<div class="mb2 flexx one two-900">*}
-<div class="mb2 md-flex items-start mx-auto" style="max-width: 50rem;">
-    {*control signUpForm*}
-    <form n:name=signUpForm class="form">
-        <ul class="errors" n:ifcontent>
-            <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
-        </ul>
+<div class="p2 md-flex items-start">
+    {control signUpForm}
+    {*<form n:name=signUpForm class="form mb2 mr2 center">
+        <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent >
+            <small>{$error}</small><br>
+        </span>
 
         <div>
             {label phone}Телефон:{input phone}{/label}
@@ -20,42 +19,31 @@
             {label password}Пароль:{input password}{/label}
             <span class=error n:ifcontent>{inputError password}</span>
         </div>
-        
-        <div id="type_of_client">
-            <span>Вы регистрируетесь как:</span><br>
-            {foreach $form[type_of_client]->items as $key => $label}
-                {label type_of_client:$key, class: [button, pseudo]}
-                    {input type_of_client:$key}
-                    <span class="checkable">{$label}</span>
-                {/label}
-            {/foreach}
-        </div>
 
         <div class="my3">
             <span n:foreach="$form['captcha']->getControls() as $key => $contr">
                 {$contr->getLabel()}
                 {$contr->getControl()}
             </span>
-            
             <span class="error" n:ifcontent>
                 <small n:foreach="$form['captcha']->getErrors() as $error">{$error}</small>
             </span>
         </div>
 
-
-        <div class="my3">
-            {input send}
+        <div class="mt3">
+            {input send,  style: "width: 100%;"}
         </div>
     </form>
-
+*}
     <div class="form">
-        <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
-        <p>
-            <a n:href=':Home:Sign:in' class="button">Войти</a>
-            <a n:href=':Home:' class="button">На главную</a>
+        <p class="">
+            <a n:href=':Home:Sign:in' class="button"  style="width: 100%;">Войти</a>
         </p>
+        <p class="">
+            <a n:href=':Home:' class="button"  style="width: 100%;">На главную</a>
+        </p>
+        <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
     </div>
-
 </div>
 
 <script n:syntax="double">
