@@ -4,6 +4,7 @@ namespace App\UI\Home\Sign;
 
 use App\Model\UserFacade;
 use App\UI\Accessory\FormFactory;
+use App\UI\Accessory\IsBot;
 use App\UI\Accessory\PhoneNumber;
 use Nette;
 use Nette\Application\Attributes\Persistent;
@@ -23,6 +24,11 @@ final class SignPresenter extends \App\UI\BasePresenter
         private FormFactory $formFactory,
         protected UserFacade $userfacade,
     ) {
+        $this->onStartup[] = function () {
+            if (IsBot::check()) {
+                $this->redirect(':Home:');
+            }
+        };
     }
 
     protected function createComponentSignInForm(): Form

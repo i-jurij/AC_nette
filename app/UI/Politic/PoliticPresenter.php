@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Politic;
 
+use App\UI\Accessory\IsBot;
 use Michelf\MarkdownExtra;
 use Nette\Application\Responses;
 use Nette\Utils\Html;
@@ -11,6 +12,14 @@ use Nette\Utils\Html;
 final class PoliticPresenter extends \App\UI\BasePresenter // \Nette\Application\UI\Presenter
 {
     // use \App\UI\Accessory\LinkFromFileSystem;
+    public function __construct(
+    ) {
+        $this->onStartup[] = function () {
+            if (IsBot::check()) {
+                $this->redirect(':Home:');
+            }
+        };
+    }
 
     public function renderDefault()
     {
