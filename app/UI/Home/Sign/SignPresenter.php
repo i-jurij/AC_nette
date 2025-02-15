@@ -13,6 +13,7 @@ use Nette\Utils\Html;
 
 final class SignPresenter extends \App\UI\BasePresenter
 {
+    use \App\UI\Accessory\YandexLogin;
     /**
      * Stores the previous page hash to redirect back after successful login.
      */
@@ -61,20 +62,29 @@ final class SignPresenter extends \App\UI\BasePresenter
     #[Requires(methods: 'POST', sameOrigin: true)]
     private function userLogin(Form $form, \stdClass $data): void
     {
+        usleep(200000);
         try {
+            $user = $this->getUser();
             if (!empty($data->username)) {
-                $this->getUser()->login($data->username, $data->password);
+                $user->login($data->username, $data->password);
             }
             if (!empty($data->phone)) {
-                $this->getUser()->login(PhoneNumber::toDb($data->phone), $data->password);
+                $user->login(PhoneNumber::toDb($data->phone), $data->password);
             }
 
             $this->restoreRequest($this->backlink);
 
             $this->redirect(':Home:');
         } catch (Nette\Security\AuthenticationException $e) {
+            sleep(1);
+            // save failed login data to db for processing (name, phone, password, ip, user agent, referer etc, time)
             $form->addError('Wrong login or password.');
         }
+    }
+
+    public function renderIn()
+    {
+        $this->template->yandexLoginUrl = $this->yandexLoginUrl();
     }
 
     public function createComponentSignUpForm()
@@ -117,9 +127,14 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
         $this->sendJson(0);
     }
+
+    public function actionYandexLogin()
+    {
+        $this->yandexLogin();
+    }
 }
 
 class SignTemplate extends \App\UI\Home\BaseTemplate
 {
-    // public array $menuList;
+    public string $yandexLoginUrl;
 }
