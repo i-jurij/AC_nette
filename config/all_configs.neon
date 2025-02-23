@@ -6,3 +6,4 @@ includes:
     - services.neon
     - webpack.neon
     - security.neon
+    - secret.neon

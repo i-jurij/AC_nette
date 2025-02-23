@@ -14,6 +14,9 @@ use Nette\Utils\Html;
 final class SignPresenter extends \App\UI\BasePresenter
 {
     use \App\UI\Accessory\YandexLogin;
+    use \App\UI\Accessory\TelegramLogin;
+    use \App\UI\Accessory\VKLogin;
+    use \App\UI\Accessory\OauthLogin;
     /**
      * Stores the previous page hash to redirect back after successful login.
      */
@@ -36,14 +39,14 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         $form = $this->formFactory->createHomeLoginForm();
         $form->setHtmlAttribute('id', 'log_in_app')
-            ->setHtmlAttribute('class', 'form center');
+            ->setHtmlAttribute('class', 'form center mb2 mr2');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
 
         $form->addGroup('');
         $form->addSubmit('send', 'Войти');
-
+        /*
         $form->addGroup('--- 👤 ---');
         $url_reg = $this->link(':Home:Sign:up');
         $form->addButton('register', Html::el('div')
@@ -53,6 +56,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         $url_restore = $this->link(':Home:Sign:restore');
         $form->addButton('restore', Html::el('div')
             ->setHtml('<a href="'.$url_restore.'">Забыли пароль?</a>'));
+        */
 
         $form->onSuccess[] = $this->userLogin(...);
 
@@ -82,9 +86,43 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
     }
 
+    public function actionYandexLogin(): void
+    {
+        try {
+            $user_data = $this->getUserDataYandex();
+            $res = $this->oauthLogin($user_data);
+        } catch (\Exception $e) {
+            $this->flashMessage('Error', 'text-danger');
+            // write logged error
+        }
+    }
+
+    public function actionTelegramLogin(): void
+    {
+        try {
+            $user_data = $this->getUserDataTelegram();
+            $res = $this->oauthLogin($user_data);
+        } catch (\Exception $e) {
+            $this->flashMessage('Error', 'text-danger');
+            // write logged error
+        }
+    }
+
+    public function actionVkLogin(): void
+    {
+        try {
+            $user_data = $this->getUserDataVK();
+            $res = $this->oauthLogin($user_data);
+        } catch (\Exception $e) {
+            $this->flashMessage('Error', 'text-danger');
+            // write logged error
+        }
+    }
+
     public function renderIn()
     {
         $this->template->yandexLoginUrl = $this->yandexLoginUrl();
+        $this->template->vkLoginUrl = $this->vkLoginUrl();
     }
 
     public function createComponentSignUpForm()
@@ -127,14 +165,10 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
         $this->sendJson(0);
     }
-
-    public function actionYandexLogin()
-    {
-        $this->yandexLogin();
-    }
 }
 
 class SignTemplate extends \App\UI\Home\BaseTemplate
 {
     public string $yandexLoginUrl;
+    public string $vkLoginUrl;
 }

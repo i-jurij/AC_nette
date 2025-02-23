@@ -121,7 +121,6 @@ class UserFacade
         return array_filter($data_array);
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
     public function add($data): string
     {
         $prepared_data = $this->prepareAddFormData($data);
