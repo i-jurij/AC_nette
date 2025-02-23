@@ -19,6 +19,9 @@ final class Signupform
         $form->setHtmlAttribute('id', 'signupform')
             ->setHtmlAttribute('class', 'form mb2 mr2 center');
 
+        $form->addEmail('email', '')
+        ->setHtmlAttribute('placeholder', '📧 Email:');
+
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
 

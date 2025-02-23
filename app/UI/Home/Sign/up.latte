@@ -4,46 +4,58 @@
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
-<div class="p2 md-flex items-start">
-    {control signUpForm}
-    {*<form n:name=signUpForm class="form mb2 mr2 center">
-        <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent >
-            <small>{$error}</small><br>
-        </span>
-
-        <div>
-            {label phone}Телефон:{input phone}{/label}
-            <span class=error n:ifcontent>{inputError phone}</span>
-        </div>
-        <div>
-            {label password}Пароль:{input password}{/label}
-            <span class=error n:ifcontent>{inputError password}</span>
-        </div>
-
-        <div class="my3">
-            <span n:foreach="$form['captcha']->getControls() as $key => $contr">
-                {$contr->getLabel()}
-                {$contr->getControl()}
-            </span>
-            <span class="error" n:ifcontent>
-                <small n:foreach="$form['captcha']->getErrors() as $error">{$error}</small>
-            </span>
-        </div>
-
-        <div class="mt3">
-            {input send,  style: "width: 100%;"}
-        </div>
-    </form>
-*}
-    <div class="form">
-        <p class="">
-            <a n:href=':Home:Sign:in' class="button"  style="width: 100%;">Войти</a>
-        </p>
-        <p class="">
-            <a n:href=':Home:' class="button"  style="width: 100%;">На главную</a>
-        </p>
-        <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
+<div class="flex flex-column items-center ">
+    <div class="bgcontent m2 p2 round center">
+        Войдите и зарегистрируйтесь с помощью сторонних сервисов или введите данные в форму:
+        <br>
+            номер телефона обязательно, так ваши клиенты смогут с вами связаться;
+        <br>
+            адрес электронной почты не обязателен, но с его помощью вы сможете восстановить доступ к учетной записи.
     </div>
+
+    <div class="p2 md-flex items-start justify-center">
+        {include loginFromOther from $shared_templates.'login_from_other.latte'}
+
+        {control signUpForm}
+        {*<form n:name=signUpForm class="form mb2 mr2 center">
+            <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent >
+                <small>{$error}</small><br>
+            </span>
+
+            <div>
+                {label phone}Телефон:{input phone}{/label}
+                <span class=error n:ifcontent>{inputError phone}</span>
+            </div>
+            <div>
+                {label password}Пароль:{input password}{/label}
+                <span class=error n:ifcontent>{inputError password}</span>
+            </div>
+
+            <div class="my3">
+                <span n:foreach="$form['captcha']->getControls() as $key => $contr">
+                    {$contr->getLabel()}
+                    {$contr->getControl()}
+                </span>
+                <span class="error" n:ifcontent>
+                    <small n:foreach="$form['captcha']->getErrors() as $error">{$error}</small>
+                </span>
+            </div>
+
+            <div class="mt3">
+                {input send,  style: "width: 100%;"}
+            </div>
+        </form>
+        *}
+
+        <div class="form">
+            <p class="">
+                <a n:href=':Home:' class="button"  style="width: 100%;">На главную</a>
+            </p>
+            <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
+        </div>
+    </div>  
+
+
 </div>
 
 <script n:syntax="double">

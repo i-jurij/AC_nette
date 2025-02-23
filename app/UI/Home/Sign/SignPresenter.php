@@ -125,6 +125,12 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->template->vkLoginUrl = $this->vkLoginUrl();
     }
 
+    public function renderUp()
+    {
+        $this->template->yandexLoginUrl = $this->yandexLoginUrl();
+        $this->template->vkLoginUrl = $this->vkLoginUrl();
+    }
+
     public function createComponentSignUpForm()
     {
         $form = (new Signupform($this->formFactory))->get();
@@ -164,6 +170,23 @@ final class SignPresenter extends \App\UI\BasePresenter
             $this->sendJson(1);
         }
         $this->sendJson(0);
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionPostRestore(): void
+    {
+        $httpRequest = $this->getHttpRequest();
+        $email = $httpRequest->getPost('email');
+        $res = $this->userfacade->searchBy('email', $email);
+        if (!empty($res->id)) {
+            // create and receive new passsword to email;
+
+            $this->flashMessage('На указанный вами адрес электронной почты отправлено письмо.', 'success');
+            $this->redirect(':Home:Sign:in');
+        } else {
+            $this->flashMessage('Пользователь с таким адресом электронной почты не зарегистрирован. Зарегистрируйтесь или войдите с помощью других сервисов.', 'info');
+            $this->redirect(':Home:Sign:up');
+        }
     }
 }
 

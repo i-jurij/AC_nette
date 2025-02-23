@@ -32,7 +32,7 @@ final class FormFactory
             return $form->addText($name, $label)
                 ->addRule($form::Pattern, 'Введен неправильный номер', PhoneNumber::PHONE_REGEX);
         });
-        $this->form->addPhone('phone', 'Телефон:')
+        $this->form->addPhone('phone', '')
             ->setHtmlType('tel')
             ->setHtmlAttribute('placeholder', '☎ +7 999 333 22 22') // 📱
             ->setHtmlAttribute('id', 'user_phone_input')
@@ -41,7 +41,7 @@ final class FormFactory
 
     private function nameAdd()
     {
-        $this->form->addText('username', 'Имя:')
+        $this->form->addText('username', '')
             ->setHtmlAttribute('placeholder', '👤 Имя:')
             ->setRequired('Имя обязательно.')
             ->addRule($this->form::MinLength, 'Имя длиной не менее %d символов', 3)
@@ -49,9 +49,15 @@ final class FormFactory
             ->setMaxLength(25);
     }
 
+    private function emailAdd()
+    {
+        $this->form->addEmail('email', '')
+        ->setHtmlAttribute('placeholder', '📧 Email:');
+    }
+
     private function passwordAdd()
     {
-        $this->form->addPassword('password', 'Пароль:')
+        $this->form->addPassword('password', '')
             ->setHtmlAttribute('placeholder', '🔒 Пароль:')
             ->setRequired('Пароль обязателен.')
             ->addRule($this->form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
