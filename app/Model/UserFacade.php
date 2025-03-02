@@ -203,6 +203,7 @@ class UserFacade
             $user = $this->db->table($this->table);
 
             if (!empty($update_data)) {
+                $update_data[self::ColumnAuthToken] = $this->token();
                 $user->where('id', $id)->update($update_data);
             }
 
@@ -219,8 +220,8 @@ class UserFacade
                 }
                 $this->db->table($this->table_role_user)->insert($roles);
             }
-        } catch (Exception $e) {
-            throw new Exception();
+        } catch (\Exception $e) {
+            throw new \Exception();
         }
     }
 

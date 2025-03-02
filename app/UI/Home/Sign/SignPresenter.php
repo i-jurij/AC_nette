@@ -3,9 +3,11 @@
 namespace App\UI\Home\Sign;
 
 use App\Model\UserFacade;
+use App\UI\Accessory\Email;
 use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\IsBot;
 use App\UI\Accessory\PhoneNumber;
+use Ijurij\Geolocation\Lib\Csrf;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
@@ -172,21 +174,68 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->sendJson(0);
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
-    public function actionPostRestore(): void
+    protected function createComponentRestoreForm(): Form
     {
-        $httpRequest = $this->getHttpRequest();
-        $email = $httpRequest->getPost('email');
-        $res = $this->userfacade->searchBy('email', $email);
-        if (!empty($res->id)) {
-            // create and receive new passsword to email;
+        $form = $this->formFactory->create();
+        $form->setHtmlAttribute('id', 'restore_password_form')
+        ->setHtmlAttribute('class', 'form center mx-auto');
 
-            $this->flashMessage('На указанный вами адрес электронной почты отправлено письмо.', 'success');
-            $this->redirect(':Home:Sign:in');
+        $form->addGroup('');
+        $form->addEmail('email', '')
+        ->setHtmlAttribute('placeholder', '📧 Email:')
+        ->setRequired('Введите адрес электронной почты.')
+        ->addRule(Form::Email, 'Введите правильный адрес электронной почты.');
+
+        $form->addGroup('');
+        $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
+
+        $form->addGroup('');
+        $form->addSubmit('send', 'Отправить');
+
+        $form->onSuccess[] = $this->postRestore(...);
+
+        return $form;
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function postRestore(Form $form, \stdClass $data): void
+    {
+        $email = filter_var($data->email, FILTER_SANITIZE_EMAIL);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $res = $this->userfacade->searchBy('email', $email);
+            if (!empty($res->auth_token)) {
+                // create or get and receive passsword or url with token to email;
+                $this->absoluteUrls = true;
+                $redirect_url = $this->link(':Home:Sign:restorelink').'?token='.$res->auth_token.'&'.Csrf::$token_name.'='.Csrf::getToken();
+
+                $mail = new Email();
+                $mail->from = 'admin@'.SITE_NAME;
+                $mail->to = $email;
+                $mail->subject = 'Restore password';
+                $mail->body = $redirect_url;
+                $mail->sendEmail();
+
+                $this->flashMessage('На указанный вами адрес электронной почты отправлено письмо.', 'success');
+                $this->redirect(':Home:Sign:in');
+            } else {
+                $this->flashMessage('Пользователь с таким адресом электронной почты не зарегистрирован. Зарегистрируйтесь или войдите с помощью других сервисов.', 'info');
+                $this->redirect(':Home:Sign:up');
+            }
         } else {
-            $this->flashMessage('Пользователь с таким адресом электронной почты не зарегистрирован. Зарегистрируйтесь или войдите с помощью других сервисов.', 'info');
-            $this->redirect(':Home:Sign:up');
+            $this->flashMessage('Адрес электронной почты указан неверно.', 'error');
+            $this->redirect(':Home:Sign:restore');
         }
+    }
+
+    public function actionRestorelink(): void
+    {
+        if (Csrf::isValid() && Csrf::isRecent()) {
+            $token = \filter_input(INPUT_GET, 'token', FILTER_SANITIZE_SPECIAL_CHARS);
+            $this->redirect(':Home:Client:Profile:restorePassword', $token);
+        } else {
+            $this->error();
+        }
+        
     }
 }
 
