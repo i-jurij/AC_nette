@@ -179,8 +179,8 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     {
         $form = $this->formFactory->createLoginForm();
 
-        $form->setHtmlAttribute('id', 'useradd')
-            ->setHtmlAttribute('class', 'form');
+        $form->setHtmlAttribute('class', 'form');
+        // ->setHtmlAttribute('id', 'useradd')
 
         $form->addPassword('passwordVerify', 'PasswordVerify')
             ->setHtmlAttribute('placeholder', 'Confirm password:')
@@ -208,13 +208,13 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
         $form->addGroup('');
         $form->addSubmit('send', 'Add user');
 
-        $form->onSuccess[] = [$this, 'add'];
+        $form->onSuccess[] = [$this, 'useradd'];
 
         return $form;
     }
 
     #[Requires(methods: 'POST')]
-    public function add(Form $form, $data): void
+    public function useradd(Form $form, $data): void
     {
         if (!$this->getUser()->isAllowed('User', ' add')) {
             $this->error('Forbidden', 403);
@@ -227,6 +227,51 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
         }
 
         $this->redirect(':Admin:');
+    }
+
+    public function actionAdd(): void
+    {
+        $this->template->applicationscount = count($this->userfacade->db->table('userappliedforregistration'));
+    }
+
+    public function actionApplicationsforregistration(): void
+    {
+        $this->template->applications = $this->userfacade->db->table('userappliedforregistration');
+    }
+
+    public function createComponentVerifyapplicationforregistrationForm()
+    {
+        $form = new Form();
+        $form->addProtection();
+        $form->addText('username');
+        $form->addText('email');
+        $form->addPassword('password');
+        $form->addText('auth_token');
+        $roles = $this->userfacade->db->table('role');
+        foreach ($roles as $role) {
+            $roles_array[$role['id']] = $role['role_name'];
+        }
+        $form->addCheckboxList('roles', 'Roles:', $roles_array);
+        $form->addSubmit('verifyFormSubmit', 'Verify');
+        $form->onSuccess[] = [$this, 'verifyapplicationforregistration'];
+
+        return $form;
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function verifyapplicationforregistration(Form $form, $data): void
+    {
+        if (!$this->getUser()->isAllowed('User', ' add')) {
+            $this->error('Forbidden', 403);
+        }
+        try {
+            // create and send email for verification (url with auth_token)
+            // url :Admin:Sign:verifyEmail
+            $this->flashMessage('Email for verify received.', 'text-success');
+        } catch (\Exception $e) {
+            $this->flashMessage('Error: '.$e->getMessage(), 'text-danger');
+        }
+        $this->redirect(':Admin:Users:add');
     }
 
     public function createComponentUserSearchForm(): Form

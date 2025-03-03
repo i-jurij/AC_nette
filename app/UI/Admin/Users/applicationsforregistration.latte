@@ -1,0 +1,82 @@
+{var $title = "Applications for registration"}
+{var $description = "Applications for registration"}
+{var $keywords = "Applications for registration"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+{default $applications = []}
+
+{block content}
+<div class="text-center">
+    <h2>Applications for registration</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-xl-none">
+        <div class="col" n:foreach="$applications as $item">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{$item->username}</h5>
+                    <p class="card-text">{$item->email}</p>
+                    <p class="card-text">{$item->created_at}</p>
+                </div>
+                <div class="card-footer">
+                    {*
+                    <form name="verifyForm" action="verifyapplicationforregistration" method="post">
+                        <input type="hidden" name="username" value="{$item->username}">
+                        <input type="hidden" name="username" value="{$item->username}">
+                        <input type="hidden" name="email" value="{$item->email}">
+                        <input type="hidden" name="password" value="{$item->password}">
+                        <div class="mb-1 p-3 border rounded">
+                            <label class="pb-2 d-block">Roles:</label>
+                            {foreach $roles as $role_id => $role_name}
+                            <label class="p-1">
+                                <input type="checkbox" name="roles[]" value="{$role_id}">
+                                {$role_name}
+                            </label>
+                            {/foreach}
+                        </div>
+                        <input type="submit" class="btn btn-primary mt-2" value="Verify">
+                    </form>
+                    *}
+                    <form n:name=verifyapplicationforregistrationForm>
+                        <input type="hidden" n:name=username value="{$item->username}">
+                        <input type="hidden" n:name=email value="{$item->email}">
+                        <input type="hidden" n:name=password value="{$item->password}">
+                        <input type="hidden" n:name=auth_token value="{$item->auth_token}">
+                        <div class="mb-1 p-3 border rounded">
+                            <label n:name=roles class="pb-2 d-block">Roles:</label>
+                            {foreach $form[roles]->items as $role_id => $role_name}
+                            <label class="p-1">
+                                <input type="checkbox" name="roles[]" value="{$role_id}">
+                                {$role_name}
+                            </label>
+                            {/foreach}
+                        </div>
+                        <input n:name=verifyFormSubmit class="btn btn-primary mt-2" value="Register">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-striped d-none d-xl-block">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Created at</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $applications as $key => $row}
+            <tr>
+                <th scope="row">{$key}</th>
+                <td>{$row->username}</td>
+                <td>{$row->email}</td>
+                <td>{$row->created_at}</td>
+                <td></td>
+            </tr>
+            {/foreach}
+        </tbody>
+    </table>
+
+</div>
