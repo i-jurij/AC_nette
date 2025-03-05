@@ -300,12 +300,14 @@ CREATE TABLE IF NOT EXISTS `userappliedforregistration` (
   `image` text DEFAULT NULL,
   `password` text NOT NULL,
   `phone` varchar(12) DEFAULT NULL,
-  `phone_verified` tinyint(4) DEFAULT 0,
+  `phone_verified` tinyint(4) DEFAULT NULL,
   `email` text DEFAULT NULL,
-  `email_verified` tinyint(4) DEFAULT 0,
+  `email_verified` tinyint(4) DEFAULT NULL,
   `auth_token` text NOT NULL,
+  `csrf` text DEFAULT NULL,
   `roles` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 

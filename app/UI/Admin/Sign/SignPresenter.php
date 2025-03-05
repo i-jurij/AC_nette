@@ -4,6 +4,7 @@ namespace App\UI\Admin\Sign;
 
 use App\Model\UserFacade;
 use App\UI\Accessory\FormFactory;
+use Ijurij\Geolocation\Lib\Csrf;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
@@ -129,10 +130,39 @@ final class SignPresenter extends Nette\Application\UI\Presenter
 
     public function actionVerifyEmail($token): void
     {
-        // if table userappliedforregistration has token (check created_at too)
-        // remove user data from userappliedforregistration
-        // and save it to user with email_verify = 1
-        // send email to new user with him username and password
+        $token = \filter_input(INPUT_GET, 'token', FILTER_SANITIZE_SPECIAL_CHARS);
+        $csrf = \filter_input(INPUT_GET, Csrf::$token_name, FILTER_SANITIZE_SPECIAL_CHARS);
+        $data = $this->userfacade->db->table('userappliedforregistration')
+            ->where('auth_token', $token)
+            ->where('csrf', $csrf)
+            ->fetch();
+
+        if (isset($data->csrf) && $csrf === $data->csrf) {
+            $data_array = [
+                UserFacade::ColumnName => $data->username,
+                UserFacade::ColumnPasswordHash => $this->userfacade->passwords->hash($data->password),
+                UserFacade::ColumnEmail => $data->email,
+                UserFacade::ColumnEmailVerified => 1,
+                UserFacade::ColumnAuthToken => $this->userfacade->token(),
+            ];
+            $data_array['roles'] = \unserialize($data->roles, ['allowed_classes' => false]);
+            $res_user_add = $this->userfacade->add((object) $data_array);
+            if ($res_user_add === 'ok') {
+                // remove user data from userappliedforregistration
+                $res_del = $this->userfacade->db->table('userappliedforregistration')
+                            ->where('auth_token', $token)
+                            ->delete();
+                // send email to new user with him username and password
+
+                $this->flashMessage('You can log in now.', 'text-success');
+                $this->redirect(':Admin:Sign:in');
+            } else {
+                $this->flashMessage($res_user_add, 'text-warning');
+                $this->redirect(':Admin:Sign:up');
+            }
+        } else {
+            $this->error();
+        }
     }
 
     public function actionOut(): void

@@ -7,6 +7,7 @@
 {block content}
 <div class="text-center">
     <h2>Applications for registration</h2>
+    <p>Assign a role to a user.</p>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 d-xl-none">
         <div class="col" n:foreach="$applications as $item">
@@ -17,39 +18,21 @@
                     <p class="card-text">{$item->created_at}</p>
                 </div>
                 <div class="card-footer">
-                    {*
-                    <form name="verifyForm" action="verifyapplicationforregistration" method="post">
-                        <input type="hidden" name="username" value="{$item->username}">
-                        <input type="hidden" name="username" value="{$item->username}">
-                        <input type="hidden" name="email" value="{$item->email}">
-                        <input type="hidden" name="password" value="{$item->password}">
-                        <div class="mb-1 p-3 border rounded">
-                            <label class="pb-2 d-block">Roles:</label>
-                            {foreach $roles as $role_id => $role_name}
-                            <label class="p-1">
-                                <input type="checkbox" name="roles[]" value="{$role_id}">
-                                {$role_name}
-                            </label>
-                            {/foreach}
-                        </div>
-                        <input type="submit" class="btn btn-primary mt-2" value="Verify">
-                    </form>
-                    *}
                     <form n:name=verifyapplicationforregistrationForm>
-                        <input type="hidden" n:name=username value="{$item->username}">
                         <input type="hidden" n:name=email value="{$item->email}">
-                        <input type="hidden" n:name=password value="{$item->password}">
                         <input type="hidden" n:name=auth_token value="{$item->auth_token}">
                         <div class="mb-1 p-3 border rounded">
                             <label n:name=roles class="pb-2 d-block">Roles:</label>
+                            {var $roles = !empty($item->roles) ? \unserialize($item->roles) : []}
                             {foreach $form[roles]->items as $role_id => $role_name}
                             <label class="p-1">
-                                <input type="checkbox" name="roles[]" value="{$role_id}">
+                                <input type="checkbox" name="roles[]" value="{$role_id}" n:attr="disabled: !empty($item->csrf), checked: in_array($role_id, $roles)">
                                 {$role_name}
                             </label>
                             {/foreach}
                         </div>
-                        <input n:name=verifyFormSubmit class="btn btn-primary mt-2" value="Register">
+                        <input n:name=verifyFormSubmit class="btn btn-primary mt-2" value="Verify" n:attr="disabled: !empty($item->csrf)">
+                        <span n:if="!empty($item->csrf)" class="badge bg-secondary">Done</span>
                     </form>
                 </div>
             </div>
@@ -63,6 +46,7 @@
                 <th scope="col">Username</th>
                 <th scope="col">Email</th>
                 <th scope="col">Created at</th>
+                <th scope="col">Roles</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -73,7 +57,29 @@
                 <td>{$row->username}</td>
                 <td>{$row->email}</td>
                 <td>{$row->created_at}</td>
-                <td></td>
+                <td>
+                    <form n:name=verifyapplicationforregistrationForm>
+                        <input type="hidden" n:name=email value="{$row->email}">
+                        <input type="hidden" n:name=auth_token value="{$row->auth_token}">
+                        <div class="mb-1 p-3 border rounded">
+                            <label n:name=roles></label>
+                            {var $rs = !empty($row->roles) ? \unserialize($row->roles) : []}
+                            {foreach $form[roles]->items as $rid => $rname}
+                            <label class="p-1">
+                                <input type="checkbox" name="roles[]" value="{$rid}" n:attr="disabled: !empty($row->csrf), checked: in_array($rid, $rs)">
+                                {$rname}
+                            </label>
+                            {/foreach}
+                        </div>
+                        <input type="submit" id="{$row->auth_token}" class="visually-hidden" value="" n:attr="disabled: !empty($row->csrf)">
+                    </form>
+                </td>
+                <td>
+                    <label for="{$row->auth_token}" n:class="!empty($row->csrf) ? disabled, 'btn btn-primary'" tabindex="0">
+                        Verify
+                        <span n:if="!empty($row->csrf)" class="badge bg-secondary">Done</span>
+                    </label>
+                </td>
             </tr>
             {/foreach}
         </tbody>

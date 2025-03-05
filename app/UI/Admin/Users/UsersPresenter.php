@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\UI\Admin\Users;
 
 use App\Model\UserFacade;
+use App\UI\Accessory\Email;
 use App\UI\Accessory\FormFactory;
+use Ijurij\Geolocation\Lib\Csrf;
 use Nette\Application\UI\Form;
 
 /**
@@ -243,15 +245,13 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     {
         $form = new Form();
         $form->addProtection();
-        $form->addText('username');
-        $form->addText('email');
-        $form->addPassword('password');
+        $form->addEmail('email');
         $form->addText('auth_token');
         $roles = $this->userfacade->db->table('role');
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }
-        $form->addCheckboxList('roles', 'Roles:', $roles_array);
+        $form->addCheckboxList('roles', '', $roles_array);
         $form->addSubmit('verifyFormSubmit', 'Verify');
         $form->onSuccess[] = [$this, 'verifyapplicationforregistration'];
 
@@ -265,13 +265,44 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
             $this->error('Forbidden', 403);
         }
         try {
-            // create and send email for verification (url with auth_token)
-            // url :Admin:Sign:verifyEmail
-            $this->flashMessage('Email for verify received.', 'text-success');
+            $this->absoluteUrls = true;
+            $token = $data->auth_token;
+            $url = $this->link(':Admin:Sign:verifyEmail', [
+                'token' => $token,
+                Csrf::$token_name => Csrf::getToken(),
+            ]);
+
+            if (!empty($data->roles)) {
+                // send email for verification (url with auth_token)
+                $mail = new Email();
+                $mail->from = 'admin@'.SITE_NAME;
+                $mail->to = $data->email;
+                $mail->subject = 'Register on '.SITE_NAME;
+                $mail->body = (string) $url;
+                $mail->sendEmail();
+                $message = 'Email for verify received.';
+                // save serialized roles to table userappliedforregistration
+
+                $roles = serialize($data->roles);
+                $upd = $this->userfacade->db
+                ->table('userappliedforregistration')
+                ->where('auth_token', $token)
+                ->update([
+                    'roles' => $roles,
+                    'csrf' => Csrf::getToken(),
+                ]);
+                if ($upd > 0) {
+                    $this->flashMessage("$message Roles of user saved.", 'text-success');
+                } else {
+                    $this->flashMessage("$message Roles of user NOT saved.", 'text-warning'); // code...
+                }
+            } else {
+                $this->flashMessage('Assign a user a role', 'text-warning');
+            }
         } catch (\Exception $e) {
             $this->flashMessage('Error: '.$e->getMessage(), 'text-danger');
         }
-        $this->redirect(':Admin:Users:add');
+        $this->redirect(':Admin:Users:applicationsforregistration');
     }
 
     public function createComponentUserSearchForm(): Form

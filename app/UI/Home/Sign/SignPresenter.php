@@ -235,7 +235,6 @@ final class SignPresenter extends \App\UI\BasePresenter
         } else {
             $this->error();
         }
-        
     }
 }
 
