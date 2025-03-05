@@ -166,7 +166,7 @@ final class RolesPresenter extends \App\UI\Admin\BasePresenter
 
         if (!empty($data['role']) && !empty($data['permissions'][0])) {
             try {
-                $role = $this->rf->permissionsAdd($data);
+                $this->rf->permissionsAdd($data);
                 $this->flashMessage('Permissions for role was inserted', 'text-success');
             } catch (\Throwable $e) {
                 $this->flashMessage($e->getMessage().PHP_EOL

@@ -6,8 +6,8 @@ namespace App\UI\Home\Client\Profile;
 
 use App\Model\UserFacade;
 use App\UI\Accessory\IsBot;
-use Nette\Application\UI\Form;
 use Ijurij\Geolocation\Lib\Csrf;
+use Nette\Application\UI\Form;
 
 /**
  * @property ProfileTemplate $template
@@ -32,7 +32,6 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
 
     public function renderRestorePassword($token) // waiting for auth_token on enter
     {
-
         $this->template->user_token = $token;
         $this->template->csrf_name = Csrf::$token_name;
         $this->template->csrf = Csrf::getToken();
@@ -47,8 +46,8 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
             $id = $this->userfacade->searchBy('auth_token', $auth_token)->id;
             $data['id'] = $id;
             $data['password'] = $httpRequest->getPost('password');
-            $res = $this->userfacade->update($id, $data);
-    
+            $this->userfacade->update($id, $data);
+
             $this->flashMessage('Теперь введите ваш новый пароль для входа.', 'info');
             $this->redirect(':Home:Sign:in');
         } else {

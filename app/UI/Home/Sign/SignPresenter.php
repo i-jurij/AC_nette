@@ -92,7 +92,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         try {
             $user_data = $this->getUserDataYandex();
-            $res = $this->oauthLogin($user_data);
+            $this->oauthLogin($user_data);
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
@@ -103,7 +103,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         try {
             $user_data = $this->getUserDataTelegram();
-            $res = $this->oauthLogin($user_data);
+            $this->oauthLogin($user_data);
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
@@ -114,7 +114,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         try {
             $user_data = $this->getUserDataVK();
-            $res = $this->oauthLogin($user_data);
+            $this->oauthLogin($user_data);
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
