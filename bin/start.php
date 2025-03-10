@@ -7,11 +7,11 @@ $path_to_sql_file = 'mysql';
 function start()
 {
     echo '
-1. Create table "user", "role", "permission" etc, run:
-"php start.php migrate"
+1. For db table creating run:
+"php bin/start.php migrate"
 
 2. Create user (with role "admin"), run:
-"php start.php useradd <username> <password>"
+"php bin/start.php useradd <username> <password>"
 
 ';
     exit(1);
@@ -20,18 +20,11 @@ function start()
 function migrate(object $container, string $path_to_sql_file)
 {
     $db = $container->getByName('database.'.$path_to_sql_file.'.connection');
-
     $begin_path_to_sql_files = APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.$path_to_sql_file.DIRECTORY_SEPARATOR;
-    $path_db_create = \realpath($begin_path_to_sql_files.'create_db.php');
-    $path_create = \realpath($begin_path_to_sql_files.'create_sql.php');
+    // $path_db_create = \realpath($begin_path_to_sql_files.'create_db.php');
+    $path_create = \realpath($begin_path_to_sql_files.'create_tables.php');
     $path_insert = \realpath($begin_path_to_sql_files.'insert_sql.php');
     $path_trigger = \realpath($begin_path_to_sql_files.'trigger_sql.php');
-
-    $geo = [
-        0 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'okrugRF.sql'),
-        1 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'regionRF.sql'),
-        2 => \realpath(APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.'geoSQLdump'.DIRECTORY_SEPARATOR.'citiesRFwithCoord.sql'),
-    ];
 
     $reflection = $db->getReflection();
 
@@ -52,26 +45,11 @@ function migrate(object $container, string $path_to_sql_file)
             }
         }
 
-        // geoLocSQL
-        for ($i = 0; $i <= 2; ++$i) {
-            if ($geo[$i] != false) {
-                $commands = file_get_contents($geo[$i]);
-            } else {
-                echo 'Wrong path for geo sql file "'.$geo[$i].'"'.".\n";
-            }
-
-            if (isset($commands) && $commands != false) {
-                $db->query($commands);
-            } else {
-                echo 'No file get contents for geo sql file "'.$geo[$i].'"'.".\n";
-            }
-        }
-
         echo "Migrate was executed. Database and table was created.\n";
     } catch (Exception $e) {
         echo "Error: '.$e.'.\n";
     }
-
+    $db = null;
     exit(1);
 }
 
@@ -104,7 +82,6 @@ if (PHP_SAPI === 'cli') {
 
     $container = App\Bootstrap::boot()
         ->createContainer();
-    // var_dump($container);
 
     if (!isset($argv[1])) {
         start();
