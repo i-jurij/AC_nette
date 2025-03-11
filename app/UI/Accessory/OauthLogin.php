@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace App\UI\Accessory;
 
+use Nette\Utils\Random;
+
 trait OauthLogin
 {
-    public function oauthLogin(array $userdata): void
+    public function oauthLogin(array $user_data): void
     {
         if (!empty($user_data['error'])) {
             foreach ($user_data['error'] as $error) {
                 $this->flashMessage($error, 'text-danger');
             }
+            $this->redirect(':Home:');
         }
+
         if (!empty($user_data['data'])) {
             // check if user not isset in db
             $check_array = [];
-            foreach ($data as $key => $value) {
+            foreach ($user_data['data'] as $key => $value) {
                 if (!empty($value)) {
                     $check_array[$key] = $value;
                 }
@@ -24,7 +28,7 @@ trait OauthLogin
 
             $user_isset = $this->userfacade->db->table($this->userfacade->table)->where($check_array)->fetch();
 
-            $data = (object) $data;
+            $data = (object) $user_data['data'];
             if (empty($user_isset)) {
                 // then add user to db: $res = $this->userfacade->add($data);
                 $data->roles = 'client';

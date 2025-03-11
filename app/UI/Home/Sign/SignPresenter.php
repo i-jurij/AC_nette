@@ -96,6 +96,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
+            $this->redirect(':Home:');
         }
     }
 
@@ -107,6 +108,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
+            $this->redirect(':Home:');
         }
     }
 
@@ -118,6 +120,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         } catch (\Exception $e) {
             $this->flashMessage('Error', 'text-danger');
             // write logged error
+            $this->redirect(':Home:');
         }
     }
 
