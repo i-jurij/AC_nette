@@ -7,9 +7,14 @@ namespace App\UI;
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
     use Accessory\Breadcrumb;
+    use Accessory\BanClient;
 
     public function beforeRender()
     {
+        if ($this->isBanned()) {
+            $this->error();
+        }
+
         parent::beforeRender();
         $this->template->breadcrumb = $this->getBC();
         $this->template->shared_templates = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR;

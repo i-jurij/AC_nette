@@ -23,5 +23,6 @@ $insert_sqls = [
     'role_permission' => $role_permission,
 ];
 */
-$role = "INSERT INTO `role` SET role_name = 'admin'";
+$role = "INSERT INTO `role`(`role_name`) VALUES('admin'),('banned')";
+// $role = "INSERT INTO `role` SET role_name = 'admin'";
 $insert_sqls = ['role' => $role];
