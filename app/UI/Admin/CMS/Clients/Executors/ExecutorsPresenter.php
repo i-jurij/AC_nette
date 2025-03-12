@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\Admin\CMS\Executors;
+namespace App\UI\Admin\CMS\Clients\Executors;
 
 final class ExecutorsPresenter extends \App\UI\Admin\BasePresenter
 {

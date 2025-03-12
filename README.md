@@ -108,6 +108,10 @@ role -> array permissions
 permission is resource and action  
 App\Core\MyAuthorizator check permissions.
 
+#### Client banned
+
+Admin - Clients - Add roles - banned. If client want autorize he wiil be redirect to default errrors page.
+
 ### Admin page and menu creating
 
 #### Nav menu

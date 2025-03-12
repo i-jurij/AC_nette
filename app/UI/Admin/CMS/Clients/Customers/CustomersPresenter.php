@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\Admin\CMS\Customers;
+namespace App\UI\Admin\CMS\Clients\Customers;
 
 final class CustomersPresenter extends \App\UI\Admin\BasePresenter
 {

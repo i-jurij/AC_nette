@@ -16,7 +16,7 @@ use Nette\Utils\Validators;
 /**
  * Manages user-related operations such as authentication and adding new users.
  */
-class UserFacade
+class ClientFacade
 {
     use \App\UI\Accessory\TableForUserFacade;
 
@@ -27,8 +27,8 @@ class UserFacade
         public Explorer $db,
         public Passwords $passwords,
     ) {
-        $this->table = ''.TABLE;
-        $this->table_role_user = 'role_'.TABLE;
+        $this->table = 'client';
+        $this->table_role_user = 'role_client';
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
@@ -285,6 +285,7 @@ class UserFacade
     {
         $users_data = [];
         $pre_data = $this->prepareSearch($data);
+
         if (!empty($pre_data)) {
             $query = $this->db->table($this->table);
 
@@ -345,11 +346,4 @@ class UserFacade
 
         return $query->where($field.$like, $pro.$data.$pro)->fetch();
     }
-}
-
-/**
- * Custom exception for duplicate usernames.
- */
-class DuplicateNameException extends \Exception
-{
 }

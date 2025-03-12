@@ -1,0 +1,20 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Clients"}
+{var $description = "Admin Simple CMS Clients"}
+{var $keywords = "Admin, SimpleCMS, Clients"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container-fluid">
+	<h2 class="text-center">Clients</h2>
+    <div class="m-3 p-3 text-center">
+        <a n:if="$user->isAllowed('Clients','search')" class="btn btn-secondary" n:href=":Admin:CMS:Clients:search">Search</a>
+        <a class="btn btn-secondary" n:href=":Admin:CMS:Clients:list">
+            List{if $user->isAllowed('Clients','update')}, edit, delete{/if}
+        </a>
+    </div>
+
+    {include menu from $shared_templates.'menu.latte', $currentPageMenu}
+</div>
+{/block}
