@@ -18,6 +18,7 @@ class MyAuthorizator implements Nette\Security\Authorizator
         if ($role === 'admin') {
             return true;
         }
+
         // check if role has resource and empty action (allowed all for this resource)
         $res = [
             'role_name' => $role,
@@ -25,7 +26,9 @@ class MyAuthorizator implements Nette\Security\Authorizator
             'action' => null,
         ];
 
-        if (\in_array($res, $this->getRolePermissionData())) {
+        $rpd = $this->getRolePermissionData();
+
+        if (\in_array($res, $rpd)) {
             return true;
         }
 
@@ -35,7 +38,7 @@ class MyAuthorizator implements Nette\Security\Authorizator
             'action' => $action,
         ];
 
-        if (\in_array($res_act, $this->getRolePermissionData())) {
+        if (\in_array($res_act, $rpd)) {
             return true;
         }
 
