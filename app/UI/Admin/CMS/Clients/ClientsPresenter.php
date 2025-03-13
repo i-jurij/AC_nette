@@ -10,7 +10,7 @@ use Nette\Application\UI\Form;
 
 final class ClientsPresenter extends \App\UI\Admin\BasePresenter
 {
-    protected $user_data;
+    protected $client_data;
     public $postsearch;
 
     public function __construct(
@@ -29,20 +29,20 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
     public function renderList(int $page = 1): void
     {
-        if (!$this->getUser()->isAllowed('Clients', 'getAllUsersData')) {
+        if (!$this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
             $this->error('Forbidden', 403);
         }
-        $users_data = $this->clientfacade->getAllUsersData();
-        $this->template->count = count($users_data);
+        $clients_data = $this->clientfacade->getAllClientsData();
+        $this->template->count = count($clients_data);
 
         $lastPage = 0;
-        $this->template->users_data = $users_data->page($page, 8, $lastPage);
+        $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
         $this->template->page = $page;
         $this->template->lastPage = $lastPage;
 
-        foreach ($users_data as $user) {
-            // $roles[$user->id] = $this->roleWithUserId($this->clientfacade->db, $user->id);
-            $roles[$user->id] = $this->clientfacade->roleWithUserId($user->id);
+        foreach ($clients_data as $user) {
+            // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
+            $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
         }
         $this->template->users_roles = $roles;
     }
@@ -60,7 +60,6 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
         $form->setHtmlAttribute('id', 'clientUpdateForm')
             ->setHtmlAttribute('class', 'form');
-        // ->setAction($this->link(':Admin:Users:update'));
 
         $form->addGroup('');
 
@@ -111,8 +110,8 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
     public function renderEdit(int $id): void
     {
         if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('Clients', 'update')) {
-            $this->template->user_data = $this->clientfacade->getUserData($id);
-            $this->template->user_roles = $this->clientfacade->roleWithUserId($id);
+            $this->template->client_data = $this->clientfacade->getClientData($id);
+            $this->template->client_roles = $this->clientfacade->roleWithClientId($id);
         } else {
             $this->flashMessage('You don\'t have permission for this', 'text-warning');
             $this->redirect(':Admin:');
@@ -151,11 +150,11 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
     public function actionDelete(int $id): void
     {
-        if (!$this->getUser()->isAllowed('Clients', ' deleteUserData')) {
+        if (!$this->getUser()->isAllowed('Clients', ' deleteClientData')) {
             $this->error('Forbidden', 403);
         }
         try {
-            $this->clientfacade->deleteUserData($id);
+            $this->clientfacade->deleteClientData($id);
             $this->flashMessage('Client deleted.');
         } catch (\Throwable $th) {
             $this->flashMessage($th);

@@ -166,9 +166,9 @@
 		<div class="pagination btn-toolbar mt-4" role="paginator" aria-label="Paginator for users data">
 			{if $page > 1}
 				<div class="btn-group me-2" role="group" aria-label="First group">
-					<a n:href="default, 1" class="btn btn-outline-info"><<</a>
+					<a n:href="list, 1" class="btn btn-outline-info"><<</a>
 					&nbsp;
-					<a n:href="default, $page - 1" class="btn btn-outline-info"><</a>
+					<a n:href="list, $page - 1" class="btn btn-outline-info"><</a>
 					&nbsp;
 				</div>
 			{/if}
@@ -180,16 +180,16 @@
 			{if $page < $lastPage}
 				<div class="btn-group" role="group" aria-label="Third group">
 					&nbsp;
-					<a n:href="default, $page + 1" class="btn btn-outline-info">></a>
+					<a n:href="list, $page + 1" class="btn btn-outline-info">></a>
 					&nbsp;
-					<a n:href="default, $lastPage" class="btn btn-outline-info">>></a>
+					<a n:href="list, $lastPage" class="btn btn-outline-info">>></a>
 				</div>
 			{/if}
 		</div>
 	</div>
 {else}
 	<p class="my-3 mx-auto p-2 text-center text-danger border border-danger">
-		You do not have admin rights!
+		You do not have access to this page.
 	</p>
 {/if}
 

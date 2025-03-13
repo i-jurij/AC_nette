@@ -32,23 +32,23 @@ class ClientFacade
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function getAllUsersData(): Selection
+    public function getAllClientsData(): Selection
     {
-        $users_data = $this->db->table($this->table)->select($this->getColumns());
+        $clients_data = $this->db->table($this->table)->select($this->getColumns());
 
-        return $users_data;
+        return $clients_data;
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function getUserData($id): ActiveRow
+    public function getClientData($id): ActiveRow
     {
-        $user_data = $this->db->table($this->table)->select($this->getColumns())->get($id);
+        $client_data = $this->db->table($this->table)->select($this->getColumns())->get($id);
 
-        return $user_data;
+        return $client_data;
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function deleteUserData($id): void
+    public function deleteClientData($id): void
     {
         try {
             $this->db->table($this->table)->where('id', $id)->delete();
@@ -59,7 +59,7 @@ class ClientFacade
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function countUsers()
+    public function countClients()
     {
         return $count = count($this->db->table($this->table));
     }
@@ -232,13 +232,13 @@ class ClientFacade
         return Nette\Utils\Random::generate(15);
     }
 
-    protected function prepare($user_id)
+    protected function prepare($client_id)
     {
         $roles_ids = [];
 
         $roles_ids_sql = $this->db->table($this->table_role_user)
             ->select('role_id')
-            ->where('user_id', $user_id);
+            ->where('user_id', $client_id);
         foreach ($roles_ids_sql as $role_id) {
             $roles_ids[] = $role_id['role_id'];
         }
@@ -248,20 +248,20 @@ class ClientFacade
         return $roles_sql;
     }
 
-    public function getRoless($user_id)
+    public function getRoless($client_id)
     {
         $roles = [];
-        foreach ($this->prepare($user_id) as $role) {
+        foreach ($this->prepare($client_id) as $role) {
             $roles[] = $role->role_name;
         }
 
         return $roles;
     }
 
-    public function roleWithUserId($user_id)
+    public function roleWithClientId($client_id)
     {
         $roles = [];
-        foreach ($this->prepare($user_id) as $role) {
+        foreach ($this->prepare($client_id) as $role) {
             $roles[$role->id] = $role->role_name;
         }
 
