@@ -1,8 +1,8 @@
 {*layout '../@layout.latte'*}
 
-{var $title = "Client search"}
-{var $description = "Client search"}
-{var $keywords = "Client search"}
+{var $title = "Customers search"}
+{var $description = "Customers search"}
+{var $keywords = "Customers search"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {*block sidebar}
@@ -11,14 +11,14 @@ sss
 
 {block content}
 <div n:class="!empty($show) ? d-none, 'container mx-auto'">
-    <h2 class="text-center">Search client</h2>
+    <h2 class="text-center">Search Customers</h2>
     <p class="text-secondary text-center">
         Fill in only the required fields.
     </p>
 
     <form 
-        n:if="$user->isAllowed('Client', 'search')" 
-        n:name="clientSearchForm" 
+        n:if="$user->isAllowed('Customers', 'search')" 
+        n:name="customerSearchForm" 
         class="mx-auto"
     >
         <ul class="error text-warning fst-italic" n:ifcontent>
@@ -36,13 +36,11 @@ sss
                     aria-controls="username_input_user_search">
                     Username: 
                 </label>
-                {var $name_pattern = "^[a-zA-Zа-яА-ЯёЁ0-9-_]{3,25}$"}
                 <input  n:name="username" size=20 
                         class="form-control collapse" 
                         id="username_input_user_search"
                         minlength="3" 
-                        maxlength="25" 
-                        pattern={$name_pattern}
+                        maxlength="25"
                 >
                 <p class="error text-warning fst-italic" n:ifcontent>{inputError username}</p>
             </div>
@@ -123,19 +121,21 @@ sss
                 </div>  
         </div>
         
-        <input type='submit' n:name="searchClient" class="btn btn-outline-primary w-50" />
+        <input type='submit' n:name="searchCustomer" class="btn btn-outline-primary w-50" />
     </form>
 </div> 
 
 <!-- after form received -->
-{if ($user->isAllowed('User', 'getAllUsersData') && !empty($show))}
-        <h2 class="text-center">Found users</h2>
+{if ($user->isAllowed('Client', 'getAllClientsData') && !empty($show))}
+        <h2 class="text-center">Found customers</h2>
         <form method="post" id="postClientsSearchForm"></form>
         <div class="container-fluid">
             <div 
                 class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 g-lg-3"
                 n:inner-foreach="$show as $user_id => $row"
             >
+            
+            {*if \in_array('customer', $row['roles'])*}
                     <div class="card mx-auto">
                         <div class="mx-auto p-1"  style="max-width: 250px;">
                             {if !empty($row->image)}
@@ -220,6 +220,7 @@ sss
                                 </div>
                         </div>
                     </div>
+                {*/if*}
             </div>
         </div>
     {/if}

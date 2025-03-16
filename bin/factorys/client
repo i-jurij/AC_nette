@@ -1,0 +1,36 @@
+<?php
+
+declare (strict_types = 1);
+
+/* Create client (with random role [client, (customer or executor)]) 11 times:
+    "php bin/factorys/client create 11"
+*/
+
+function create(object $user_factory, int $int = 0): void
+{
+    for ($i = 0; $i < $int; ++$i) {
+        $user = $user_factory->seedClient();
+        $user_factory->saveClient($user);
+        foreach ($user as $key => $value) {
+            echo $key . ': ' . $value . "\n";
+        }
+    }
+}
+
+if (PHP_SAPI === 'cli') {
+    require __DIR__ . '/../../vendor/autoload.php';
+
+    $container = App\Bootstrap::boot()
+        ->createContainer();
+    // var_dump($container);
+    $user_facade  = $container->getByType(App\Model\ClientFacade::class);
+    $user_factory = new App\UI\Accessory\ClientFact($user_facade);
+
+    if ($argc == 3 && $argv[1] === 'create' && is_integer((int) $argv[2])) {
+        create($user_factory, (int) $argv[2]);
+        exit(1);
+    } else {
+        echo "Somethig wrong :( \n";
+        exit(1);
+    }
+}

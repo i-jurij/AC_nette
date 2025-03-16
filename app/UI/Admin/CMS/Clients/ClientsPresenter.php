@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\UI\Admin\CMS\Clients;
 
@@ -8,37 +8,36 @@ use App\Model\ClientFacade;
 use App\UI\Accessory\FormFactory;
 use Nette\Application\UI\Form;
 
-final class ClientsPresenter extends \App\UI\Admin\BasePresenter
+class ClientsPresenter extends \App\UI\Admin\BasePresenter
 {
     protected $client_data;
     public $postsearch;
 
     public function __construct(
         protected ClientFacade $clientfacade,
-        private FormFactory $formFactory)
-    {
+        private FormFactory $formFactory) {
         parent::__construct();
     }
 
     public function renderDefault()
     {
-        if (!$this->getUser()->isAllowed('Clients', '')) {
+        if (! $this->getUser()->isAllowed('Clients', '')) {
             $this->error('Forbidden', 403);
         }
     }
 
     public function renderList(int $page = 1): void
     {
-        if (!$this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
+        if (! $this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
             $this->error('Forbidden', 403);
         }
-        $clients_data = $this->clientfacade->getAllClientsData();
+        $clients_data          = $this->clientfacade->getAllClientsData();
         $this->template->count = count($clients_data);
 
-        $lastPage = 0;
+        $lastPage                     = 0;
         $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
-        $this->template->page = $page;
-        $this->template->lastPage = $lastPage;
+        $this->template->page         = $page;
+        $this->template->lastPage     = $lastPage;
 
         foreach ($clients_data as $user) {
             // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
@@ -51,12 +50,12 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
     {
         $form = new Form();
         $form->addProtection();
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
+        $renderer                                    = $form->getRenderer();
+        $renderer->wrappers['group']['container']    = 'div class="my1 mx-auto pb2 px2"';
         $renderer->wrappers['controls']['container'] = 'div';
-        $renderer->wrappers['pair']['container'] = 'div';
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
+        $renderer->wrappers['pair']['container']     = 'div';
+        $renderer->wrappers['label']['container']    = null;
+        $renderer->wrappers['control']['container']  = null;
 
         $form->setHtmlAttribute('id', 'clientUpdateForm')
             ->setHtmlAttribute('class', 'form');
@@ -68,7 +67,8 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
         $form->addText('username', 'Username:')
             ->setHtmlAttribute('placeholder', 'Name:')
             ->addRule($form::MinLength, 'Имя длиной не менее %d символов', 3)
-            ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$')
+            ->addRule($form::MaxLength, 'Имя длиной до 25 символов', 25)
+            ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9_\-]+$')
             ->setMaxLength(25);
 
         $form->addPassword('password', 'Password:')
@@ -92,7 +92,10 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
         $form->addEmail('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:');
 
-        $roles = $this->clientfacade->db->table('role');
+        $roles = $this->clientfacade->db
+            ->table('role')
+            ->where('role_name', ['banned', 'client', 'executor', 'customer']);
+
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }
@@ -110,7 +113,7 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
     public function renderEdit(int $id): void
     {
         if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('Clients', 'update')) {
-            $this->template->client_data = $this->clientfacade->getClientData($id);
+            $this->template->client_data  = $this->clientfacade->getClientData($id);
             $this->template->client_roles = $this->clientfacade->roleWithClientId($id);
         } else {
             $this->flashMessage('You don\'t have permission for this', 'text-warning');
@@ -127,19 +130,19 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
                 $id = $data->id;
                 unset($data->id);
                 $update = array_filter((array) $data);
-                if (!empty($update)) {
+                if (! empty($update)) {
                     $this->clientfacade->update($id, $update);
-                    $this->flashMessage(\json_encode($update).' Client updated', 'text-success');
+                    $this->flashMessage(\json_encode($update) . ' Client updated', 'text-success');
                 } else {
                     $this->flashMessage('Nothing was updated', 'text-success');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage('Caught Exception!'.PHP_EOL
-                    .'Error message: '.$e->getMessage().PHP_EOL
-                    .'File: '.$e->getFile().PHP_EOL
-                    .'Line: '.$e->getLine().PHP_EOL
-                    .'Error code: '.$e->getCode().PHP_EOL
-                    .'Trace: '.$e->getTraceAsString().PHP_EOL, 'text-danger');
+                $this->flashMessage('Caught Exception!' . PHP_EOL
+                    . 'Error message: ' . $e->getMessage() . PHP_EOL
+                    . 'File: ' . $e->getFile() . PHP_EOL
+                    . 'Line: ' . $e->getLine() . PHP_EOL
+                    . 'Error code: ' . $e->getCode() . PHP_EOL
+                    . 'Trace: ' . $e->getTraceAsString() . PHP_EOL, 'text-danger');
             }
         } else {
             $this->error('Forbidden', 403);
@@ -150,7 +153,7 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
     public function actionDelete(int $id): void
     {
-        if (!$this->getUser()->isAllowed('Clients', ' deleteClientData')) {
+        if (! $this->getUser()->isAllowed('Clients', ' deleteClientData')) {
             $this->error('Forbidden', 403);
         }
         try {
@@ -172,16 +175,18 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
         $form->addText('username', 'Name:')
             ->setHtmlAttribute('placeholder', 'Name:')
             ->addRule($form::MinLength, 'Имя длиной не менее %d символов', 3)
-            ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$')
+            ->addRule($form::MaxLength, 'Имя длиной до 25 символов', 25)
+            ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9_\-]+$')
             ->setMaxLength(25);
         $form->addText('phone', 'Phone:')
             ->setHtmlAttribute('placeholder', 'Phone:')
-            ->addRule($form::Pattern, 'Only +, digits, underscore, spaces and hyphens', '^[+0-9\-_]{3,30}$')
+            ->addRule($form::Pattern, 'Only +, digits, underscore, spaces and hyphens', '^[+0-9\-_]$')
             ->setMaxLength(30);
         $form->addText('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:')
             ->setMaxLength(125);
-        $roles = $this->clientfacade->db->table('role');
+        $roles = $this->clientfacade->db->table('role')
+            ->where('role_name', ['banned', 'client', 'executor', 'customer']);
         foreach ($roles as $role) {
             $roles_array[$role['id']] = $role['role_name'];
         }
@@ -195,13 +200,13 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
     #[Requires(methods: 'POST')]
     public function postSearch(?Form $form = null): void
     {
-        if (!$this->getUser()->isAllowed('Clients', 'search')) {
+        if (! $this->getUser()->isAllowed('Clients', 'search')) {
             $this->error('Forbidden', 403);
         }
 
         $httpRequest = $this->getHttpRequest();
 
-        if ($httpRequest->isMethod('POST') && !empty($form)) {
+        if ($httpRequest->isMethod('POST') && ! empty($form)) {
             try {
                 $this->template->show = $this->clientfacade->search($form->getValues());
                 if (empty($this->template->show)) {
@@ -209,7 +214,7 @@ final class ClientsPresenter extends \App\UI\Admin\BasePresenter
                     $this->redirect('this');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage("\n".$e->getMessage(), 'text-danger');
+                $this->flashMessage("\n" . $e->getMessage(), 'text-danger');
                 $this->redirect('this');
             }
         }

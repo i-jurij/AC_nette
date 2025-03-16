@@ -1,14 +1,14 @@
-{var $title = "Client editing"}
-{var $description = "Client editing"}
-{var $keywords = "Client editing"}
+{var $title = "Customers editing"}
+{var $description = "Customers editing"}
+{var $keywords = "Customers editing"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
 <div class="container">
-    <h2 class="text-center">Client data editing</h2>
+    <h2 class="text-center">Customers data editing</h2>
     <p class="text-secondary text-center">
         Fill in only the required fields.<br />
-        Click for edit.
+        Click for edit
     </p>
      <form  n:if="(!empty($client_data) && ( $user->isInRole('admin') || ($user->isLoggedIn() && $user->getIdentity()->getId() === $client_data->id) ) )" 
             n:name=clientUpdateForm 

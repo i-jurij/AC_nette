@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types = 1);
 
 namespace App\Model;
 
@@ -27,7 +27,7 @@ class ClientFacade
         public Explorer $db,
         public Passwords $passwords,
     ) {
-        $this->table = 'client';
+        $this->table           = 'client';
         $this->table_role_user = 'role_client';
     }
 
@@ -76,13 +76,13 @@ class ClientFacade
                 ->where('role_name', 'admin')
                 ->fetch();
             $row = $this->db->table($table)->insert([
-                self::ColumnName => $username,
+                self::ColumnName         => $username,
                 self::ColumnPasswordHash => $this->passwords->hash($password),
-                self::ColumnAuthToken => $this->token(),
+                self::ColumnAuthToken    => $this->token(),
             ]);
 
             // insert into users_roles users (first admin user) id, role "admin" id
-            $this->db->table('role_'.$table)->insert([
+            $this->db->table('role_' . $table)->insert([
                 'user_id' => $row->id,
                 'role_id' => $role_admin_id['id'],
             ]);
@@ -93,28 +93,28 @@ class ClientFacade
 
     public function prepareAddFormData($data)
     {
-        if (!empty($data->email) && Validators::isEmail($data->email)) {
+        if (! empty($data->email) && Validators::isEmail($data->email)) {
             $email = $data->email;
         }
 
-        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$/', $data->username)) {
+        if (! empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$/', $data->username)) {
             $username = $data->username;
         }
 
-        if (!empty($data->phone) && PhoneNumber::isValid($data->phone)) {
+        if (! empty($data->phone) && PhoneNumber::isValid($data->phone)) {
             $phone = PhoneNumber::toDb($data->phone);
         }
 
         // $email = !empty($data->email) ? $data->email : $data->username.'@'.$data->username.'.com';
         $data_array = [
-            self::ColumnName => $username ?? $phone ?? null,
-            self::ColumnPasswordHash => $this->passwords->hash($data->password),
-            self::ColumnImage => $data->image ?? null,
-            self::ColumnPhone => $phone ?? null,
+            self::ColumnName          => $username ?? $phone ?? null,
+            self::ColumnPasswordHash  => $this->passwords->hash($data->password),
+            self::ColumnImage         => $data->image ?? null,
+            self::ColumnPhone         => $phone ?? null,
             self::ColumnPhoneVerified => $data->{self::ColumnPhoneVerified} ?? null,
-            self::ColumnEmail => $email ?? null,
+            self::ColumnEmail         => $email ?? null,
             self::ColumnEmailVerified => $data->{self::ColumnEmailVerified} ?? null,
-            self::ColumnAuthToken => $this->token(),
+            self::ColumnAuthToken     => $this->token(),
             // self::ColumnCreatedAt => $created_at,
             // self::ColumnUpdatedAt => $updated_at,
         ];
@@ -133,7 +133,7 @@ class ClientFacade
 
         $this->db->beginTransaction();
         try {
-            $t = $this->db->table($this->table);
+            $t        = $this->db->table($this->table);
             $new_user = $t->insert($prepared_data);
 
             // check if $data->roles === 'client' from Home:SignPresenter
@@ -143,14 +143,14 @@ class ClientFacade
             // then put it to table "role_user"
 
             if ($data->roles === 'client') {
-                $role = $this->db->table('role');
+                $role              = $this->db->table('role');
                 $role_client_check = $role->where('role_name', 'client')->fetch();
 
-                if (!empty($role_client_check->id)) {
+                if (! empty($role_client_check->id)) {
                     $role_id = $role_client_check->id;
                 } else {
                     $role_client_add = $role->insert(['role_name' => 'client']);
-                    $role_id = $role_client_add->id;
+                    $role_id         = $role_client_add->id;
                 }
                 if (isset($role_id)) {
                     $this->db->table($this->table_role_user)->insert([
@@ -160,7 +160,7 @@ class ClientFacade
                 }
             }
 
-            // check if is_array($data->roles) from Admin:UserPresenter
+            // check if is_array($data->roles)
             if (\is_array($data->roles)) {
                 foreach ($data->roles as $id) {
                     $this->db->table($this->table_role_user)->insert([
@@ -188,12 +188,12 @@ class ClientFacade
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function update($id, $data): void
     {
-        if (!empty($data['email'])) {
+        if (! empty($data['email'])) {
             Validators::assert($data['email'], 'email');
         }
         try {
             foreach ($data as $key => $value) {
-                if (!empty($value) && $key !== 'id' && $key !== 'roles') {
+                if (! empty($value) && $key !== 'id' && $key !== 'roles') {
                     if ($key === 'password') {
                         $update_data[$key] = $this->passwords->hash($value);
                     } else {
@@ -204,13 +204,13 @@ class ClientFacade
 
             $user = $this->db->table($this->table);
 
-            if (!empty($update_data)) {
+            if (! empty($update_data)) {
                 $update_data[self::ColumnAuthToken] = $this->token();
                 $user->where('id', $id)->update($update_data);
             }
 
-            if (!empty($data['roles']) && is_array($data['roles'])) {
-                if ($user->get($id)->related($this->table_role_user.'.user_id')->delete() > 0) {
+            if (! empty($data['roles']) && is_array($data['roles'])) {
+                if ($user->get($id)->related($this->table_role_user . '.user_id')->delete() > 0) {
                     unset($user);
                 }
                 $roles = [];
@@ -271,10 +271,10 @@ class ClientFacade
     protected function prepareSearch($data)
     {
         $data_array = [
-            self::ColumnName => $data->username ?? null,
+            self::ColumnName  => $data->username ?? null,
             self::ColumnPhone => isset($data->phone) ? PhoneNumber::toDb($data->phone) : null,
             self::ColumnEmail => $data->email ?? null,
-            'roles' => $data->roles ?? null,
+            'roles'           => $data->roles ?? null,
         ];
 
         // remove the empty element
@@ -284,43 +284,43 @@ class ClientFacade
     public function search($data): array
     {
         $users_data = [];
-        $pre_data = $this->prepareSearch($data);
+        $pre_data   = $this->prepareSearch($data);
 
-        if (!empty($pre_data)) {
+        if (! empty($pre_data)) {
             $query = $this->db->table($this->table);
 
-            if (!empty($pre_data[self::ColumnName])) {
+            if (! empty($pre_data[self::ColumnName])) {
                 $username = $pre_data[self::ColumnName];
-                $query = $query->where('username LIKE ?', "%$username%");
+                $query    = $query->where('username LIKE ?', "%$username%");
             }
-            if (!empty($pre_data[self::ColumnPhone])) {
+            if (! empty($pre_data[self::ColumnPhone])) {
                 $phone = $pre_data[self::ColumnPhone];
                 $query = $query->where('phone LIKE ?', "%$phone%");
             }
-            if (!empty($pre_data[self::ColumnEmail])) {
+            if (! empty($pre_data[self::ColumnEmail])) {
                 $email = $pre_data[self::ColumnEmail];
                 $query = $query->where('email LIKE ?', "%$email%");
             }
 
             foreach ($query as $user) {
                 $users_data[$user->id] = [
-                    'username' => $user->username,
-                    'phone' => $user->phone,
+                    'username'       => $user->username,
+                    'phone'          => $user->phone,
                     'phone_verified' => $user->phone_verified,
-                    'email' => $user->email,
+                    'email'          => $user->email,
                     'email_verified' => $user->email_verified,
-                    'created_at' => $user->created_at,
-                    'updated_at' => $user->updated_at,
+                    'created_at'     => $user->created_at,
+                    'updated_at'     => $user->updated_at,
                 ];
 
-                foreach ($user->related($this->table_role_user.'.user_id') as $row) {
+                foreach ($user->related($this->table_role_user . '.user_id') as $row) {
                     $users_data[$user->id]['roles'][] = $row->ref('role', 'role_id');
                 }
             }
 
-            if (!empty($pre_data['roles'])) {
+            if (! empty($pre_data['roles'])) {
                 foreach ($users_data as $id => $value) {
-                    if (!empty(array_diff($pre_data['roles'], $value['roles']))) {
+                    if (! empty(array_diff($pre_data['roles'], $value['roles']))) {
                         unset($users_data[$id]);
                     }
                 }
@@ -333,17 +333,37 @@ class ClientFacade
     public function searchBy($field, $data, $strict = true): ?ActiveRow
     {
         $like = ' LIKE ?';
-        $pro = '%';
+        $pro  = '%';
 
         if ($strict) {
             $like = '';
-            $pro = '';
+            $pro  = '';
         }
         if ($field === 'phone') {
             $data = PhoneNumber::toDb($data);
         }
         $query = $this->db->table($this->table);
 
-        return $query->where($field.$like, $pro.$data.$pro)->fetch();
+        return $query->where($field . $like, $pro . $data . $pro)->fetch();
+    }
+
+    /**
+     * Summary of getCl
+     * @param string $type 'customer' or 'executor'
+     * @return Nette\Database\Table\Selection
+     */
+    public function getCl(string $type): Selection
+    {
+        $customer_role_id = $this->db->table('role')
+            ->where('role_name', $type)
+            ->fetch()
+            ->id;
+        $customers_id = $this->db->table($this->table_role_user)
+            ->select('user_id')
+            ->where('role_id', $customer_role_id);
+        $customers = $this->db->table($this->table)
+            ->where('id', $customers_id);
+
+        return $customers;
     }
 }

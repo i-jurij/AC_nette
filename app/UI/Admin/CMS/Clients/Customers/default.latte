@@ -8,4 +8,12 @@
 {block content}	
 <div class="container">
     <h2 class="text-center">Customers</h2>
+        <div class="m-3 p-3 text-center">
+        <a n:if="$user->isAllowed('Customers','search')" class="btn btn-secondary" n:href=":Admin:CMS:Clients:Customers:search">Search</a>
+        <a class="btn btn-secondary" n:href=":Admin:CMS:Clients:Customers:list">
+            List{if $user->isAllowed('Customers','update')}, edit, delete{/if}
+        </a>
+    </div>
+
+    {include menu from $shared_templates.'menu.latte', $currentPageMenu}
 </div>

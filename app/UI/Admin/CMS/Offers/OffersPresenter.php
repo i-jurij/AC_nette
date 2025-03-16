@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\UI\Admin\CMS\Orders;
+namespace App\UI\Admin\CMS\Offers;
 
-final class OrdersPresenter extends \App\UI\Admin\BasePresenter
+final class OffersPresenter extends \App\UI\Admin\BasePresenter
 {
     public function renderDefault()
     {

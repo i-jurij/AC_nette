@@ -1,11 +1,14 @@
 <?php
+
+$role = "INSERT INTO `role`(`role_name`) 
+                VALUES  ('admin'),
+                        ('banned'),
+                        ('client'),
+                        ('customer'),
+                        ('executor')";
+// $role = "INSERT INTO `role` SET role_name = 'admin'";
+$insert_sqls = ['role' => $role];
 /*
-$role = 'INSERT INTO "role" ("role_name") VALUES
-        ("client"),
-        ("guest"),
-        ("user"),
-        ("moder"),
-        ("admin")';
 $permission = 'INSERT INTO "permission" ("resource", "action") VALUES
         ("User", "getUserData"),
         ("User", "add"),
@@ -23,6 +26,3 @@ $insert_sqls = [
     'role_permission' => $role_permission,
 ];
 */
-$role = "INSERT INTO `role`(`role_name`) VALUES('admin'),('banned')";
-// $role = "INSERT INTO `role` SET role_name = 'admin'";
-$insert_sqls = ['role' => $role];
