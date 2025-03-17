@@ -176,6 +176,22 @@ sss
                             </p>
 
                             <div class="border-top pt-2">
+                                                            <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:byClient $user_id}"
+                                    n:if="$user->isAllowed('Offers', 'byClient')"
+                                >
+                                    Offers
+                                </button>
+                                <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $user_id}"
+                                    n:if="$user->isAllowed('Comments', 'byClient')"
+                                >
+                                    Comments
+                                </button>
                                 <button 
                                     class="btn btn-outline-primary" 
                                     form="postClientsSearchForm" 

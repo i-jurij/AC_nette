@@ -177,7 +177,25 @@ sss
 
                             <div class="border-top pt-2">
                                 <button 
-                                    class="btn btn-outline-primary" 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:byClient $user_id}"
+                                    n:if="$user->isAllowed('Offers', 'byClient')"
+                                >
+                                    Offers
+                                </button>
+                                <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $user_id}"
+                                    n:if="$user->isAllowed('Comments', 'byClient')"
+                                >
+                                    Comments
+                                </button>
+
+
+                                <button 
+                                    class="btn btn-outline-primary m-1" 
                                     form="postClientsSearchForm" 
                                     formaction="{link :Admin:CMS:Clients:edit $user_id}"
                                     n:if="$user->isAllowed('Clients', 'update')"
@@ -186,7 +204,7 @@ sss
                                 </button>
                                 <button 
                                     type="button" 
-                                    class="btn btn-outline-primary" 
+                                    class="btn btn-outline-primary m-1" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#smSearch{$row['username']}{$user_id}"
                                     n:if="$user->isAllowed('Clients', 'deleteClientData')"

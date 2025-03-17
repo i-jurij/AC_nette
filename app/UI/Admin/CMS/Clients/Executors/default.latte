@@ -59,12 +59,28 @@
                     </p>
 
                     <div n:if="in_array('admin', $user->getRoles())" class="border-top pt-2">
-                        <button class="btn btn-outline-primary" form="postUsersForm"
+                        <button class="btn btn-outline-primary m-1" form="postUsersForm"
                             formaction="{link edit $row['id']}">Edit</button>
-                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal"
                             data-bs-target="#sm{$row->username}{$row->id}">
                             Delete
                         </button>
+                        <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                                    n:if="$user->isAllowed('Offers', 'byClient')"
+                                >
+                                    Offers
+                            </button>
+                            <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
+                                    n:if="$user->isAllowed('Comments', 'byClient')"
+                                >
+                                    Comments
+                            </button>
                     </div>
                     <!-- Modal -->
                     <div class="modal fade" id="sm{$row->username}{$row->id}" tabindex="-1"
@@ -131,11 +147,27 @@
                         <td><img src="{$baseUrl}/{$img}" alt="Photo {$row->username}" style="width:64px;" /></td>
                         <td>{$row->username}</td>
                         <td n:if="in_array('admin', $user->getRoles())">
-                            <button class="btn btn-outline-primary d-block m-2" form="postUsersForm"
+                            <button class="btn btn-outline-primary m-1" form="postUsersForm"
                                 formaction="{link edit $row['id']}">Edit</button>
-                            <button type="button" class="btn btn-outline-primary d-block m-2" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal"
                                 data-bs-target="#{$row->username}{$row->id}">
                                 Delete
+                            </button>
+                            <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                                    n:if="$user->isAllowed('Offers', 'byClient')"
+                                >
+                                    Offers
+                            </button>
+                            <button 
+                                    class="btn btn-outline-primary m-1" 
+                                    form="postClientsSearchForm" 
+                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
+                                    n:if="$user->isAllowed('Comments', 'byClient')"
+                                >
+                                    Comments
                             </button>
                             <!-- Modal -->
                             <div class="modal fade" id="{$row->username}{$row->id}" tabindex="-1"
