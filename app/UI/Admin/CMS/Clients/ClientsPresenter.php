@@ -19,14 +19,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         parent::__construct();
     }
 
-    public function renderDefault()
-    {
-        if (! $this->getUser()->isAllowed('Clients', '')) {
-            $this->error('Forbidden', 403);
-        }
-    }
-
-    public function renderList(int $page = 1): void
+    public function renderDefault(int $page = 1): void
     {
         if (! $this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
             $this->error('Forbidden', 403);

@@ -8,11 +8,27 @@ use Nette\Application\UI\Form;
 
 final class CustomersPresenter extends \App\UI\Admin\CMS\Clients\ClientsPresenter
 {
-    public function renderDefault()
+    public function renderDefault(int $page = 1): void
     {
-        if (! $this->getUser()->isAllowed('Customers', '')) {
+        if (! $this->getUser()->isAllowed('Customers', 'getAllClientsData')) {
             $this->error('Forbidden', 403);
         }
+        //$clients_data          = $this->clientfacade->getAllClientsData();
+        $clients_data = $this->clientfacade->getCl('customer');
+
+        $this->template->count = count($clients_data);
+
+        $lastPage                     = 0;
+        $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
+        $this->template->page         = $page;
+        $this->template->lastPage     = $lastPage;
+
+        $roles = [];
+        foreach ($clients_data as $user) {
+            // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
+            $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
+        }
+        $this->template->users_roles = $roles;
     }
     public function createComponentCustomerSearchForm(): Form
     {
@@ -73,28 +89,5 @@ final class CustomersPresenter extends \App\UI\Admin\CMS\Clients\ClientsPresente
                 $this->redirect('this');
             }
         }
-    }
-
-    public function renderList(int $page = 1): void
-    {
-        if (! $this->getUser()->isAllowed('Customers', 'getAllClientsData')) {
-            $this->error('Forbidden', 403);
-        }
-        //$clients_data          = $this->clientfacade->getAllClientsData();
-        $clients_data = $this->clientfacade->getCl('customer');
-
-        $this->template->count = count($clients_data);
-
-        $lastPage                     = 0;
-        $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
-        $this->template->page         = $page;
-        $this->template->lastPage     = $lastPage;
-
-        $roles = [];
-        foreach ($clients_data as $user) {
-            // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
-            $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
-        }
-        $this->template->users_roles = $roles;
     }
 }
