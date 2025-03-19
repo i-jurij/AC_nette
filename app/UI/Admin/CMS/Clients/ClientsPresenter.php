@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\UI\Admin\CMS\Clients;
 
@@ -15,32 +15,33 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
     public function __construct(
         protected ClientFacade $clientfacade,
-        private FormFactory $formFactory) {
+        private FormFactory $formFactory
+    ) {
         parent::__construct();
     }
 
     public function renderDefault(int $page = 1): void
     {
-        if (! $this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
+        if (!$this->getUser()->isAllowed('Clients', 'getAllClientsData')) {
             $this->error('Forbidden', 403);
         }
-        $clients_data          = $this->clientfacade->getAllClientsData();
+        $clients_data = $this->clientfacade->getAllClientsData();
         $this->template->count = count($clients_data);
 
-        $lastPage                     = 0;
+        $lastPage = 0;
         $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
-        $this->template->page         = $page;
-        $this->template->lastPage     = $lastPage;
+        $this->template->page = $page;
+        $this->template->lastPage = $lastPage;
 
         foreach ($clients_data as $user) {
             // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
             $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
 
-            $offers_count_by_client   = count($this->clientfacade->db->table('offer')->where('user_id', $user->id));
-            $comments_count_by_client = count($this->clientfacade->db->table('comment')->where('user_id', $user->id));
+            $offers_count_by_client = count($this->clientfacade->db->table('offer')->where('client_id', $user->id));
+            $comments_count_by_client = count($this->clientfacade->db->table('comment')->where('client_id', $user->id));
         }
-        $this->template->users_roles              = $roles ?? [];
-        $this->template->offers_count_by_client   = $offers_count_by_client ?? 0;
+        $this->template->users_roles = $roles ?? [];
+        $this->template->offers_count_by_client = $offers_count_by_client ?? 0;
         $this->template->comments_count_by_client = $comments_count_by_client ?? 0;
 
     }
@@ -49,12 +50,12 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
     {
         $form = new Form();
         $form->addProtection();
-        $renderer                                    = $form->getRenderer();
-        $renderer->wrappers['group']['container']    = 'div class="my1 mx-auto pb2 px2"';
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
         $renderer->wrappers['controls']['container'] = 'div';
-        $renderer->wrappers['pair']['container']     = 'div';
-        $renderer->wrappers['label']['container']    = null;
-        $renderer->wrappers['control']['container']  = null;
+        $renderer->wrappers['pair']['container'] = 'div';
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
 
         $form->setHtmlAttribute('id', 'clientUpdateForm')
             ->setHtmlAttribute('class', 'form');
@@ -112,7 +113,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
     public function renderEdit(int $id): void
     {
         if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('Clients', 'update')) {
-            $this->template->client_data  = $this->clientfacade->getClientData($id);
+            $this->template->client_data = $this->clientfacade->getClientData($id);
             $this->template->client_roles = $this->clientfacade->roleWithClientId($id);
         } else {
             $this->flashMessage('You don\'t have permission for this', 'text-warning');
@@ -129,7 +130,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
                 $id = $data->id;
                 unset($data->id);
                 $update = array_filter((array) $data);
-                if (! empty($update)) {
+                if (!empty($update)) {
                     $this->clientfacade->update($id, $update);
                     $this->flashMessage(\json_encode($update) . ' Client updated', 'text-success');
                 } else {
@@ -152,7 +153,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
 
     public function actionDelete(int $id): void
     {
-        if (! $this->getUser()->isAllowed('Clients', ' deleteClientData')) {
+        if (!$this->getUser()->isAllowed('Clients', ' deleteClientData')) {
             $this->error('Forbidden', 403);
         }
         try {
@@ -199,13 +200,13 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
     #[Requires(methods: 'POST')]
     public function postSearch(?Form $form = null): void
     {
-        if (! $this->getUser()->isAllowed('Clients', 'search')) {
+        if (!$this->getUser()->isAllowed('Clients', 'search')) {
             $this->error('Forbidden', 403);
         }
 
         $httpRequest = $this->getHttpRequest();
 
-        if ($httpRequest->isMethod('POST') && ! empty($form)) {
+        if ($httpRequest->isMethod('POST') && !empty($form)) {
             try {
                 $this->template->show = $this->clientfacade->search($form->getValues());
                 if (empty($this->template->show)) {

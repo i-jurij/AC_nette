@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\UI\Accessory;
 
@@ -12,8 +12,8 @@ class ClientFact
     private array $array = [
         'username' => '',
         'password' => '',
-        'phone'    => '',
-        'email'    => '',
+        'phone' => '',
+        'email' => '',
     ];
     private $client_role_id;
     private $customer_role_id;
@@ -45,10 +45,10 @@ class ClientFact
 
     protected function prepare()
     {
-        $this->array['username'] = Random::generate(7, 'a-z');
-        $this->array['password'] = password_hash('password', PASSWORD_DEFAULT);
-        $this->array['phone']    = Random::generate(10, '0-9');
-        $this->array['email']    = $this->array['username'] . '@' . $this->array['username'] . '.com';
+        $this->array['username'] = '7' . Random::generate(10, '0-9');
+        $this->array['password'] = 'password';
+        $this->array['phone'] = $this->array['username'];
+        $this->array['email'] = $this->array['username'] . '@' . $this->array['username'] . '.com';
     }
 
     public function seedClient()

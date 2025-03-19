@@ -27,7 +27,7 @@ class UserFact
     public function seedUser()
     {
         $this->array['username'] = Random::generate(7, 'a-z');
-        $this->array['password'] = password_hash('password', PASSWORD_DEFAULT);
+        $this->array['password'] = 'password';
         $this->array['phone'] = Random::generate(10, '0-9');
         $this->array['email'] = $this->array['username'] . '@' . $this->array['username'] . '.com';
         $this->array['auth_token'] = Random::generate(10, '0-9');

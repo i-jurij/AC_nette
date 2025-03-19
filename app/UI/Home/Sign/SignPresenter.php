@@ -48,17 +48,6 @@ final class SignPresenter extends \App\UI\BasePresenter
 
         $form->addGroup('');
         $form->addSubmit('send', 'Войти');
-        /*
-        $form->addGroup('--- 👤 ---');
-        $url_reg = $this->link(':Home:Sign:up');
-        $form->addButton('register', Html::el('div')
-            ->setHtml('<a href="'.$url_reg.'">Зарегистрироваться</a>'));
-
-        $form->addGroup('--- 🔓 ---');
-        $url_restore = $this->link(':Home:Sign:restore');
-        $form->addButton('restore', Html::el('div')
-            ->setHtml('<a href="'.$url_restore.'">Забыли пароль?</a>'));
-        */
 
         $form->onSuccess[] = $this->userLogin(...);
 
@@ -181,13 +170,13 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         $form = $this->formFactory->create();
         $form->setHtmlAttribute('id', 'restore_password_form')
-        ->setHtmlAttribute('class', 'form center mx-auto');
+            ->setHtmlAttribute('class', 'form center mx-auto');
 
         $form->addGroup('');
         $form->addEmail('email', '')
-        ->setHtmlAttribute('placeholder', '📧 Email:')
-        ->setRequired('Введите адрес электронной почты.')
-        ->addRule(Form::Email, 'Введите правильный адрес электронной почты.');
+            ->setHtmlAttribute('placeholder', '📧 Email:')
+            ->setRequired('Введите адрес электронной почты.')
+            ->addRule(Form::Email, 'Введите правильный адрес электронной почты.');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
@@ -209,10 +198,10 @@ final class SignPresenter extends \App\UI\BasePresenter
             if (!empty($res->auth_token)) {
                 // create or get and receive passsword or url with token to email;
                 $this->absoluteUrls = true;
-                $redirect_url = $this->link(':Home:Sign:restorelink').'?token='.$res->auth_token.'&'.Csrf::$token_name.'='.Csrf::getToken();
+                $redirect_url = $this->link(':Home:Sign:restorelink') . '?token=' . $res->auth_token . '&' . Csrf::$token_name . '=' . Csrf::getToken();
 
                 $mail = new Email();
-                $mail->from = 'admin@'.SITE_NAME;
+                $mail->from = 'admin@' . SITE_NAME;
                 $mail->to = $email;
                 $mail->subject = 'Restore password';
                 $mail->body = $redirect_url;

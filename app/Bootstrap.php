@@ -15,16 +15,16 @@ class Bootstrap
 
         // $configurator->setDebugMode('secret@23.75.345.200'); // enable for your remote IP
         // $configurator->setDebugMode(false); // disable debug mode
-        $configurator->enableTracy($rootDir.'/log');
+        $configurator->enableTracy($rootDir . '/log');
 
-        $configurator->setTempDirectory($rootDir.'/temp');
+        $configurator->setTempDirectory($rootDir . '/temp');
 
         $configurator->createRobotLoader()
             ->addDirectory(__DIR__)
             ->register();
         $configurator->setTimeZone('Europe/Moscow');
 
-        $configurator->addConfig($rootDir.'/config/all_configs.neon');
+        $configurator->addConfig($rootDir . '/config/all_configs.neon');
         /*
         $configurator->addConfig($rootDir.'/config/common.neon');
         $configurator->addConfig($rootDir.'/config/db.neon');
@@ -38,14 +38,14 @@ class Bootstrap
         $protocol = ($https || $port) ? 'https://' : 'http://';
         $cur_url = $_SERVER['REQUEST_URI'] ?? false;
         $host = $_SERVER['HTTP_HOST'] ?? false;
-        $cur_full_url = ((bool) $cur_url && (bool) $host) ? $protocol.$host.$cur_url : false;
+        $cur_full_url = ((bool) $cur_url && (bool) $host) ? $protocol . $host . $cur_url : false;
 
         $check = ((bool) $cur_full_url) ? filter_var($cur_full_url, FILTER_VALIDATE_URL) : false;
 
-        if ($check && (bool) \mb_stristr($check, '/admin')) {
-            $configurator->addConfig($rootDir.'/config/auth_user.neon');
+        if ($check && \mb_stristr($check, '/admin') === false) {
+            $configurator->addConfig($rootDir . '/config/auth_client.neon');
         } else {
-            $configurator->addConfig($rootDir.'/config/auth_client.neon');
+            $configurator->addConfig($rootDir . '/config/auth_user.neon');
         }
 
         return $configurator;

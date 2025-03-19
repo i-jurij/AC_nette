@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\UI\Admin\CMS\Clients\Customers;
 
@@ -10,7 +10,7 @@ final class CustomersPresenter extends \App\UI\Admin\CMS\Clients\ClientsPresente
 {
     public function renderDefault(int $page = 1): void
     {
-        if (! $this->getUser()->isAllowed('Customers', 'getAllClientsData')) {
+        if (!$this->getUser()->isAllowed('Customers', 'getAllClientsData')) {
             $this->error('Forbidden', 403);
         }
         //$clients_data          = $this->clientfacade->getAllClientsData();
@@ -18,17 +18,22 @@ final class CustomersPresenter extends \App\UI\Admin\CMS\Clients\ClientsPresente
 
         $this->template->count = count($clients_data);
 
-        $lastPage                     = 0;
+        $lastPage = 0;
         $this->template->clients_data = $clients_data->page($page, 6, $lastPage);
-        $this->template->page         = $page;
-        $this->template->lastPage     = $lastPage;
+        $this->template->page = $page;
+        $this->template->lastPage = $lastPage;
 
         $roles = [];
         foreach ($clients_data as $user) {
             // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
             $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
+            $offers_count_by_client = count($this->clientfacade->db->table('offer')->where('client_id', $user->id));
+            $comments_count_by_client = count($this->clientfacade->db->table('comment')->where('client_id', $user->id));
+
         }
-        $this->template->users_roles = $roles;
+        $this->template->users_roles = $roles ?? [];
+        $this->template->offers_count_by_client = $offers_count_by_client ?? 0;
+        $this->template->comments_count_by_client = $comments_count_by_client ?? 0;
     }
     public function createComponentCustomerSearchForm(): Form
     {
@@ -63,13 +68,13 @@ final class CustomersPresenter extends \App\UI\Admin\CMS\Clients\ClientsPresente
 
     public function postSearch(?Form $form = null): void
     {
-        if (! $this->getUser()->isAllowed('Customers', 'search')) {
+        if (!$this->getUser()->isAllowed('Customers', 'search')) {
             $this->error('Forbidden', 403);
         }
 
         $httpRequest = $this->getHttpRequest();
 
-        if ($httpRequest->isMethod('POST') && ! empty($form)) {
+        if ($httpRequest->isMethod('POST') && !empty($form)) {
             try {
                 $data = $form->getValues();
 

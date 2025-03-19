@@ -67,7 +67,7 @@
                         </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
+                                    form="postUsersForm" 
                                     formaction="{link :Admin:CMS:Offers:byClient $row->id}"
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
@@ -78,7 +78,7 @@
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
+                                    form="postUsersForm" 
                                     formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
@@ -161,7 +161,7 @@
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
+                                    form="postUsersForm" 
                                     formaction="{link :Admin:CMS:Offers:byClient $row->id}"
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
@@ -172,7 +172,7 @@
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
+                                    form="postUsersForm" 
                                     formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
