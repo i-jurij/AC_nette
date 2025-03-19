@@ -29,17 +29,23 @@ function migrate(object $container, string $path_to_sql_file)
     $reflection = $db->getReflection();
 
     try {
-        if (include $path_create) {
+        if (include_once $path_create) {
             foreach ($create_sqls as $key => $sql) {
                 $check_table = $reflection->hasTable($key);
 
                 if ($check_table == false) {
                     $db->query($sql);
-                    if ((include $path_insert) && isset($insert_sqls[$key])) {
+                    if ((include_once $path_insert) && isset($insert_sqls[$key])) {
                         $db->query($insert_sqls[$key]);
                     }
-                    if ((include $path_trigger) && isset($trigger_sqls[$key])) {
-                        $db->query($trigger_sqls[$key]);
+                    if ((include_once $path_trigger) && isset($trigger_sqls[$key])) {
+                        if (is_array($trigger_sqls[$key])) {
+                            foreach ($trigger_sqls[$key] as $value) {
+                                $db->query($value);
+                            }
+                        } else {
+                            $db->query($trigger_sqls[$key]);
+                        }
                     }
                 }
             }

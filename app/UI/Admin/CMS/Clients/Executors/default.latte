@@ -65,13 +65,16 @@
                             data-bs-target="#sm{$row->username}{$row->id}">
                             Delete
                         </button>
-                        <button 
+                            <button 
                                     class="btn btn-outline-primary m-1" 
                                     form="postClientsSearchForm" 
                                     formaction="{link :Admin:CMS:Offers:byClient $row->id}"
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
                                     Offers
+                                <span class="badge bg-secondary">
+                                    {$offers_count_by_client}
+                                </span>
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
@@ -80,6 +83,9 @@
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
                                     Comments
+                                <span class="badge bg-secondary">
+                                    {$comments_count_by_client}
+                                </span>
                             </button>
                     </div>
                     <!-- Modal -->
@@ -160,6 +166,9 @@
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
                                     Offers
+                                <span class="badge bg-secondary">
+                                    {$offers_count_by_client}
+                                </span>
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
@@ -168,6 +177,9 @@
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
                                     Comments
+                                <span class="badge bg-secondary">
+                                    {$comments_count_by_client}
+                                </span>
                             </button>
                             <!-- Modal -->
                             <div class="modal fade" id="{$row->username}{$row->id}" tabindex="-1"

@@ -27,8 +27,8 @@ class UserFacade
         public Explorer $db,
         public Passwords $passwords,
     ) {
-        $this->table = ''.TABLE;
-        $this->table_role_user = 'role_'.TABLE;
+        $this->table = '' . TABLE;
+        $this->table_role_user = 'role_' . TABLE;
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
@@ -82,7 +82,7 @@ class UserFacade
             ]);
 
             // insert into users_roles users (first admin user) id, role "admin" id
-            $this->db->table('role_'.$table)->insert([
+            $this->db->table('role_' . $table)->insert([
                 'user_id' => $row->id,
                 'role_id' => $role_admin_id['id'],
             ]);
@@ -210,7 +210,7 @@ class UserFacade
             }
 
             if (!empty($data['roles']) && is_array($data['roles'])) {
-                if ($user->get($id)->related($this->table_role_user.'.user_id')->delete() > 0) {
+                if ($user->get($id)->related($this->table_role_user . '.user_id')->delete() > 0) {
                     unset($user);
                 }
                 $roles = [];
@@ -312,7 +312,7 @@ class UserFacade
                     'updated_at' => $user->updated_at,
                 ];
 
-                foreach ($user->related($this->table_role_user.'.user_id') as $row) {
+                foreach ($user->related($this->table_role_user . '.user_id') as $row) {
                     $users_data[$user->id]['roles'][] = $row->ref('role', 'role_id');
                 }
             }
@@ -343,7 +343,7 @@ class UserFacade
         }
         $query = $this->db->table($this->table);
 
-        return $query->where($field.$like, $pro.$data.$pro)->fetch();
+        return $query->where($field . $like, $pro . $data . $pro)->fetch();
     }
 }
 

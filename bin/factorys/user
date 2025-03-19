@@ -12,13 +12,17 @@ function create(object $user_factory, int $int = 0): void
         $user = $user_factory->seedUser();
         $user_factory->saveUser($user);
         foreach ($user as $key => $value) {
-            echo $key.': '.$value."\n";
+            $v = $value;
+            if ($key === 'roles') {
+                $v = implode($value);
+            }
+            echo $key . ': ' . $v . "\n";
         }
     }
 }
 
 if (PHP_SAPI === 'cli') {
-    require __DIR__.'/../../vendor/autoload.php';
+    require __DIR__ . '/../../vendor/autoload.php';
 
     $container = App\Bootstrap::boot()
         ->createContainer();

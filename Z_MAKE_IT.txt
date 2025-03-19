@@ -1,0 +1,20 @@
+	
+--------------------------------
+для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
+
+список предложений работы справа (моб сверху) три самых больших прайса
+список предложений услуг слева (моб снизу) 3 миним прайса
+
+пункт меню "средние расценки": мин, макс, средние
+
+у исполнителей и заказчиков рейтинг (оценка) и комментарии (make trigger for
+table rating on ins del upd)
+
+чат между клиентами 
+
+избранное для клиентов
+
+remove client (and him comments) from db if he dont have orders in 3 month eg
+remove from db orders from customers if it is 3 month old eg
+
+authorize logging and users actions logging

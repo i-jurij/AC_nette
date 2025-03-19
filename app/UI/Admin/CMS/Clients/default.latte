@@ -4,6 +4,8 @@
 {var $description = "Admin Simple CMS Clients"}
 {var $keywords = "Admin, SimpleCMS, Clients"}
 {var $robots = "NOINDEX,NOFOLLOW"}
+{default $offers_count_by_client = 0}
+{default $comments_count_by_client = 0}
 
 {block content}
 <div class="container-fluid">
@@ -69,22 +71,28 @@
                         </button>
 
 
-                                <button 
+                            <button 
                                     class="btn btn-outline-primary m-1" 
                                     form="postClientsSearchForm" 
                                     formaction="{link :Admin:CMS:Offers:byClient $row->id}"
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
                                     Offers
-                                </button>
-                                <button 
+                                <span class="badge bg-secondary">
+                                    {$offers_count_by_client}
+                                </span>
+                            </button>
+                            <button 
                                     class="btn btn-outline-primary m-1" 
                                     form="postClientsSearchForm" 
                                     formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
                                     Comments
-                                </button>
+                                <span class="badge bg-secondary">
+                                    {$comments_count_by_client}
+                                </span>
+                            </button>
 
                     </div>
                     <!-- Modal -->
@@ -166,6 +174,9 @@
                                     n:if="$user->isAllowed('Offers', 'byClient')"
                                 >
                                     Offers
+                                <span class="badge bg-secondary">
+                                    {$offers_count_by_client}
+                                </span>
                             </button>
                             <button 
                                     class="btn btn-outline-primary m-1" 
@@ -174,6 +185,9 @@
                                     n:if="$user->isAllowed('Comments', 'byClient')"
                                 >
                                     Comments
+                                <span class="badge bg-secondary">
+                                    {$comments_count_by_client}
+                                </span>
                             </button>
 
                             <!-- Modal -->

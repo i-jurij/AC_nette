@@ -90,8 +90,13 @@ Other routes as in Nette Framework: "Home::Pages::OtherPresenters::method", "Adm
 `PermissionFacade` - add, edit, delete permissions  
 `UserFacade` - add, edit, delete users
 
+#### DB
+
+See directory "bin/mysql".
+
 ### Accessory
 
+Traits and classes for using in presenters.  
 `RequireLoggedUser` - trait for page that need autentication (in user not logged - redirect to sign in)
 
 ### Authentication
@@ -166,4 +171,6 @@ List, show, clear logs
 
 #### CMS
 
-Create, update, delete pages (SEO, content, user permissions etc)
+SEO --- MAKE IT!!!
+Create, update, delete clients (customers, executors)  
+Create, update, delete offers, comments, rating

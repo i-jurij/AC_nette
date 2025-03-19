@@ -12,6 +12,9 @@ function create(object $user_factory, int $int = 0): void
         $user = $user_factory->seedClient();
         $user_factory->saveClient($user);
         foreach ($user as $key => $value) {
+            if ($key === 'roles') {
+                $value = implode($value);
+            }
             echo $key . ': ' . $value . "\n";
         }
     }

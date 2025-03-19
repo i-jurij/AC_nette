@@ -35,8 +35,14 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         foreach ($clients_data as $user) {
             // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
             $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
+
+            $offers_count_by_client   = count($this->clientfacade->db->table('offer')->where('user_id', $user->id));
+            $comments_count_by_client = count($this->clientfacade->db->table('comment')->where('user_id', $user->id));
         }
-        $this->template->users_roles = $roles;
+        $this->template->users_roles              = $roles ?? [];
+        $this->template->offers_count_by_client   = $offers_count_by_client ?? 0;
+        $this->template->comments_count_by_client = $comments_count_by_client ?? 0;
+
     }
 
     public function createComponentClientUpdateForm()
