@@ -1,0 +1,88 @@
+<?php
+
+declare(strict_types=1);
+
+/* Create offers from random client, (customer or executor)]) 11 times:
+    "php bin/factorys/offers create 11"
+*/
+
+use Nette\Database\Connection;
+use Nette\Utils\Random;
+
+class OfferFact
+{
+    public Connection $c;
+    public array $client_ids;
+    public array $locations;
+
+    public function __construct(Connection $connection)
+    {
+        $this->c = $connection;
+
+
+
+        $sql = 'SELECT (`id`) FROM `client`';
+        $this->client_ids = $this->c->query($sql)->fetchAll();
+
+        $path_to_geo_db = realpath(__DIR__ . '/../../vendor\i-jurij\geolocation\src\sqlite\geolocation.db');
+        $dsn = "sqlite:$path_to_geo_db";
+        $sqlite = new Nette\Database\Connection($dsn);
+        $loc_sql = 'SELECT (`id`) FROM `geo_city`';
+        $this->locations = $sqlite->query($loc_sql)->fetchAll();
+    }
+    public function seed()
+    {
+        $offers_type = array_rand(['workoffer' => 0, 'serviceoffer' => 1], 1);
+
+        $row = array_rand($this->client_ids, 1);
+        $client_id = ($this->client_ids[$row])->id;
+
+        $loc_row = array_rand($this->client_ids, 1);
+        $location = ($this->locations[$loc_row])->id;
+
+        $services = $this->array['username'] . '@' . $this->array['username'] . '.com';
+        $price = 'password';
+
+        return [
+            'offers_type' => $offers_type,
+            'client_id' => $client_id,
+            'location' => $location,
+            'services' => $offers_type,
+            'price' => $offers_type,
+        ];
+
+    }
+    public function save()
+    {
+
+    }
+}
+
+
+
+if (PHP_SAPI === 'cli') {
+    require __DIR__ . '/../../vendor/autoload.php';
+
+    $container = App\Bootstrap::boot()
+        ->createContainer();
+    // var_dump($container);
+    $connection = $container->getByType(Nette\Database\Connection::class);
+
+    if ($argc == 3 && $argv[1] === 'create' && is_integer((int) $argv[2])) {
+        $offersFactory = new OfferFact($connection);
+        for ($i = 0; $i < (int) $argv[2]; ++$i) {
+            $offer = $offersFactory->seed();
+            $user_factory->saveClient($user);
+            foreach ($user as $key => $value) {
+                if ($key === 'roles') {
+                    $value = implode($value);
+                }
+                echo $key . ': ' . $value . "\n";
+            }
+        }
+        exit(1);
+    } else {
+        echo "Somethig wrong :( \n";
+        exit(1);
+    }
+}

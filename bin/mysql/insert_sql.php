@@ -5,7 +5,8 @@ $role = "INSERT INTO `role`(`role_name`)
                         ('banned'),
                         ('client'),
                         ('customer'),
-                        ('executor')";
+                        ('executor')
+                ON DUPLICATE KEY UPDATE `role_name` = VALUES(`role_name`)";
 // $role = "INSERT INTO `role` SET role_name = 'admin'";
 $insert_sqls = ['role' => $role];
 /*

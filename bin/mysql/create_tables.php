@@ -124,40 +124,40 @@ $rating = 'CREATE TABLE IF NOT EXISTS `rating` (
 
 $category = 'CREATE TABLE IF NOT EXISTS `category` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`created_at` timestamp NULL DEFAULT NULL,
-	`updated_at` timestamp NULL DEFAULT NULL,
-	`image` varchar(1500) NOT NULL,
+	`image` varchar(1500) DEFAULT NULL,
 	`name` varchar(255) NOT NULL,
-	`description` varchar(500) NOT NULL
+	`description` varchar(500) DEFAULT NULL,
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   ';
 
 $service = 'CREATE TABLE IF NOT EXISTS `service` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`created_at` timestamp NULL DEFAULT NULL,
-	`updated_at` timestamp NULL DEFAULT NULL,
 	`category_id` INTEGER UNSIGNED DEFAULT NULL,
-	`image` varchar(1500) NOT NULL,
+	`image` varchar(1500) DEFAULT NULL,
 	`name` varchar(255) NOT NULL,
-	`description` varchar(500) NOT NULL,
+	`description` varchar(500) DEFAULT NULL,
 	`price` decimal(9,2) NOT NULL,
-	`duration` int(11) NOT NULL,
+	`duration` int(11) DEFAULT NULL,
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (`category_id`) REFERENCES `category`(`id`) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   ';
 
 $create_sqls = [
-    'role'                       => $role,
-    'permission'                 => $permission,
-    'role_permission'            => $role_permission,
-    'user'                       => $user,
-    'role_user'                  => $role_user,
-    'client'                     => $client,
-    'role_client'                => $role_client,
-    'userappliedforregistration' => $userappliedforregistration,
-    'offer'                      => $offer,
-    'comment'                    => $comment,
-    'rating'                     => $rating,
-    'category'                   => $category,
-    'service'                    => $service,
+	'role' => $role,
+	'permission' => $permission,
+	'role_permission' => $role_permission,
+	'user' => $user,
+	'role_user' => $role_user,
+	'client' => $client,
+	'role_client' => $role_client,
+	'userappliedforregistration' => $userappliedforregistration,
+	'offer' => $offer,
+	'comment' => $comment,
+	'rating' => $rating,
+	'category' => $category,
+	'service' => $service,
 ];

@@ -19,35 +19,33 @@ function start()
 
 function migrate(object $container, string $path_to_sql_file)
 {
-    $db = $container->getByName('database.'.$path_to_sql_file.'.connection');
-    $begin_path_to_sql_files = APPDIR.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'bin'.DIRECTORY_SEPARATOR.$path_to_sql_file.DIRECTORY_SEPARATOR;
-    // $path_db_create = \realpath($begin_path_to_sql_files.'create_db.php');
-    $path_create = \realpath($begin_path_to_sql_files.'create_tables.php');
-    $path_insert = \realpath($begin_path_to_sql_files.'insert_sql.php');
-    $path_trigger = \realpath($begin_path_to_sql_files.'trigger_sql.php');
+    $db = $container->getByName('database.' . $path_to_sql_file . '.connection');
+    $begin_path_to_sql_files = APPDIR . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . $path_to_sql_file . DIRECTORY_SEPARATOR;
+    $path_create = \realpath($begin_path_to_sql_files . 'create_tables.php');
+    $path_insert = \realpath($begin_path_to_sql_files . 'insert_sql.php');
+    $path_trigger = \realpath($begin_path_to_sql_files . 'trigger_sql.php');
 
-    $reflection = $db->getReflection();
+    //$reflection = $db->getReflection();
 
     try {
         if (include_once $path_create) {
             foreach ($create_sqls as $key => $sql) {
-                $check_table = $reflection->hasTable($key);
-
-                if ($check_table == false) {
-                    $db->query($sql);
-                    if ((include_once $path_insert) && isset($insert_sqls[$key])) {
-                        $db->query($insert_sqls[$key]);
-                    }
-                    if ((include_once $path_trigger) && isset($trigger_sqls[$key])) {
-                        if (is_array($trigger_sqls[$key])) {
-                            foreach ($trigger_sqls[$key] as $value) {
-                                $db->query($value);
-                            }
-                        } else {
-                            $db->query($trigger_sqls[$key]);
+                //$check_table = $reflection->hasTable($key);
+                //if ($check_table == false) {
+                $db->query($sql);
+                if ((include_once $path_insert) && isset($insert_sqls[$key])) {
+                    $db->query($insert_sqls[$key]);
+                }
+                if ((include_once $path_trigger) && isset($trigger_sqls[$key])) {
+                    if (is_array($trigger_sqls[$key])) {
+                        foreach ($trigger_sqls[$key] as $value) {
+                            $db->query($value);
                         }
+                    } else {
+                        $db->query($trigger_sqls[$key]);
                     }
                 }
+                //}
             }
         }
 
@@ -69,7 +67,7 @@ function userAdd(object $container, array $argv)
 
     if (empty($admin_isset['count(*)'])) {
         try {
-            [,, $username, $password] = $argv;
+            [, , $username, $password] = $argv;
             $userFacade->shortAdd($username, $password, 'user');
             echo "User $username was added.\n";
             exit(1);
@@ -84,7 +82,7 @@ function userAdd(object $container, array $argv)
 }
 
 if (PHP_SAPI === 'cli') {
-    require __DIR__.'/../vendor/autoload.php';
+    require __DIR__ . '/../vendor/autoload.php';
 
     $container = App\Bootstrap::boot()
         ->createContainer();
