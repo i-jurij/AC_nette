@@ -138,7 +138,7 @@ $service = 'CREATE TABLE IF NOT EXISTS `service` (
 	`image` varchar(1500) DEFAULT NULL,
 	`name` varchar(255) NOT NULL,
 	`description` varchar(500) DEFAULT NULL,
-	`price` decimal(9,2) NOT NULL,
+	`price` decimal(9,2) DEFAULT NULL,
 	`duration` int(11) DEFAULT NULL,
 	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

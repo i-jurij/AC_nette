@@ -14,51 +14,79 @@ class OfferFact
     public Connection $c;
     public array $client_ids;
     public array $locations;
+    public array $services;
 
     public function __construct(Connection $connection)
     {
         $this->c = $connection;
+        $this->createServices();
+        $this->getServices();
+        $this->getLocations();
+        $this->getClientIds();
+    }
+    private function createServices()
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $cat[] = ['name' => Random::generate(6, 'a-z')];
+        }
+        $this->c->query('INSERT INTO `category` ?', $cat);
+        $cat_ids = $this->c->query('SELECT (`id`) FROM `category`')->fetchAll();
 
+        foreach ($cat_ids as $row) {
+            for ($i = 0; $i < count($cat_ids); $i++) {
+                $serv[] = ['category_id' => $row->id, 'name' => Random::generate(6, 'a-z')];
+            }
+        }
 
+        $this->c->query('INSERT INTO `service` ?', $serv);
+    }
 
-        $sql = 'SELECT (`id`) FROM `client`';
-        $this->client_ids = $this->c->query($sql)->fetchAll();
+    private function getServices()
+    {
+        $serv_sql = 'SELECT (`id`) FROM `service`';
+        $this->services = $this->c->query($serv_sql)->fetchAll();
+    }
 
+    private function getLocations()
+    {
         $path_to_geo_db = realpath(__DIR__ . '/../../vendor\i-jurij\geolocation\src\sqlite\geolocation.db');
         $dsn = "sqlite:$path_to_geo_db";
         $sqlite = new Nette\Database\Connection($dsn);
         $loc_sql = 'SELECT (`id`) FROM `geo_city`';
         $this->locations = $sqlite->query($loc_sql)->fetchAll();
     }
-    public function seed()
+    private function getClientIds()
     {
-        $offers_type = array_rand(['workoffer' => 0, 'serviceoffer' => 1], 1);
-
-        $row = array_rand($this->client_ids, 1);
-        $client_id = ($this->client_ids[$row])->id;
-
-        $loc_row = array_rand($this->client_ids, 1);
-        $location = ($this->locations[$loc_row])->id;
-
-        $services = $this->array['username'] . '@' . $this->array['username'] . '.com';
-        $price = 'password';
-
-        return [
-            'offers_type' => $offers_type,
-            'client_id' => $client_id,
-            'location' => $location,
-            'services' => $offers_type,
-            'price' => $offers_type,
-        ];
-
+        $sql = 'SELECT (`id`) FROM `client`';
+        $this->client_ids = $this->c->query($sql)->fetchAll();
     }
-    public function save()
+    public function seed(int $num): array
     {
+        $res = [];
+        for ($i = 0; $i < $num; ++$i) {
+            $offers_type = \array_rand(['workoffer' => 0, 'serviceoffer' => 1], 1);
+            $row = \array_rand($this->client_ids, 1);
+            $loc_row = \array_rand($this->client_ids, 1);
+            $services_row = implode('_', \array_rand($this->services, 2));
+            $price = Random::generate(5, '0-9');
 
+            $res[] = [
+                'offers_type' => $offers_type,
+                'client_id' => ($this->client_ids[$row])->id,
+                'location' => ($this->locations[$loc_row])->id,
+                'services' => $services_row,
+                'price' => $price,
+            ];
+        }
+
+        return $res;
+    }
+    public function save(array $offer)
+    {
+        $sql = 'INSERT INTO `offer` ?';
+        $this->c->query($sql, $offer);
     }
 }
-
-
 
 if (PHP_SAPI === 'cli') {
     require __DIR__ . '/../../vendor/autoload.php';
@@ -70,13 +98,12 @@ if (PHP_SAPI === 'cli') {
 
     if ($argc == 3 && $argv[1] === 'create' && is_integer((int) $argv[2])) {
         $offersFactory = new OfferFact($connection);
-        for ($i = 0; $i < (int) $argv[2]; ++$i) {
-            $offer = $offersFactory->seed();
-            $user_factory->saveClient($user);
-            foreach ($user as $key => $value) {
-                if ($key === 'roles') {
-                    $value = implode($value);
-                }
+        $offer = $offersFactory->seed((int) $argv[2]);
+        $offersFactory->save($offer);
+        foreach ($offer as $key => $value) {
+            if (is_array($value)) {
+                print_r($value);
+            } else {
                 echo $key . ': ' . $value . "\n";
             }
         }

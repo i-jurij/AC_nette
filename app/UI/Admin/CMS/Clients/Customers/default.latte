@@ -75,7 +75,7 @@
                                 >
                                     Offers
                                 <span class="badge bg-secondary">
-                                    {$offers_count_by_client}
+                                    {$offers_count_by_client[$row->id]}
                                 </span>
                             </button>
                             <button 
@@ -86,7 +86,7 @@
                                 >
                                     Comments
                                 <span class="badge bg-secondary">
-                                    {$comments_count_by_client}
+                                    {$comments_count_by_client[$row->id]}
                                 </span>
                             </button>
                     </div>
@@ -169,7 +169,7 @@
                                 >
                                     Offers
                                 <span class="badge bg-secondary">
-                                    {$offers_count_by_client}
+                                    {$offers_count_by_client[$row->id]}
                                 </span>
                             </button>
                             <button 
@@ -180,7 +180,7 @@
                                 >
                                     Comments
                                 <span class="badge bg-secondary">
-                                    {$comments_count_by_client}
+                                    {$comments_count_by_client[$row->id]}
                                 </span>
                             </button>
                             <!-- Modal -->

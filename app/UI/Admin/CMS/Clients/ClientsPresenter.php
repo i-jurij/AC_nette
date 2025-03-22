@@ -37,12 +37,12 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
             // $roles[$user->id] = $this->roleWithClientId($this->clientfacade->db, $user->id);
             $roles[$user->id] = $this->clientfacade->roleWithClientId($user->id);
 
-            $offers_count_by_client = count($this->clientfacade->db->table('offer')->where('client_id', $user->id));
-            $comments_count_by_client = count($this->clientfacade->db->table('comment')->where('client_id', $user->id));
+            $offers_count_by_client[$user->id] = count($this->clientfacade->db->table('offer')->where('client_id', $user->id)->fetchAll());
+            $comments_count_by_client[$user->id] = count($this->clientfacade->db->table('comment')->where('client_id', $user->id)->fetchAll());
         }
         $this->template->users_roles = $roles ?? [];
-        $this->template->offers_count_by_client = $offers_count_by_client ?? 0;
-        $this->template->comments_count_by_client = $comments_count_by_client ?? 0;
+        $this->template->offers_count_by_client = $offers_count_by_client;
+        $this->template->comments_count_by_client = $comments_count_by_client;
 
     }
 
