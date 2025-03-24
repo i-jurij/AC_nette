@@ -25,11 +25,11 @@ final class PermissionFacade
 
     public function actionListFromModelDir(): array
     {
-        foreach (Finder::findFiles('*Facade.php')->in(APPDIR.DIRECTORY_SEPARATOR.'Model') as $name => $file) {
+        foreach (Finder::findFiles('*Facade.php')->in(APPDIR . DIRECTORY_SEPARATOR . 'Model') as $name => $file) {
             $model = \pathinfo($name, PATHINFO_FILENAME);
             $resource = Strings::before($model, 'Facade', 1);
-            if (\class_exists('App\Model\\'.$model)) {
-                foreach (\get_class_methods('App\Model\\'.$model) as $key => $action) {
+            if (\class_exists('App\Model\\' . $model)) {
+                foreach (\get_class_methods('App\Model\\' . $model) as $key => $action) {
                     if (!in_array($action, ['__construct', 'token', 'getColumns', 'injectRequireLoggedUser', 'shortAdd'])) {
                         $actions[$resource][$key] = $action;
                     }
@@ -48,14 +48,14 @@ final class PermissionFacade
             }
         }
 
-        foreach (Finder::findFiles('*Presenter.php')->from(APPDIR.DIRECTORY_SEPARATOR.'UI') as $name => $file) {
+        foreach (Finder::findFiles('*Presenter.php')->from(APPDIR . DIRECTORY_SEPARATOR . 'UI') as $name => $file) {
             $path_parts = pathinfo($name);
             $name = $path_parts['filename'];
             $path = Strings::after($path_parts['dirname'], 'UI/', 1);
 
-            $namespace = implode('\\', explode(DIRECTORY_SEPARATOR, $path)).'\\';
+            $namespace = implode('\\', explode(DIRECTORY_SEPARATOR, $path)) . '\\';
             $resource = Strings::before($name, 'Presenter', 1);
-            $class = 'App\UI\\'.$namespace.$name;
+            $class = 'App\UI\\' . $namespace . $name;
             if (\class_exists($class)) {
                 foreach (\get_class_methods($class) as $action) {
                     if (!in_array($action, $presenter) && $action !== 'injectRequireLoggedUser') {
@@ -97,8 +97,8 @@ final class PermissionFacade
             }
 
             $this->table->insert($insert);
-        } catch (Exception $e) {
-            throw new Exception();
+        } catch (\Exception $e) {
+            throw new \Exception();
         }
     }
 
@@ -106,8 +106,8 @@ final class PermissionFacade
     {
         try {
             $this->table->where('id', $ids_array)->delete();
-        } catch (Exception $e) {
-            throw new Exception();
+        } catch (\Exception $e) {
+            throw new \Exception();
         }
     }
 }

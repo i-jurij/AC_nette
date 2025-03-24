@@ -49,7 +49,21 @@ class OfferFact
 
     private function getLocations()
     {
-        $path_to_geo_db = realpath(__DIR__ . '/../../vendor\i-jurij\geolocation\src\sqlite\geolocation.db');
+        $path_to_geo_db = realpath(APPDIR
+            . DIRECTORY_SEPARATOR
+            . '..'
+            . DIRECTORY_SEPARATOR
+            . 'vendor'
+            . DIRECTORY_SEPARATOR
+            . 'i-jurij'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation'
+            . DIRECTORY_SEPARATOR
+            . 'src'
+            . DIRECTORY_SEPARATOR
+            . 'sqlite'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation.db');
         $dsn = "sqlite:$path_to_geo_db";
         $sqlite = new Nette\Database\Connection($dsn);
         $loc_sql = 'SELECT (`id`) FROM `geo_city`';

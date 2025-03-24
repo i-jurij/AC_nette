@@ -7,14 +7,17 @@ namespace App\UI\Home;
 // use App\Model\PageFacade;
 use Nette\Database\Connection;
 use Nette\Database\Explorer;
+use \App\Model\OfferFacade;
 
 /**
  * @property HomeTemplate $template
  */
 final class HomePresenter extends BasePresenter
 {
-    public function __construct(public Explorer $db)
-    {
+    public function __construct(
+        private Explorer $db,
+        private OfferFacade $offers,
+    ) {
         parent::__construct();
     }
 
@@ -52,36 +55,23 @@ final class HomePresenter extends BasePresenter
 
     private function getData($location = []): string
     {
+        $string = '';
+
         if (!empty($location['city'])) {
             $loc_id = $this->getLocation($location);
-
-            $data = $this->db->table('offer')
-                ->where('offer.location', $loc_id)
-                ->where('offer.end_time >', \time())
+            $offer = $this->db->table('offer')
+                ->where('location', $loc_id)
+                ->where('end_time >', 'CURRENT_TIMESTAMP')
+                ->order('created_at DESC')
                 ->fetchAll();
         } else {
-            $data = $this->db->table('offer')->where('end_time >', \time())->fetchAll();
+            $offer = $this->offers->get();
         }
 
-        $string = '';
-        foreach ($data as $v) {
-            $string .= $v->id
-                . ' ' .
-                $v->offers_type
-                . ' ' .
-                $v->client_id
-                . ' ' .
-                $v->location
-                . ' ' .
-                $v->services
-                . ' ' .
-                $v->price
-                . ' ' .
-                $v->message
-                . ' ' .
-                $v->updated_at
-            ;
-        }
+        $string = '<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">';
+        $string .= $this->ts($offer);
+        $string .= '</div>';
+
         return $string;
     }
 
@@ -106,25 +96,48 @@ final class HomePresenter extends BasePresenter
         $dsn = "sqlite:$path_to_geo_db";
 
         $sqlite = new Connection($dsn);
-        /*
-                if (!empty($location['city']) && !empty($location['region'])) {
-                    $city = $location['city'];
-                    $region = $location['region'];
 
-                    $res_id = $sqlite
-                        ->query('SELECT (`id`) FROM `geo_city` WHERE', [
-                            '`geo_city`.`name` LIKE' => "%$city%",
-                            '`region` LIKE' => "%$region%",
-                        ])
-                        ->fetch()
-                        ->id;
-                }
-                        */
-        $city = $location['city'];
-        $loc_sql = 'SELECT (`id`) FROM `geo_city` WHERE `name` LIKE ?';
-        $res_id = $sqlite->query($loc_sql, "%$city%")->fetchField();
+        if (!empty($location['city']) && !empty($location['region'])) {
+            $city = $location['city'];
+            $region = $location['region'];
+
+            $reg_sql = 'SELECT (`id`) FROM `geo_regions` WHERE `name` LIKE ?';
+            $region_id = $sqlite->query($reg_sql, "%$region%")->fetchField();
+
+            $res_id = $sqlite
+                ->query('SELECT (`id`) FROM `geo_city` WHERE', [
+                    'name LIKE' => "%$city%",
+                    'region_id' => $region_id,
+                ])
+                ->fetchField();
+        }
+
+        if (!empty($location['city']) && empty($location['region'])) {
+            $city = $location['city'];
+            $loc_sql = 'SELECT (`id`) FROM `geo_city` WHERE `name` LIKE ?';
+            $res_id = $sqlite->query($loc_sql, "%$city%")->fetchField();
+        }
 
         return (int) $res_id;
+    }
+    private function ts($data)
+    {
+        $string = '';
+        foreach ($data as $v) {
+            $string .=
+                '<div>
+                <article class="card">
+                <p> ID: ' . $v->id . '</p>
+                <p> Client: ' . $v->client_id . '</p>
+                <p> Location: ' . $v->location . '</p>
+                <p> Services: ' . $v->services . '</p>
+                <p> Price: ' . $v->price . '</p>
+                <p> Message: ' . $v->message . '</p>
+                <p> Updated_at: ' . $v->updated_at
+                . '</article></div>'
+            ;
+        }
+        return $string;
     }
 }
 class HomeTemplate extends BaseTemplate
