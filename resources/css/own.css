@@ -32,6 +32,10 @@ textarea {
     margin: 0 auto 1rem auto;
 }
 
+.info {
+    background-color: rgb(0, 55, 174);
+}
+
 .bgcontent {
     background-color: var(--bgcolor-content, rgb(44, 46, 43));
 }
@@ -131,6 +135,77 @@ span.error {
 .netteFormsModal {
     background-color: var(--bgcolor-content, black);
     color: var(--fontcolor-light, white);
+}
+
+.form_radio_group {
+    display: inline-block;
+    overflow: hidden;
+}
+
+.form_radio_group-item {
+    display: inline-block;
+    float: left;
+}
+
+.form_radio_group input[type=radio] {
+    display: none;
+}
+
+.form_radio_group label, 
+.form_radio_group select {
+    display: inline-block;
+    cursor: pointer;
+    margin: 0.3em 0;
+    padding: 0.3em 0.9em;
+    vertical-align: baseline;
+    /* line-height: 2rem; */
+    height: auto;
+    width: auto;
+    border: 1px solid #004303;
+    border-right: none;
+    user-select: none;
+    transition: all 0.3s;
+}
+
+.form_radio_group label,
+.form_radio_group>input[type="submit"],
+.form_radio_group>button {
+    background-image: linear-gradient(to bottom, #333b33 0%, #030702 100%);
+}
+
+.form_radio_group>input[type="submit"].grred {
+    background-image: linear-gradient(to bottom, #8f3900 0%, #530000 100%);
+}
+
+.form_radio_group .form_radio_group-item:first-child label {
+    border-radius: 6px 0 0 6px;
+}
+
+.form_radio_group .form_radio_group-item:last-child label {
+    border-radius: 0 6px 6px 0;
+    border-right: 1px solid #004303;
+}
+
+/* Checked *//* Hover */
+.form_radio_group input[type=radio]:checked+label,
+.form_radio_group>input[type="submit"].active,
+.form_radio_group>button.active{
+    background-image: linear-gradient(to top, #2a4d2a 0%, #072200 100%);
+    box-shadow: 0px 0px 1px 0px rgb(255, 255, 255) inset;
+
+}
+.form_radio_group label:hover,
+.form_radio_group>input[type="submit"]:hover,
+.form_radio_group>button:hover {
+    -webkit-box-shadow: 0px 0px 1px 50px rgba(9, 166, 1, 0.25) inset;
+    -moz-box-shadow: 0px 0px 1px 50px rgba(9, 166, 1, 0.25) inset;
+    box-shadow: 0px 0px 1px 50px rgba(9, 166, 1, 0.25) inset;
+}
+
+/* Disabled */
+.form_radio_group input[type=radio]:disabled+label {
+    background: #005301;
+    color: #0d5800;
 }
 
 /* ----------- resolution up to 620px ----------------- */

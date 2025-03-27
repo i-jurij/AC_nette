@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc979688f532805387e5fdd8fafcf566",
+    "content-hash": "1c8dd67fab66c5cc96906104c4cbeef5",
     "packages": [
         {
             "name": "contributte/webpack",
@@ -89,12 +89,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/i-jurij/geolocation.git",
-                "reference": "5c1ffe0d30cd16d2bd72861a469f8b16c163439f"
+                "reference": "215429a48ca90ea2fcc9747c610802c2e96ad503"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/i-jurij/geolocation/zipball/5c1ffe0d30cd16d2bd72861a469f8b16c163439f",
-                "reference": "5c1ffe0d30cd16d2bd72861a469f8b16c163439f",
+                "url": "https://api.github.com/repos/i-jurij/geolocation/zipball/215429a48ca90ea2fcc9747c610802c2e96ad503",
+                "reference": "215429a48ca90ea2fcc9747c610802c2e96ad503",
                 "shasum": ""
             },
             "default-branch": true,
@@ -118,7 +118,7 @@
                 "source": "https://github.com/i-jurij/geolocation/tree/main",
                 "issues": "https://github.com/i-jurij/geolocation/issues"
             },
-            "time": "2025-03-01T17:30:16+00:00"
+            "time": "2025-03-27T17:23:27+00:00"
         },
         {
             "name": "i-jurij/nette_form_captcha",
@@ -1691,7 +1691,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">= 8.1"
+        "php": ">= 8.2"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"

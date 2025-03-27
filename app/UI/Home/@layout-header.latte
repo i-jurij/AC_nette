@@ -2,7 +2,7 @@
 
 <header class="p1 flex justify-between content-center">
 
-	<div id="location_div">{$geo|noescape}</div>
+	<div id="location_div" class="button pseudo">{$geo|noescape}</div>
 
 	<div >
 		<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>

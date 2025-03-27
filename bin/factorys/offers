@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-/* Create offers from random client, (customer or executor)]) 11 times:
+/* After this create Clients:
+"php bin/factorys/client create 11"
+Then create Offers from random client, (customer or executor)]) 11 times:
     "php bin/factorys/offers create 11"
 */
 
@@ -24,16 +26,17 @@ class OfferFact
         $this->getLocations();
         $this->getClientIds();
     }
+
     private function createServices()
     {
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $cat[] = ['name' => Random::generate(6, 'a-z')];
         }
         $this->c->query('INSERT INTO `category` ?', $cat);
         $cat_ids = $this->c->query('SELECT (`id`) FROM `category`')->fetchAll();
 
         foreach ($cat_ids as $row) {
-            for ($i = 0; $i < count($cat_ids); $i++) {
+            for ($i = 0; $i < count($cat_ids); ++$i) {
                 $serv[] = ['category_id' => $row->id, 'name' => Random::generate(6, 'a-z')];
             }
         }
@@ -50,30 +53,32 @@ class OfferFact
     private function getLocations()
     {
         $path_to_geo_db = realpath(APPDIR
-            . DIRECTORY_SEPARATOR
-            . '..'
-            . DIRECTORY_SEPARATOR
-            . 'vendor'
-            . DIRECTORY_SEPARATOR
-            . 'i-jurij'
-            . DIRECTORY_SEPARATOR
-            . 'geolocation'
-            . DIRECTORY_SEPARATOR
-            . 'src'
-            . DIRECTORY_SEPARATOR
-            . 'sqlite'
-            . DIRECTORY_SEPARATOR
-            . 'geolocation.db');
+            .DIRECTORY_SEPARATOR
+            .'..'
+            .DIRECTORY_SEPARATOR
+            .'vendor'
+            .DIRECTORY_SEPARATOR
+            .'i-jurij'
+            .DIRECTORY_SEPARATOR
+            .'geolocation'
+            .DIRECTORY_SEPARATOR
+            .'src'
+            .DIRECTORY_SEPARATOR
+            .'sqlite'
+            .DIRECTORY_SEPARATOR
+            .'geolocation.db');
         $dsn = "sqlite:$path_to_geo_db";
-        $sqlite = new Nette\Database\Connection($dsn);
+        $sqlite = new Connection($dsn);
         $loc_sql = 'SELECT (`id`) FROM `geo_city`';
         $this->locations = $sqlite->query($loc_sql)->fetchAll();
     }
+
     private function getClientIds()
     {
         $sql = 'SELECT (`id`) FROM `client`';
         $this->client_ids = $this->c->query($sql)->fetchAll();
     }
+
     public function seed(int $num): array
     {
         $res = [];
@@ -86,8 +91,8 @@ class OfferFact
 
             $res[] = [
                 'offers_type' => $offers_type,
-                'client_id' => ($this->client_ids[$row])->id,
-                'location' => ($this->locations[$loc_row])->id,
+                'client_id' => $this->client_ids[$row]->id,
+                'location' => $this->locations[$loc_row]->id,
                 'services' => $services_row,
                 'price' => $price,
             ];
@@ -95,6 +100,7 @@ class OfferFact
 
         return $res;
     }
+
     public function save(array $offer)
     {
         $sql = 'INSERT INTO `offer` ?';
@@ -103,12 +109,12 @@ class OfferFact
 }
 
 if (PHP_SAPI === 'cli') {
-    require __DIR__ . '/../../vendor/autoload.php';
+    require __DIR__.'/../../vendor/autoload.php';
 
     $container = App\Bootstrap::boot()
         ->createContainer();
     // var_dump($container);
-    $connection = $container->getByType(Nette\Database\Connection::class);
+    $connection = $container->getByType(Connection::class);
 
     if ($argc == 3 && $argv[1] === 'create' && is_integer((int) $argv[2])) {
         $offersFactory = new OfferFact($connection);
@@ -118,7 +124,7 @@ if (PHP_SAPI === 'cli') {
             if (is_array($value)) {
                 print_r($value);
             } else {
-                echo $key . ': ' . $value . "\n";
+                echo $key.': '.$value."\n";
             }
         }
         exit(1);
