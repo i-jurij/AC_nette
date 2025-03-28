@@ -23,41 +23,20 @@ final class HomePresenter extends BasePresenter
         private OfferFacade $offers,
     ) {
         parent::__construct();
-        $this->type = '';
-        $this->location = $this->locality;
+        $type = Session::get('offertype');
+        $this->type = (!empty($type)) ? $type : '';
     }
 
     public function actionSaveToBackend()
     {
-        $httpRequest = $this->getHttpRequest();
-
-        $data = '';
-        if (
-            $httpRequest->isMethod('POST')
-            && !empty($httpRequest->getPost('city'))
-            && !empty($httpRequest->getPost('region'))
-        ) {
-            $city = filter_var($httpRequest->getPost('city'), FILTER_SANITIZE_SPECIAL_CHARS);
-            $region = filter_var($httpRequest->getPost('region'), FILTER_SANITIZE_SPECIAL_CHARS);
-
-            $location = [
-                'city' => $city,
-                'region' => $region,
-            ];
-            $type = Session::get('offertype');
-            // code for saving user location to server
-            // code for getting data by location
-            $data .= $this->getData($type, $location);
-            // $this->sendJson($this->model->getData);
-            // $data .= $city . '<br>' . $region . '<br>Content after city choice';
-        }
+        $data = $this->getData($this->type, $this->locality);
 
         $this->sendJson($data);
     }
 
     public function renderDefault()
     {
-        $this->template->data = $this->getData($this->type, $this->location);
+        $this->template->data = $this->getData($this->type, $this->locality);
         $this->template->offers_type = $this->type;
     }
 
@@ -65,22 +44,16 @@ final class HomePresenter extends BasePresenter
     public function handleFilter(): void
     {
         $httpRequest = $this->getHttpRequest();
-        $city = (!empty($httpRequest->getPost('offers_form_city'))) ? $httpRequest->getPost('city') : '';
-        $region = (!empty($httpRequest->getPost('offers_form_region'))) ? $httpRequest->getPost('region') : '';
-        if (!empty($city)) {
-            $this->location = [
-                'city' => $city,
-                'region' => $region,
-            ];
-        }
-
-        $this->type = $httpRequest->getPost('offertype');
-        Session::set('offertype', $this->type);
+        $offertype = $httpRequest->getPost('offertype');
+        $this->type = (!empty($offertype)) ? $offertype : '';
+        Session::destroy('offertype');
+        Session::set('offertype', $offertype);
+        $this->redirect('this');
     }
 
-    private function getData(string $type = '', array $location = []): string
+    private function getData(string $type = '', array $location = [], int $offset = 0, int $length = 25): string
     {
-        $loc_id = (!empty($location['city'])) ? $this->getLocation($location) : '';
+        $loc_id = (!empty($location['city'])) ? $this->getLocationId($location) : '';
         $loc_cond = (!empty($loc_id)) ? 'location' : 'location<>';
         $sql_offer_method = 'get'.\ucfirst($type).'s';
         $sql_type_param = $type.'offer';
@@ -109,14 +82,12 @@ final class HomePresenter extends BasePresenter
             $offer = $this->offers->get();
         }
 
-        $string = '<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">';
-        $string .= $this->ts($offer);
-        $string .= '</div>';
+        $string = $this->ts($offer);
 
         return $string;
     }
 
-    private function getLocation(array $location): int
+    private function getLocationId(array $location): int
     {
         $path_to_geo_db = realpath(APPDIR
             .DIRECTORY_SEPARATOR
@@ -164,7 +135,7 @@ final class HomePresenter extends BasePresenter
 
     private function ts($data)
     {
-        $string = '';
+        $string = '<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">';
         foreach ($data as $v) {
             $string .=
                 '<div>
@@ -180,6 +151,7 @@ final class HomePresenter extends BasePresenter
                 .'</article></div>'
             ;
         }
+        $string .= '</div>';
 
         return $string;
     }

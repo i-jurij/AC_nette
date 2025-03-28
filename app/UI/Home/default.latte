@@ -20,8 +20,7 @@
 
         <div class="form_radio_group">
             <div class="form_radio_group-item">
-                <input id="offertypeall" type='radio' name="offertype" n:attr="checked: empty($offers_type)"
-                    value="">
+                <input id="offertypeall" type='radio' name="offertype" n:attr="checked: empty($offers_type)" value="">
                 <label for="offertypeall">Все</label>
             </div>
             <div class="form_radio_group-item">
@@ -56,11 +55,11 @@
     *}
     <form name="offers_form" id="" action="{link filter!}" method="post" class="">
         <div class="form_radio_group">
-            <input type="hidden" name="offers_form_city" value="{(!empty($location['city'])) ? $location['city'] : ''}">
-            <input type="hidden" name="offers_form_region" value="{(!empty($location['region'])) ? $location['region'] : ''}">
             <button name="offertype" type="submit" value="" n:class="empty($offers_type) ? active">Все</button>
-            <button name="offertype" type="submit" value="work" n:class="!empty($offers_type) && $offers_type == 'work' ? active">Заказы</button>
-            <button name="offertype" type="submit" value="service" n:class="!empty($offers_type) && $offers_type == 'service' ? active">Услуги</button>
+            <button name="offertype" type="submit" value="work"
+                n:class="!empty($offers_type) && $offers_type == 'work' ? active">Заказы</button>
+            <button name="offertype" type="submit" value="service"
+                n:class="!empty($offers_type) && $offers_type == 'service' ? active">Услуги</button>
         </div>
     </form>
 </div>
