@@ -13,9 +13,9 @@
 <h1 n:if="!$user->isLoggedIn()" class="rounded center shadow bgcontent main_title mb1">
     Сервис объявлений о работе и услугах
 </h1>
-<div class="left" id="div_for_buttons_offers_type">
+
     {*
-    <form action="{link filter!}" method="post">
+    <form  name="offers_form" action="{link filter!}" method="post">
         <input type="hidden" name="locality" value="{$locality}">
 
         <div class="form_radio_group">
@@ -53,7 +53,9 @@
         </div>
     </form>
     *}
-    <form name="offers_form" id="" action="{link filter!}" method="post" class="">
+  
+    <div class="left" id="div_for_filter_buttons">
+    <form name="offers_form_noscript" action="{link filter!}" method="post" class="">
         <div class="form_radio_group">
             <button name="offertype" type="submit" value="" n:class="empty($offers_type) ? active">Все</button>
             <button name="offertype" type="submit" value="work"
@@ -62,12 +64,28 @@
                 n:class="!empty($offers_type) && $offers_type == 'service' ? active">Услуги</button>
         </div>
     </form>
-</div>
+    </div>
 
-<div id="data_by_location">{$data|noescape}</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        
-    });
-</script>
+
+<div id="data_by_location">
+    {$data|noescape}
+
+    <div class="pagination">
+        {if !$paginator->isFirst()}
+        <a n:href="default, 1">First</a>
+        &nbsp;|&nbsp;
+        <a n:href="default, $paginator->page-1">Previous</a>
+        &nbsp;|&nbsp;
+        {/if}
+
+        Page {$paginator->getPage()} of {$paginator->getPageCount()}
+
+        {if !$paginator->isLast()}
+        &nbsp;|&nbsp;
+        <a n:href="default, $paginator->getPage() + 1">Next</a>
+        &nbsp;|&nbsp;
+        <a n:href="default, $paginator->getPageCount()">Last</a>
+        {/if}
+    </div>
+</div>
 {/block}
