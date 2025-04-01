@@ -1,0 +1,132 @@
+{block filter_form}
+<style>
+    #filter_form_wrapper_div-input {
+        display: none;
+    }
+
+    #menu-filter-btn {
+      display: none;
+    }
+
+    input[type=checkbox]:checked~#filter_form_wrapper_div {
+        visibility: visible;
+        position: relative;
+        transition: left 0.5s linear;
+        left: 0;
+    }
+
+    #filter_form_wrapper_div.active {
+        visibility: visible;
+        position: relative;
+        transition: left 0.5s linear;
+        left: 0;
+    }
+
+/* ----------- resolution up to 48px ----------------- */
+
+@media screen and (max-width: 480px) {
+  #menu-filter-btn {
+      display: block;
+    }
+    #filter_form_wrapper_div {
+        visibility: hidden;
+        position: absolute;
+        left: -100%;
+    }
+/*
+    #filter_form_wrapper_div {
+        height: auto;
+        width: 85%;
+        background: var(--bgcolor);
+        z-index: 2;
+        visibility: hidden;
+        position: fixed;
+        top:0;
+        left: 0;
+    }
+
+    #filter_form_wrapper_div ul {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        height: 100vh;
+        padding-left: 0;
+        list-style-type: none;
+    }
+*/
+  }
+</style>
+
+
+<input type="checkbox" id="filter_form_wrapper_div-input" />
+<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix">
+  <span class="right pb1" style='font-size:2rem;'>&#9776;</span>
+</label>
+
+<div class="card px2 pt1" id="filter_form_wrapper_div">
+    <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="">
+        <div class="form_radio_group clearfix">
+            <p class="my0">Выбор типа:</p>
+            <div class="form_radio_group-item">
+                <input id="offertypeall" type='radio' name="offertype"
+                    n:attr="checked: empty($form_data->offertype) || $form_data->offertype=='all'" value="all">
+                <label for="offertypeall">Все</label>
+            </div>
+            <div class="form_radio_group-item">
+                <input id="offertypework" type='radio' name="offertype"
+                    n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'work'" value="work">
+                <label for="offertypework">Заказы</label>
+            </div>
+            <div class="form_radio_group-item">
+                <input id="offertypeservice" type='radio' name="offertype"
+                    n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'service'"
+                    value="service">
+                <label for="offertypeservice">Услуги</label>
+            </div>
+        </div>
+
+        <div class="form_radio_group clearfix">
+            <p class="my0">Упорядочить:</p>
+            <select name="order_by" class="select form_radio_group-item" id="order_by">
+                <option value="end_time"
+                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'end_time'">По времени
+                </option>
+                <option value="price"
+                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'price'">По Стоимости
+                </option>
+                <option value="services"
+                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'services'">По услугам
+                </option>
+            </select>
+
+            <div class="form_radio_group-item">
+                <input id="order_type_desc" type='radio' name="order_type"
+                    n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'DESC'" value="DESC">
+                <label for="order_type_desc">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-sort-down" viewBox="0 -1 14 14">
+                        <path
+                            d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
+                    </svg>
+                </label>
+            </div>
+            <div class="form_radio_group-item">
+                <input id="order_type_asc" type='radio' name="order_type"
+                    n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'" value="ASC">
+                <label for="order_type_asc">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-sort-up-alt" viewBox="0 -1 14 14">
+                        <path
+                            d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
+                    </svg></label>
+            </div>
+        </div>
+
+        <div class="form_radio_group">
+            <input type="submit" value="Применить">
+        </div>
+    </form>
+</div>
+<script></script>

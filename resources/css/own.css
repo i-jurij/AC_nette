@@ -143,7 +143,6 @@ span.error {
 }
 
 .form_radio_group-item {
-    display: inline-block;
     float: left;
 }
 
@@ -151,7 +150,7 @@ span.error {
     display: none;
 }
 
-.form_radio_group label, 
+.form_radio_group label,
 .form_radio_group select {
     display: inline-block;
     cursor: pointer;
@@ -186,14 +185,16 @@ span.error {
     border-right: 1px solid #004303;
 }
 
-/* Checked *//* Hover */
+/* Checked */
+/* Hover */
 .form_radio_group input[type=radio]:checked+label,
 .form_radio_group>input[type="submit"].active,
-.form_radio_group>button.active{
+.form_radio_group>button.active {
     background-image: linear-gradient(to top, #2a4d2a 0%, #072200 100%);
     box-shadow: 0px 0px 1px 0px rgb(255, 255, 255) inset;
 
 }
+
 .form_radio_group label:hover,
 .form_radio_group>input[type="submit"]:hover,
 .form_radio_group>button:hover {

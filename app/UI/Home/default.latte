@@ -6,65 +6,13 @@
 {var $robots = "INDEX,FOLLOW"}
 
 {block content}
-<style>
-
-</style>
-
 <h1 n:if="!$user->isLoggedIn()" class="rounded center shadow bgcontent main_title mb1">
-    Сервис объявлений о работе и услугах
+    <span class="mx1">
+        Сервис объявлений о работе и услугах
+    </span>
 </h1>
 
-    {*
-    <form  name="offers_form" action="{link filter!}" method="post">
-        <input type="hidden" name="locality" value="{$locality}">
-
-        <div class="form_radio_group">
-            <div class="form_radio_group-item">
-                <input id="offertypeall" type='radio' name="offertype" n:attr="checked: empty($offers_type)" value="">
-                <label for="offertypeall">Все</label>
-            </div>
-            <div class="form_radio_group-item">
-                <input id="offertypework" type='radio' name="offertype"
-                    n:attr="checked: !empty($offers_type) && $offers_type == 'work'" value="work">
-                <label for="offertypework">Заказы</label>
-            </div>
-            <div class="form_radio_group-item">
-                <input id="offertypeservice" type='radio' name="offertype"
-                    n:attr="checked: !empty($offers_type) && $offers_type == 'service'" value="service">
-                <label for="offertypeservice">Услуги</label>
-            </div>
-        </div>
-
-        <div class="form_radio_group">
-            <select name="sortbytype" class="select" id="sortbytype">
-                <option value="hamster">Упорядочить по типу</option>
-                <option value="hamster">Упорядочить по стоимости</option>
-                <option value="hamster">Упорядочить по времени</option>
-            </select>
-
-            <select name="ordertype" class="select" id="ordertype">
-                <option value="desc">По возрастанию</option>
-                <option value="asc">По убыванию</option>
-            </select>
-        </div>
-
-        <div class="form_radio_group">
-            <input type="submit" value="Применить">
-        </div>
-    </form>
-    *}
-  
-    <div class="left" id="div_for_filter_buttons">
-    <form name="offers_form_noscript" action="{link filter!}" method="post" class="">
-        <div class="form_radio_group">
-            <button name="offertype" type="submit" value="" n:class="empty($offers_type) ? active">Все</button>
-            <button name="offertype" type="submit" value="work"
-                n:class="!empty($offers_type) && $offers_type == 'work' ? active">Заказы</button>
-            <button name="offertype" type="submit" value="service"
-                n:class="!empty($offers_type) && $offers_type == 'service' ? active">Услуги</button>
-        </div>
-    </form>
-    </div>
+    {include filter_form  from $shared_templates.'home_filter_form.latte'}
 
 
 <div id="data_by_location">
@@ -72,20 +20,56 @@
 
     <div class="pagination">
         {if !$paginator->isFirst()}
-        <a n:href="default, 1">First</a>
-        &nbsp;|&nbsp;
-        <a n:href="default, $paginator->page-1">Previous</a>
-        &nbsp;|&nbsp;
+        <a class="pseudo button" n:href="default, 1">1</a>
+        
+        <a class="pseudo button" n:href="default, $paginator->page-1"><</a>
+        
         {/if}
 
-        Page {$paginator->getPage()} of {$paginator->getPageCount()}
+        &nbsp;Стр. {$paginator->getPage()} из {$paginator->getPageCount()}&nbsp;
 
         {if !$paginator->isLast()}
-        &nbsp;|&nbsp;
-        <a n:href="default, $paginator->getPage() + 1">Next</a>
-        &nbsp;|&nbsp;
-        <a n:href="default, $paginator->getPageCount()">Last</a>
+        
+        <a class="pseudo button" n:href="default, $paginator->getPage() + 1">></a>
+        
+        <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
         {/if}
     </div>
 </div>
+
+<script  n:syntax="double">
+    function isLsItemExist(name) {
+        return (name in localStorage)
+    }
+    function getFromLocalStorage(name) {
+        if (isLsItemExist(name)) {
+            return JSON.parse(localStorage.getItem(name));
+        }
+        return null;
+    }
+    //localStorage.setItem('locality', JSON.stringify(data_object));
+    //localStorage.removeItem("locality");
+    //localStorage.clear();
+
+    // function added new element to DOM by after or before element with point_id
+    // html is a html code
+    // method is 
+    // "beforebegin" – insert before elem,
+    // "afterbegin" – insert into start of elem,
+    // "beforeend" – insert html into end of elem,
+    // "afterend" – insert html after elem.
+    function addHtml(html, point_id, method) {
+        let point = document.getElementById(String(point_id));
+        if (point) {
+            point.insertAdjacentHTML(String(method), html);
+        }
+    }
+    //document.body.onload = addHtml('<h1>content</h1>', 'data_by_location', 'beforebegin');
+    document.body.onload = function(){
+        const offers_form = document.getElementById('offers_form');
+        if (offers_form) {
+            offers_form.classList.remove("display-none");
+        }
+    };
+</script>
 {/block}

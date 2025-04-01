@@ -30,10 +30,10 @@ class OfferFacade
         $this->allowed_columns = $table->columns;
         $this->sql_params = ['end_time > CURRENT_TIMESTAMP'];
         $this->limit_sql = '';
-        $this->order_sql = '';
+        $this->order_sql = "ORDER BY end_time DESC";
     }
 
-    private function setSqlParams(string $type = '', array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
+    private function setSqlParams(array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
     {
         $city_id = $this->getCityId($location);
         if ($city_id != false && is_integer($city_id)) {
@@ -43,8 +43,8 @@ class OfferFacade
             $this->sql_params[] = "client_id = {$form_data->client_id}";
         }
 
-        if (!empty($type) && is_string($type)) {
-            $this->sql_params[] = "offers_type = '{$type}offer'";
+        if (!empty($form_data->offertype) && in_array($form_data->offertype, ['work', 'service'], true)) {
+            $this->sql_params[] = "offers_type = '{$form_data->offertype}offer'";
         }
 
         if (!empty($form_data->price_min) && !empty($form_data->price_max)) {
@@ -60,17 +60,16 @@ class OfferFacade
 
         if (
             !empty($form_data->order_by) && !empty($form_data->order_type)
-            && is_string($form_data->order_by) && is_string($form_data->order_type)
-            && ($form_data->order_type === 'ASC' || $form_data->order_type === 'DESC')
+            && in_array($form_data->order_type, ['ASC', 'DESC', 'asc', 'desc'], true)
             && array_key_exists($form_data->order_by, $this->allowed_columns)
         ) {
             $this->order_sql = "ORDER BY {$form_data->order_by} {$form_data->order_type}";
         }
     }
 
-    public function offersCount($type = '', array $location = [], ?object $form_data = null): int
+    public function offersCount(array $location = [], ?object $form_data = null): int
     {
-        $this->setSqlParams(type: $type, location: $location, form_data: $form_data);
+        $this->setSqlParams(location: $location, form_data: $form_data);
         $sql = "SELECT COUNT(*) FROM {$this->table} WHERE";
         $numItems = count($this->sql_params);
         $i = 0;
@@ -84,10 +83,10 @@ class OfferFacade
         return $this->db->query($sql)->fetchField();
     }
 
-    public function getOffers(string $type = '', array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null)
+    public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null)
     {
         $sql = "SELECT * FROM {$this->table} WHERE";
-        $this->setSqlParams(type: $type, location: $location, limit: $limit, offset: $offset, form_data: $form_data);
+        $this->setSqlParams(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
 
         $numItems = count($this->sql_params);
         $i = 0;
