@@ -30,15 +30,35 @@ class OfferFacade
         $this->allowed_columns = $table->columns;
         $this->sql_params = ['end_time > CURRENT_TIMESTAMP'];
         $this->limit_sql = '';
-        $this->order_sql = "ORDER BY end_time DESC";
+        $this->order_sql = 'ORDER BY end_time DESC';
     }
 
     private function setSqlParams(array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
     {
+        if (!empty($form_data->service)) {
+            $ids = \unserialize($form_data->service, ['allowed_classes' => false]);
+            $offer_ids = [];
+            if (is_array($ids) && $this->ifEachArrayValueInt($ids)) {
+                $offer_ids = $this->db->query('SELECT (offer_id) FROM offer_service WHERE service_id IN ?', $ids);
+            } else {
+                $offer_ids = $this->db->query('SELECT (offer_id) FROM offer_service WHERE service_id = ?', $ids);
+            }
+            foreach ($offer_ids as $row) {
+                $res1[] = $row->offer_id;
+            }
+            if (!empty($res1)) {
+                $res = '('.\implode(',', \array_values(\array_unique($res1, SORT_REGULAR))).')';
+                $this->sql_params[] = "`id` IN {$res}";
+            } else {
+                $this->sql_params[] = '`id` = -1';
+            }
+        }
+
         $city_id = $this->getCityId($location);
         if ($city_id != false && is_integer($city_id)) {
             $this->sql_params[] = "location = {$city_id}";
         }
+
         if (!empty($form_data->client_id) && is_integer($form_data->client_id)) {
             $this->sql_params[] = "client_id = {$form_data->client_id}";
         }
@@ -118,5 +138,16 @@ class OfferFacade
 
     public function update()
     {
+    }
+
+    public function ifEachArrayValueInt($array)
+    {
+        foreach ($array as $value) {
+            if (!is_int($value) && !ctype_digit(strval($value))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

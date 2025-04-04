@@ -1,74 +1,123 @@
 {block filter_form}
 <style>
-    #filter_form_wrapper_div-input {
+    #filter_form_wrapper_div-input,
+    .menu-filter-btn,
+    #filter_form_wrapper_div-input:checked~.menu-filter-btn {
         display: none;
     }
 
-    #menu-filter-btn {
-      display: none;
-    }
-
-    input[type=checkbox]:checked~#filter_form_wrapper_div {
+    #filter_form_wrapper_div-input:checked~#filter_form_wrapper_div {
         visibility: visible;
         position: relative;
-        transition: left 0.5s linear;
+        transition: left 0.25s linear;
         left: 0;
     }
 
     #filter_form_wrapper_div.active {
         visibility: visible;
         position: relative;
-        transition: left 0.5s linear;
+        transition: left 0.25s linear;
         left: 0;
     }
 
-/* ----------- resolution up to 48px ----------------- */
-
-@media screen and (max-width: 480px) {
-  #menu-filter-btn {
-      display: block;
-    }
-    #filter_form_wrapper_div {
-        visibility: hidden;
-        position: absolute;
-        left: -100%;
-    }
-/*
-    #filter_form_wrapper_div {
-        height: auto;
-        width: 85%;
-        background: var(--bgcolor);
-        z-index: 2;
-        visibility: hidden;
-        position: fixed;
-        top:0;
-        left: 0;
+    .filter_form_mobile {
+        font-size: var(--middle-fontsize);
     }
 
-    #filter_form_wrapper_div ul {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        text-align: center;
-        height: 100vh;
-        padding-left: 0;
-        list-style-type: none;
+    .filter_form_mobile>*:not(:first-child) {
+        margin: 0 0 0 1rem;
     }
-*/
-  }
+
+    /* ----------- resolution up to 480px ----------------- */
+
+    @media screen and (max-width: 480px) {
+        .menu-filter-btn {
+            display: block;
+        }
+
+        #filter_form_wrapper_div {
+            visibility: hidden;
+            position: absolute;
+            left: -100%;
+        }
+
+        #filter_form_wrapper_div ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            height: 100vh;
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .filter_form_mobile>* {
+            display: block;
+        }
+
+        .filter_form_mobile>*:not(:first-child),
+        .filter_form_mobile>*:not(:last-child) {
+            margin: 1rem 0 0 0;
+        }
+
+        .filter_form_submit_p {
+            display: none;
+        }
+
+    }
 </style>
 
+{var $servicetype = (!empty($form_data->offertype))
+? ($form_data->offertype == 'work'
+? 'Заказы'
+: (($form_data->offertype === 'service') ? 'Услуги' : 'Все услуги' ))
+: ''}
+{var $order_by = (!empty($form_data->order_by))
+? ($form_data->order_by == 'end_time'
+? 'По времени'
+: (($form_data->order_by == 'price') ? 'По Стоимости' : 'По услугам') )
+: ''}
+{var $order_type = (!empty($form_data->order_type))
+? ($form_data->order_type == 'DESC'
+? '&#129031;'
+: '&#129029;' )
+: ''}
+
+<p n:inner-foreach="$form_data as $key => $item">{$key} - {$item}<br></p>
 
 <input type="checkbox" id="filter_form_wrapper_div-input" />
-<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix">
-  <span class="right pb1" style='font-size:2rem;'>&#9776;</span>
+<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix menu-filter-btn">
+    <p class="h5 justify left">Фильтры:
+        <span class="">{$servicetype}</span>
+        | <span>{$order_by}</span>
+        | <span>{$order_type|noescape}</span>
+        | Category (if several - dropdown list)
+        | Service (if several - dropdown list)
+    </p>
+    <span class="right pb1" style='font-size:2rem;'>
+        {*&#9776;*}
+        {*
+        <img height="24px" width="24px"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACcklEQVR4nO2ZP4gTQRjFRz1F5JprRAVFCwUtFLRR8E+hgthoo5U22mkhWsnZWNppdVZeIXZWYiEWGkFEi9jIQrLz3pfNokFREP//Qb2RgW8lCpfbi3vJ7LE/mCbMvJmXN9nMN2tMRcCQvE/SlaEBeNjLiCtTMzMZMYHDvEbSNB0zgZKm6VgeI4+00+MoikZNYERRNOrXpmt8Om1HkssBNPXHdC9JkqUmEKIoWkLyjppAu91e2XMAgNUA2jrgVr1eX2yGjHNuEcmbuqbnSZKszTWQ5HoALzWZG865hWZIOOcWAJhUE6/jON44KwER2QzgrZqZ9IJmOCau6hreAdjal5C1djvJjyp0xQwYAJd07s8isuu/xEjuBfBVBcfNgABwQbfTdwAHihI9RPKHmjlXiGjv+U7rXD8BHClU3Fp7DMAvAFPW2pNmjgBwPJtHRE7MySTW2lNd39TRovUBHM6St9aeLVr/38nGs71L8mBRuiKyj+Q3ry0i582AnyZf4jjeXYDejq6n42Uz4Of7hCbznuS2frVardaWrv+rCTNo1Mw1NfPGWrtpthoisgHAq6GfINzfZ6AXzWZzXd6xIrIGQJqd6Wq12ogJ6FTKRqOxaqYxwZ6yO53OMl9D91GuPgmu7km7Kre8LdhKlDlr/uDvBlgZCQxWiQQGq0QCg1UigcEqkcBglUhgsEokMDjfEhGRnXn6mVAh+UDr8CmS15MkWVFKI7VabYTkGb3r8ov9BOCiv6AolZEMn4RPRJPxCTVFZH/pjGT461QAz7KFA7jt31GWzki23fzNetd2+1BKI9Ntt9IaybDW7iFZJ3n3z4cV85DfrmEc4zdJw0oAAAAASUVORK5CYII="
+            alt="filter--v1">
+        *}
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-funnel"
+            viewBox="0 0 16 16">
+            <path
+                d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z" />
+        </svg>
+    </span>
 </label>
 
 <div class="card px2 pt1" id="filter_form_wrapper_div">
-    <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="">
+    <label for="filter_form_wrapper_div-input" id="menu-filter-btn-2" class="clearfix menu-filter-btn">
+        <span class="right pb1" style='font-size:2rem;'>&#10006;</span>
+    </label>
+    <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="filter_form_mobile">
         <div class="form_radio_group clearfix">
-            <p class="my0">Выбор типа:</p>
+            <p class="my0">Тип:</p>
+            {*
             <div class="form_radio_group-item">
                 <input id="offertypeall" type='radio' name="offertype"
                     n:attr="checked: empty($form_data->offertype) || $form_data->offertype=='all'" value="all">
@@ -85,6 +134,20 @@
                     value="service">
                 <label for="offertypeservice">Услуги</label>
             </div>
+            *}
+            <select name="offertype" class="select form_radio_group-item" id="offertype">
+                <option value="all" n:attr="selected: empty($form_data->offertype) || $form_data->offertype=='all'">
+                    Все
+                </option>
+                <option value="work"
+                    n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'work'">
+                    Заказы
+                </option>
+                <option value="service"
+                    n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'service'">
+                    Услуги
+                </option>
+            </select>
         </div>
 
         <div class="form_radio_group clearfix">
@@ -105,7 +168,10 @@
                 <input id="order_type_desc" type='radio' name="order_type"
                     n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'DESC'" value="DESC">
                 <label for="order_type_desc">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    {*
+                    &#129031;
+                    *}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-sort-down" viewBox="0 -1 14 14">
                         <path
                             d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
@@ -116,17 +182,71 @@
                 <input id="order_type_asc" type='radio' name="order_type"
                     n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'" value="ASC">
                 <label for="order_type_asc">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    {* &#129029;
+                    *}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-sort-up-alt" viewBox="0 -1 14 14">
                         <path
                             d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
-                    </svg></label>
+                    </svg>
+                </label>
             </div>
         </div>
 
+
         <div class="form_radio_group">
+            <p class="my0">Услуги:</p>
+            <select name="service" class="select form_radio_group-item">
+                <option value="">Все</option>
+                {foreach $service_list as $cat}
+                <optgroup label="{$cat['category_name']}">
+                    <option value="{\serialize(\array_column($cat['services'], 'id'))}"
+                        n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize(\array_column($cat['services'], 'id'))">
+                        Все из "{$cat['category_name']}"</option>
+                    {foreach $cat['services'] as $serv}
+                    <option value="{\serialize($serv['id'])}"
+                        n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize($serv['id'])">
+                        {$serv['name']}
+                    </option>
+                    {/foreach}
+                </optgroup>
+                {/foreach}
+            </select>
+        </div>
+        {*
+        <div class="form_radio_group display-none" id="category_list_js">
+            <p class="my0">Категории:</p>
+            <select name="category" id="categories_list" n:inner-foreach="$service_list as $cat"
+                class="select form_radio_group-item">
+                <option value="{$cat['category_id']}"
+                    n:attr="selected: !empty($form_data->category) && $form_data->category == $cat['category_id']">
+                    {$cat['category_name']}
+                </option>
+            </select>
+        </div>
+
+        <div class="form_radio_group display-none" id="service_list_js">
+            <p class="my0">Услуги:</p>
+            <span class="select" id="for_show_if_cat_not_choose">...</span>
+            {foreach $service_list as $cat}
+            // вместо селекта - дропдаун лист чекбоксов
+            <select name="service" id="cat_{$cat['category_id']}" class="select form_radio_group-item display-none">
+                <option value="9999999" selected>Выбрать все</option>
+                <optgroup label="{$cat['category_name']}" n:inner-foreach="$cat['services'] as $serv">
+                    <option value="{$serv['id']}"
+                        n:attr="selected: !empty($form_data->service) && $form_data->service == $serv['id']">
+                        {$serv['name']}
+                    </option>
+                </optgroup>
+            </select>
+            {/foreach}
+        </div>
+        *}
+        <div class="form_radio_group">
+            <p class="filter_form_submit_p">&nbsp;</p>
             <input type="submit" value="Применить">
         </div>
     </form>
 </div>
+
 <script></script>

@@ -91,7 +91,6 @@ $offer = 'CREATE TABLE IF NOT EXISTS `offer` (
 	`offers_type` varchar(25) NOT NULL,
 	`client_id` INTEGER UNSIGNED NOT NULL,
 	`location` varchar(512) NOT NULL,
-	`services` varchar(1024) NOT NULL,
 	`price` DECIMAL(10,2) NOT NULL,
 	`message` text DEFAULT NULL,
   	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -146,18 +145,28 @@ $service = 'CREATE TABLE IF NOT EXISTS `service` (
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   ';
 
+$offer_service = 'CREATE TABLE IF NOT EXISTS `offer_service`
+	(
+		`offer_id` INTEGER UNSIGNED NOT NULL,
+		`service_id` INTEGER UNSIGNED NOT NULL,
+		PRIMARY KEY (`offer_id`, `service_id`),
+		FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE,
+		FOREIGN KEY (`service_id`) REFERENCES `service`(`id`) ON DELETE CASCADE
+	)';
+
 $create_sqls = [
-	'role' => $role,
-	'permission' => $permission,
-	'role_permission' => $role_permission,
-	'user' => $user,
-	'role_user' => $role_user,
-	'client' => $client,
-	'role_client' => $role_client,
-	'userappliedforregistration' => $userappliedforregistration,
-	'offer' => $offer,
-	'comment' => $comment,
-	'rating' => $rating,
-	'category' => $category,
-	'service' => $service,
+    'role' => $role,
+    'permission' => $permission,
+    'role_permission' => $role_permission,
+    'user' => $user,
+    'role_user' => $role_user,
+    'client' => $client,
+    'role_client' => $role_client,
+    'userappliedforregistration' => $userappliedforregistration,
+    'offer' => $offer,
+    'comment' => $comment,
+    'rating' => $rating,
+    'category' => $category,
+    'service' => $service,
+    'offer_service' => $offer_service,
 ];

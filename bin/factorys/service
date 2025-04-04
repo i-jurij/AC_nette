@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+/* Create 5 Category with 5 Services each (5*5 = 25 services):
+    "php bin/factorys/service create"
+*/
+
+use Nette\Database\Connection;
+use Nette\Utils\Random;
+
+class ServiceFact
+{
+    public Connection $c;
+
+    public function __construct(Connection $connection)
+    {
+        $this->c = $connection;
+    }
+
+    public function createServices()
+    {
+        for ($i = 0; $i < 5; ++$i) {
+            $cat[] = ['name' => Random::generate(6, 'a-z')];
+        }
+        $this->c->query('INSERT INTO `category` ?', $cat);
+        $cat_ids = $this->c->query('SELECT (`id`) FROM `category`')->fetchAll();
+
+        foreach ($cat_ids as $row) {
+            for ($i = 0; $i < count($cat_ids); ++$i) {
+                $serv[] = ['category_id' => $row->id, 'name' => Random::generate(6, 'a-z')];
+            }
+        }
+
+        $this->c->query('INSERT INTO `service` ?', $serv);
+    }
+}
+
+if (PHP_SAPI === 'cli') {
+    require __DIR__.'/../../vendor/autoload.php';
+
+    $container = App\Bootstrap::boot()
+        ->createContainer();
+    // var_dump($container);
+    $connection = $container->getByType(Connection::class);
+
+    if ($argc == 2 && $argv[1] === 'create') {
+        $serviceFactory = new ServiceFact($connection);
+        $serviceFactory->createServices();
+        echo 'Services created';
+        exit(1);
+    } else {
+        echo "Somethig wrong :( \n";
+        exit(1);
+    }
+}
