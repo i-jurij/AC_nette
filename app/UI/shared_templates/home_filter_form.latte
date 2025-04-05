@@ -92,16 +92,56 @@
 : '&#129029;' )
 : ''}
 
-<p n:inner-foreach="$form_data as $key => $item">{$key} - {$item}<br></p>
+{var $serv = (isset($form_data->service)) ? \unserialize($form_data->service) : ''}
+{var $category_name = 'Все'}
+{foreach $service_list as $cat}
+{if is_array($serv) && empty(array_diff(array_column($cat['services'],
+'id'),$serv))}
+{var $category_name = 'Все из '. $cat['category_name']}
+Все из {$cat['category_name']}<br>
+{/if}
+{if !is_array($serv) && ctype_digit(strval($serv)) && \in_array($serv, array_column($cat['services'],
+'id'), true)}
+{var $category_name = $cat['category_name']}
+{/if}
+{/foreach}
+
+{var $service_name = 'Все'}
+{if is_array($serv)}
+{foreach $serv as $sid}
+{foreach $service_list as $cat}
+{foreach $cat['services'] as $service}
+{if $service['id'] === $sid}
+{var $service_name[] = $service['name']}
+{/if}
+{/foreach}
+{/foreach}
+{/foreach}
+{elseif is_int($serv)}
+{foreach $service_list as $cat}
+{foreach $cat['services'] as $service}
+{if $service['id'] === $serv}
+{var $service_name = $service['name']}
+{/if}
+{/foreach}
+{/foreach}
+{/if}
+
 
 <input type="checkbox" id="filter_form_wrapper_div-input" />
 <label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix menu-filter-btn">
     <p class="h5 justify left">Фильтры:
         <span class="">{$servicetype}</span>
-        | <span>{$order_by}</span>
-        | <span>{$order_type|noescape}</span>
-        | Category (if several - dropdown list)
-        | Service (if several - dropdown list)
+        | <span>{$order_by}</span>&nbsp;<span>{$order_type|noescape}</span>
+        | Раздел:&nbsp;{$category_name}
+        | Услуга:&nbsp;
+        {if is_array($service_name)}
+        {var $ss = \implode(', ', $service_name)}
+        {$ss}
+        {else}
+        {$service_name}
+        {/if}
+        | Цена от ... до ...
     </p>
     <span class="right pb1" style='font-size:2rem;'>
         {*&#9776;*}
