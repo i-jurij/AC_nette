@@ -24,8 +24,13 @@
         font-size: var(--middle-fontsize);
     }
 
-    .filter_form_mobile>*:not(:first-child) {
-        margin: 0 0 0 1rem;
+    .filter_form_mobile>*:not(:last-child) {
+        margin: 0 1rem 0 0;
+    }
+
+    input[type="range"] {
+        accent-color: var(--bgcolor);
+        width: 8rem;
     }
 
     /* ----------- resolution up to 480px ----------------- */
@@ -61,10 +66,13 @@
             margin: 1rem 0 0 0;
         }
 
-        .filter_form_submit_p {
-            display: none;
+        .filter_form_mobile:last-child {
+            margin: 0 0 1rem 0;
         }
 
+        input[type="range"] {
+            width: 100%;
+        }
     }
 </style>
 
@@ -115,8 +123,8 @@
         <span class="right pb1" style='font-size:2rem;'>&#10006;</span>
     </label>
     <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="filter_form_mobile">
-        <div class="form_radio_group clearfix">
-            <p class="my0">Тип:</p>
+        <div class="form_radio_group clearfix" aria-labelledby="filter_form_type_p">
+            <p class="my0" id="filter_form_type_p">Тип:</p>
             {*
             <div class="form_radio_group-item">
                 <input id="offertypeall" type='radio' name="offertype"
@@ -150,8 +158,8 @@
             </select>
         </div>
 
-        <div class="form_radio_group clearfix">
-            <p class="my0">Упорядочить:</p>
+        <div class="form_radio_group clearfix" aria-labelledby="filter_form_order_p">
+            <p class="my0" id="filter_form_order_p">Упорядочить:</p>
             <select name="order_by" class="select form_radio_group-item" id="order_by">
                 <option value="end_time"
                     n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'end_time'">По времени
@@ -194,8 +202,8 @@
         </div>
 
 
-        <div class="form_radio_group">
-            <p class="my0">Услуги:</p>
+        <div class="form_radio_group" aria-labelledby="filter_form_service_p">
+            <p class="my0" id="filter_form_service_p">Услуги:</p>
             <select name="service" class="select form_radio_group-item">
                 <option value="">Все</option>
                 {foreach $service_list as $cat}
@@ -242,9 +250,27 @@
             {/foreach}
         </div>
         *}
+
         <div class="form_radio_group">
-            <p class="filter_form_submit_p">&nbsp;</p>
-            <input type="submit" value="Применить">
+            <div class="inline-block">
+                <p class="filter_form_submit_p">Цена от:</p>
+                {var $price_min = (!empty($form_data->price_min)) ? $form_data->price_min : $price['price_min']}
+                <input type="range" list="pricemarksmin" value="{$price_min}" min="{$price['price_min']}"
+                    max="{$price['price_max']}" step="10" id="pricefiltermin" name="price_min"
+                    oninput="pricevaluemin.value=value" class="block" />
+                <output id="pricevaluemin" class="block">{$price_min}</output>
+            </div>
+            <div class="inline-block">
+                <p class="filter_form_submit_p">Цена до:</p>
+                {var $price_max = (!empty($form_data->price_max)) ? $form_data->price_max : $price['price_max']}
+                <input type="range" value="{$price_max}" min="{$price['price_min']}" max="{$price['price_max']}"
+                    step="10" id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value" class="block" />
+                <output id="pricevaluemax" class="block">{$price_max}</output>
+            </div>
+        </div>
+
+        <div class="form_radio_group">
+            <input type="submit" class="" value="Применить">
         </div>
     </form>
 </div>

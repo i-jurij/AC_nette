@@ -59,6 +59,11 @@ final class HomePresenter extends BasePresenter
         $this->template->data = $this->getData($this->locality, $paginator->getLength(), $paginator->getOffset(), $fm);
         $this->template->form_data = $this->form_data;
         $this->template->service_list = $this->services->getAllServices();
+
+        $this->template->price = [
+            'price_min' => $this->offers->priceMinMax()->price_min,
+            'price_max' => $this->offers->priceMinMax()->price_max,
+        ];
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
@@ -109,4 +114,5 @@ class HomeTemplate extends BaseTemplate
     public object $form_data;
     public Paginator $paginator;
     public array $service_list;
+    public array $price;
 }

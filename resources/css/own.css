@@ -167,7 +167,6 @@ span.error {
 }
 
 .form_radio_group label,
-.form_radio_group>input[type="submit"],
 .form_radio_group>button {
     background-image: linear-gradient(to bottom, #333b33 0%, #030702 100%);
 }

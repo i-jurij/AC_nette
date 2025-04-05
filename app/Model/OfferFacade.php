@@ -41,7 +41,9 @@ class OfferFacade
             if (is_array($ids) && $this->ifEachArrayValueInt($ids)) {
                 $offer_ids = $this->db->query('SELECT (offer_id) FROM offer_service WHERE service_id IN ?', $ids);
             } else {
-                $offer_ids = $this->db->query('SELECT (offer_id) FROM offer_service WHERE service_id = ?', $ids);
+                if (ctype_digit(strval($ids))) {
+                    $offer_ids = $this->db->query('SELECT (offer_id) FROM offer_service WHERE service_id = ?', $ids);
+                }
             }
             foreach ($offer_ids as $row) {
                 $res1[] = $row->offer_id;
@@ -67,8 +69,12 @@ class OfferFacade
             $this->sql_params[] = "offers_type = '{$form_data->offertype}offer'";
         }
 
-        if (!empty($form_data->price_min) && !empty($form_data->price_max)) {
-            $this->sql_params[] = $this->db::literal('price > ? AND price < ?', $form_data->price_min, $form_data->price_max);
+        if (!empty($form_data->price_min) && ctype_digit(strval($form_data->price_min))) {
+            $this->sql_params[] = "price >= {$form_data->price_min}";
+        }
+
+        if (!empty($form_data->price_max) && ctype_digit(strval($form_data->price_max))) {
+            $this->sql_params[] = "price <= {$form_data->price_max}";
         }
 
         if (!empty($limit) && !empty($offset)) {
@@ -138,6 +144,11 @@ class OfferFacade
 
     public function update()
     {
+    }
+
+    public function priceMinMax()
+    {
+        return $this->db->query('SELECT MAX(`price`) AS price_max, MIN(`price`) AS price_min FROM `offer`')->fetch();
     }
 
     public function ifEachArrayValueInt($array)
