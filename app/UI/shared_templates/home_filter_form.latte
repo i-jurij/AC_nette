@@ -33,9 +33,7 @@
         width: 8rem;
     }
 
-    /* ----------- resolution up to 480px ----------------- */
-
-    @media screen and (max-width: 480px) {
+    @media screen and (max-width: 640px) {
         .menu-filter-btn {
             display: block;
         }
@@ -111,7 +109,7 @@
 {foreach $service_list as $cat}
 {foreach $cat['services'] as $service}
 {if $service['id'] === $sid}
-{var $service_name[] = $service['name']}
+{var $service_name_ar[] = $service['name']}
 {/if}
 {/foreach}
 {/foreach}
@@ -131,31 +129,31 @@
 
 
 <input type="checkbox" id="filter_form_wrapper_div-input" />
-<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix menu-filter-btn h5 justify mb1">
-    <span class="left pr2" style='font-size:2rem;'>
-        {*&#9776;*}
-        {*
-        <img height="24px" width="24px"
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACcklEQVR4nO2ZP4gTQRjFRz1F5JprRAVFCwUtFLRR8E+hgthoo5U22mkhWsnZWNppdVZeIXZWYiEWGkFEi9jIQrLz3pfNokFREP//Qb2RgW8lCpfbi3vJ7LE/mCbMvJmXN9nMN2tMRcCQvE/SlaEBeNjLiCtTMzMZMYHDvEbSNB0zgZKm6VgeI4+00+MoikZNYERRNOrXpmt8Om1HkssBNPXHdC9JkqUmEKIoWkLyjppAu91e2XMAgNUA2jrgVr1eX2yGjHNuEcmbuqbnSZKszTWQ5HoALzWZG865hWZIOOcWAJhUE6/jON44KwER2QzgrZqZ9IJmOCau6hreAdjal5C1djvJjyp0xQwYAJd07s8isuu/xEjuBfBVBcfNgABwQbfTdwAHihI9RPKHmjlXiGjv+U7rXD8BHClU3Fp7DMAvAFPW2pNmjgBwPJtHRE7MySTW2lNd39TRovUBHM6St9aeLVr/38nGs71L8mBRuiKyj+Q3ry0i582AnyZf4jjeXYDejq6n42Uz4Of7hCbznuS2frVardaWrv+rCTNo1Mw1NfPGWrtpthoisgHAq6GfINzfZ6AXzWZzXd6xIrIGQJqd6Wq12ogJ6FTKRqOxaqYxwZ6yO53OMl9D91GuPgmu7km7Kre8LdhKlDlr/uDvBlgZCQxWiQQGq0QCg1UigcEqkcBglUhgsEokMDjfEhGRnXn6mVAh+UDr8CmS15MkWVFKI7VabYTkGb3r8ov9BOCiv6AolZEMn4RPRJPxCTVFZH/pjGT461QAz7KFA7jt31GWzki23fzNetd2+1BKI9Ntt9IaybDW7iFZJ3n3z4cV85DfrmEc4zdJw0oAAAAASUVORK5CYII="
-            alt="filter--v1">
-        *}
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-funnel"
+<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="menu-filter-btn h5 justify mb1 py1">
+    {*
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-funnel"
             viewBox="0 0 16 16">
             <path
                 d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z" />
         </svg>
-    </span>
-    <span class="">{$servicetype}</span>
-    | <span>{$order_by}</span>&nbsp;<span>{$order_type|noescape}</span>
-    | Раздел:&nbsp;{$category_name}
-    | Услуга:&nbsp;
-    {if is_array($service_name)}
-    {var $ss = \implode(', ', $service_name)}
-    {$ss}
-    {else}
-    {$service_name}
-    {/if}
-    | Цена от {$price_min} до {$price_max}
+    *}
+    <img height="24px" width="24px" class="align-middle mr1"
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAACcklEQVR4nO2ZP4gTQRjFRz1F5JprRAVFCwUtFLRR8E+hgthoo5U22mkhWsnZWNppdVZeIXZWYiEWGkFEi9jIQrLz3pfNokFREP//Qb2RgW8lCpfbi3vJ7LE/mCbMvJmXN9nMN2tMRcCQvE/SlaEBeNjLiCtTMzMZMYHDvEbSNB0zgZKm6VgeI4+00+MoikZNYERRNOrXpmt8Om1HkssBNPXHdC9JkqUmEKIoWkLyjppAu91e2XMAgNUA2jrgVr1eX2yGjHNuEcmbuqbnSZKszTWQ5HoALzWZG865hWZIOOcWAJhUE6/jON44KwER2QzgrZqZ9IJmOCau6hreAdjal5C1djvJjyp0xQwYAJd07s8isuu/xEjuBfBVBcfNgABwQbfTdwAHihI9RPKHmjlXiGjv+U7rXD8BHClU3Fp7DMAvAFPW2pNmjgBwPJtHRE7MySTW2lNd39TRovUBHM6St9aeLVr/38nGs71L8mBRuiKyj+Q3ry0i582AnyZf4jjeXYDejq6n42Uz4Of7hCbznuS2frVardaWrv+rCTNo1Mw1NfPGWrtpthoisgHAq6GfINzfZ6AXzWZzXd6xIrIGQJqd6Wq12ogJ6FTKRqOxaqYxwZ6yO53OMl9D91GuPgmu7km7Kre8LdhKlDlr/uDvBlgZCQxWiQQGq0QCg1UigcEqkcBglUhgsEokMDjfEhGRnXn6mVAh+UDr8CmS15MkWVFKI7VabYTkGb3r8ov9BOCiv6AolZEMn4RPRJPxCTVFZH/pjGT461QAz7KFA7jt31GWzki23fzNetd2+1BKI9Ntt9IaybDW7iFZJ3n3z4cV85DfrmEc4zdJw0oAAAAASUVORK5CYII="
+            alt="filter--v1">
+
+    <span class="">
+        <span class="">{$servicetype}</span>
+        | <span>{$order_by}&nbsp;{$order_type|noescape}</span>
+        | <span>Раздел:&nbsp;{$category_name}</span>
+        | <span>
+            {if !empty($service_name_ar) && is_array($service_name_ar)}
+            {var $ss = \implode(', ', $service_name_ar)}
+            Услуга:&nbsp;{$ss}
+            {else}
+            Услуга:&nbsp;{$service_name}
+            {/if}
+        </span>
+        | <span>Цена&nbsp;от&nbsp;{$price_min}&nbsp;до&nbsp;{$price_max}</span>
     </span>
 </label>
 

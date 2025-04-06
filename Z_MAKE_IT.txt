@@ -1,5 +1,12 @@
-then make price range 
-    
+    &#9776; menu icon trigram
+        
+MAKE    
+profile for client (edit, delete)
+offer add, edit, delete for client
+
+comments for offer-client
+rating for client
+
     why menu not work???
 --------------------------------
 admin clients customers executors, offers punkt "by location" make

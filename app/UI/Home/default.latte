@@ -12,64 +12,25 @@
     </span>
 </h1>
 
-    {include filter_form from $shared_templates.'home_filter_form.latte'}
+{include filter_form from $shared_templates.'home_filter_form.latte'}
 
 
 <div id="data_by_location">
     {$data|noescape}
 
+    {*
     <div class="pagination">
         {if !$paginator->isFirst()}
         <a class="pseudo button" n:href="default, 1">1</a>
-        
-        <a class="pseudo button" n:href="default, $paginator->page-1"><</a>
-        
+        <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
         {/if}
-
-        &nbsp;Стр. {$paginator->getPage()} из {$paginator->getPageCount()}&nbsp;
-
+        &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
         {if !$paginator->isLast()}
-        
-        <a class="pseudo button" n:href="default, $paginator->getPage() + 1">></a>
-        
+        <a class="pseudo button" n:href="default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
         <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
         {/if}
     </div>
+    *}
 </div>
 
-<script  n:syntax="double">
-    function isLsItemExist(name) {
-        return (name in localStorage)
-    }
-    function getFromLocalStorage(name) {
-        if (isLsItemExist(name)) {
-            return JSON.parse(localStorage.getItem(name));
-        }
-        return null;
-    }
-    //localStorage.setItem('locality', JSON.stringify(data_object));
-    //localStorage.removeItem("locality");
-    //localStorage.clear();
-
-    // function added new element to DOM by after or before element with point_id
-    // html is a html code
-    // method is 
-    // "beforebegin" – insert before elem,
-    // "afterbegin" – insert into start of elem,
-    // "beforeend" – insert html into end of elem,
-    // "afterend" – insert html after elem.
-    function addHtml(html, point_id, method) {
-        let point = document.getElementById(String(point_id));
-        if (point) {
-            point.insertAdjacentHTML(String(method), html);
-        }
-    }
-    //document.body.onload = addHtml('<h1>content</h1>', 'data_by_location', 'beforebegin');
-    document.body.onload = function(){
-        const offers_form = document.getElementById('offers_form');
-        if (offers_form) {
-            offers_form.classList.remove("display-none");
-        }
-    };
-</script>
 {/block}

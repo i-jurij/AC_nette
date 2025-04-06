@@ -40,12 +40,31 @@ final class HomePresenter extends BasePresenter
 
     public function actionSaveToBackend()
     {
-        $data = $this->getData(location: $this->locality, limit: 0, offset: 0, form_data: $this->form_data);
+        $this->setPaginator(1);
+
+        $offer = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
+        $data = $this->ts_js($offer);
 
         $this->sendJson($data);
     }
 
     public function renderDefault(int $page = 1)
+    {
+        $this->setPaginator($page);
+
+        $this->template->form_data = $this->form_data;
+        $this->template->service_list = $this->services->getAllServices();
+
+        $this->template->price = [
+            'price_min' => $this->offers->priceMinMax()->price_min,
+            'price_max' => $this->offers->priceMinMax()->price_max,
+        ];
+
+        $offer = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
+        $this->template->data = $this->ts_js($offer);
+    }
+
+    protected function setPaginator(int $page)
     {
         $offersCount = $this->offers->offersCount(location: $this->locality);
         $paginator = new Paginator();
@@ -54,16 +73,6 @@ final class HomePresenter extends BasePresenter
         $paginator->setPage($page);
 
         $this->template->paginator = $paginator;
-
-        $fm = (!empty($this->form_data)) ? $this->form_data : null;
-        $this->template->data = $this->getData($this->locality, $paginator->getLength(), $paginator->getOffset(), $fm);
-        $this->template->form_data = $this->form_data;
-        $this->template->service_list = $this->services->getAllServices();
-
-        $this->template->price = [
-            'price_min' => $this->offers->priceMinMax()->price_min,
-            'price_max' => $this->offers->priceMinMax()->price_max,
-        ];
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
@@ -75,35 +84,49 @@ final class HomePresenter extends BasePresenter
         $this->redirect('this');
     }
 
-    private function getData(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): string
-    {
-        $offer = $this->offers->getOffers($location, $limit, $offset, $form_data)->fetchAll();
-
-        $string = $this->ts($offer);
-
-        return $string;
-    }
-
-    private function ts($data)
+    private function ts_js($data)
     {
         $string = '<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">';
         foreach ($data as $v) {
             $string .=
                 '<div>
                 <article class="card">
-                <p> ID: '.$v->id.'</p>
-                <p> Client: '.$v->client_id.'</p>
-                <p> Type: '.$v->offers_type.'</p>
-                <p> Location: '.$v->location.'</p>
-                <p> Price: '.$v->price.'</p>
-                <p> Message: '.$v->message.'</p>
-                <p> Updated_at: '.$v->updated_at.'</p>
-                <p> End_time: '.$v->end_time.'</p>
+                <p> ID: ' . $v->id . '</p>
+                <p> Client: ' . $v->client_id . '</p>
+                <p> Type: ' . $v->offers_type . '</p>
+                <p> Location: ' . $v->location . '</p>
+                <p> Price: ' . $v->price . '</p>
+                <p> Message: ' . $v->message . '</p>
+                <p> Updated_at: ' . $v->updated_at . '</p>
+                <p> End_time: ' . $v->end_time . '</p>
                 </article>
                 </div>'
             ;
         }
         $string .= '</div>';
+
+        $first = '';
+        if (!$this->template->paginator->isFirst()) {
+            $first = '
+                <a class="pseudo button" href="' . $this->link(':Home:default', 1) . '">1</a>
+                <a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPage() - 1) . '">&nbsp;&#60;&nbsp;</a>';
+        }
+
+        $last = '';
+        if (!$this->template->paginator->isLast()) {
+            $last = '<a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPage() + 1) . '">&nbsp;&#62;&nbsp;</a>
+                <a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPageCount()) . '">'
+                . $this->template->paginator->getPageCount() .
+                '</a>';
+        }
+
+        $string .= '
+            <div class="pagination">'
+            . $first .
+            '&nbsp;Стр.&nbsp;' . $this->template->paginator->getPage() . '&nbsp;из&nbsp;' . $this->template->paginator->getPageCount() . '&nbsp;'
+            . $last .
+            '</div>
+        ';
 
         return $string;
     }
