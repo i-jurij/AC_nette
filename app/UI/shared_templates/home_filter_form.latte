@@ -61,8 +61,7 @@
             display: block;
         }
 
-        .filter_form_mobile>*:not(:first-child),
-        .filter_form_mobile>*:not(:last-child) {
+        .filter_form_mobile>*:not(:first-child) {
             margin: 1rem 0 0 0;
         }
 
@@ -127,23 +126,13 @@
 {/foreach}
 {/if}
 
+{var $price_min = (!empty($form_data->price_min)) ? $form_data->price_min : $price['price_min']}
+{var $price_max = (!empty($form_data->price_max)) ? $form_data->price_max : $price['price_max']}
+
 
 <input type="checkbox" id="filter_form_wrapper_div-input" />
-<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix menu-filter-btn">
-    <p class="h5 justify left">Фильтры:
-        <span class="">{$servicetype}</span>
-        | <span>{$order_by}</span>&nbsp;<span>{$order_type|noescape}</span>
-        | Раздел:&nbsp;{$category_name}
-        | Услуга:&nbsp;
-        {if is_array($service_name)}
-        {var $ss = \implode(', ', $service_name)}
-        {$ss}
-        {else}
-        {$service_name}
-        {/if}
-        | Цена от ... до ...
-    </p>
-    <span class="right pb1" style='font-size:2rem;'>
+<label for="filter_form_wrapper_div-input" id="menu-filter-btn" class="clearfix menu-filter-btn h5 justify mb1">
+    <span class="left pr2" style='font-size:2rem;'>
         {*&#9776;*}
         {*
         <img height="24px" width="24px"
@@ -156,6 +145,18 @@
                 d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z" />
         </svg>
     </span>
+    <span class="">{$servicetype}</span>
+    | <span>{$order_by}</span>&nbsp;<span>{$order_type|noescape}</span>
+    | Раздел:&nbsp;{$category_name}
+    | Услуга:&nbsp;
+    {if is_array($service_name)}
+    {var $ss = \implode(', ', $service_name)}
+    {$ss}
+    {else}
+    {$service_name}
+    {/if}
+    | Цена от {$price_min} до {$price_max}
+    </span>
 </label>
 
 <div class="card px2 pt1" id="filter_form_wrapper_div">
@@ -163,149 +164,151 @@
         <span class="right pb1" style='font-size:2rem;'>&#10006;</span>
     </label>
     <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="filter_form_mobile">
-        <div class="form_radio_group clearfix" aria-labelledby="filter_form_type_p">
-            <p class="my0" id="filter_form_type_p">Тип:</p>
+        <div class="form_radio_group filter_form_mobile">
+            <div class="form_radio_group clearfix" aria-labelledby="filter_form_type_p">
+                <p class="my0" id="filter_form_type_p">Тип:</p>
+                {*
+                <div class="form_radio_group-item">
+                    <input id="offertypeall" type='radio' name="offertype"
+                        n:attr="checked: empty($form_data->offertype) || $form_data->offertype=='all'" value="all">
+                    <label for="offertypeall">Все</label>
+                </div>
+                <div class="form_radio_group-item">
+                    <input id="offertypework" type='radio' name="offertype"
+                        n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'work'" value="work">
+                    <label for="offertypework">Заказы</label>
+                </div>
+                <div class="form_radio_group-item">
+                    <input id="offertypeservice" type='radio' name="offertype"
+                        n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'service'"
+                        value="service">
+                    <label for="offertypeservice">Услуги</label>
+                </div>
+                *}
+                <select name="offertype" class="select form_radio_group-item" id="offertype">
+                    <option value="all" n:attr="selected: empty($form_data->offertype) || $form_data->offertype=='all'">
+                        Все
+                    </option>
+                    <option value="work"
+                        n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'work'">
+                        Заказы
+                    </option>
+                    <option value="service"
+                        n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'service'">
+                        Услуги
+                    </option>
+                </select>
+            </div>
+
+            <div class="form_radio_group clearfix" aria-labelledby="filter_form_order_p">
+                <p class="my0" id="filter_form_order_p">Упорядочить:</p>
+                <select name="order_by" class="select form_radio_group-item" id="order_by">
+                    <option value="end_time"
+                        n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'end_time'">По времени
+                    </option>
+                    <option value="price"
+                        n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'price'">По Стоимости
+                    </option>
+                    <option value="services"
+                        n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'services'">По услугам
+                    </option>
+                </select>
+
+                <div class="form_radio_group-item">
+                    <input id="order_type_desc" type='radio' name="order_type"
+                        n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'DESC'"
+                        value="DESC">
+                    <label for="order_type_desc">
+                        {*
+                        &#129031;
+                        *}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-sort-down" viewBox="0 -1 14 14">
+                            <path
+                                d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
+                        </svg>
+                    </label>
+                </div>
+                <div class="form_radio_group-item">
+                    <input id="order_type_asc" type='radio' name="order_type"
+                        n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'" value="ASC">
+                    <label for="order_type_asc">
+                        {* &#129029;
+                        *}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-sort-up-alt" viewBox="0 -1 14 14">
+                            <path
+                                d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
+                        </svg>
+                    </label>
+                </div>
+            </div>
+
+
+            <div class="form_radio_group" aria-labelledby="filter_form_service_p">
+                <p class="my0" id="filter_form_service_p">Услуги:</p>
+                <select name="service" class="select form_radio_group-item">
+                    <option value="">Все</option>
+                    {foreach $service_list as $cat}
+                    <optgroup label="{$cat['category_name']}">
+                        <option value="{\serialize(\array_column($cat['services'], 'id'))}"
+                            n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize(\array_column($cat['services'], 'id'))">
+                            Все из "{$cat['category_name']}"</option>
+                        {foreach $cat['services'] as $serv}
+                        <option value="{\serialize($serv['id'])}"
+                            n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize($serv['id'])">
+                            {$serv['name']}
+                        </option>
+                        {/foreach}
+                    </optgroup>
+                    {/foreach}
+                </select>
+            </div>
             {*
-            <div class="form_radio_group-item">
-                <input id="offertypeall" type='radio' name="offertype"
-                    n:attr="checked: empty($form_data->offertype) || $form_data->offertype=='all'" value="all">
-                <label for="offertypeall">Все</label>
+            <div class="form_radio_group display-none" id="category_list_js">
+                <p class="my0">Категории:</p>
+                <select name="category" id="categories_list" n:inner-foreach="$service_list as $cat"
+                    class="select form_radio_group-item">
+                    <option value="{$cat['category_id']}"
+                        n:attr="selected: !empty($form_data->category) && $form_data->category == $cat['category_id']">
+                        {$cat['category_name']}
+                    </option>
+                </select>
             </div>
-            <div class="form_radio_group-item">
-                <input id="offertypework" type='radio' name="offertype"
-                    n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'work'" value="work">
-                <label for="offertypework">Заказы</label>
-            </div>
-            <div class="form_radio_group-item">
-                <input id="offertypeservice" type='radio' name="offertype"
-                    n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'service'"
-                    value="service">
-                <label for="offertypeservice">Услуги</label>
+
+            <div class="form_radio_group display-none" id="service_list_js">
+                <p class="my0">Услуги:</p>
+                <span class="select" id="for_show_if_cat_not_choose">...</span>
+                {foreach $service_list as $cat}
+                // вместо селекта - дропдаун лист чекбоксов
+                <select name="service" id="cat_{$cat['category_id']}" class="select form_radio_group-item display-none">
+                    <option value="9999999" selected>Выбрать все</option>
+                    <optgroup label="{$cat['category_name']}" n:inner-foreach="$cat['services'] as $serv">
+                        <option value="{$serv['id']}"
+                            n:attr="selected: !empty($form_data->service) && $form_data->service == $serv['id']">
+                            {$serv['name']}
+                        </option>
+                    </optgroup>
+                </select>
+                {/foreach}
             </div>
             *}
-            <select name="offertype" class="select form_radio_group-item" id="offertype">
-                <option value="all" n:attr="selected: empty($form_data->offertype) || $form_data->offertype=='all'">
-                    Все
-                </option>
-                <option value="work"
-                    n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'work'">
-                    Заказы
-                </option>
-                <option value="service"
-                    n:attr="selected: !empty($form_data->offertype) && $form_data->offertype == 'service'">
-                    Услуги
-                </option>
-            </select>
-        </div>
 
-        <div class="form_radio_group clearfix" aria-labelledby="filter_form_order_p">
-            <p class="my0" id="filter_form_order_p">Упорядочить:</p>
-            <select name="order_by" class="select form_radio_group-item" id="order_by">
-                <option value="end_time"
-                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'end_time'">По времени
-                </option>
-                <option value="price"
-                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'price'">По Стоимости
-                </option>
-                <option value="services"
-                    n:attr="selected: !empty($form_data->order_by) && $form_data->order_by == 'services'">По услугам
-                </option>
-            </select>
-
-            <div class="form_radio_group-item">
-                <input id="order_type_desc" type='radio' name="order_type"
-                    n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'DESC'" value="DESC">
-                <label for="order_type_desc">
-                    {*
-                    &#129031;
-                    *}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-sort-down" viewBox="0 -1 14 14">
-                        <path
-                            d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z" />
-                    </svg>
-                </label>
-            </div>
-            <div class="form_radio_group-item">
-                <input id="order_type_asc" type='radio' name="order_type"
-                    n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'" value="ASC">
-                <label for="order_type_asc">
-                    {* &#129029;
-                    *}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="bi bi-sort-up-alt" viewBox="0 -1 14 14">
-                        <path
-                            d="M3.5 13.5a.5.5 0 0 1-1 0V4.707L1.354 5.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L3.5 4.707V13.5zm4-9.5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
-                    </svg>
-                </label>
-            </div>
-        </div>
-
-
-        <div class="form_radio_group" aria-labelledby="filter_form_service_p">
-            <p class="my0" id="filter_form_service_p">Услуги:</p>
-            <select name="service" class="select form_radio_group-item">
-                <option value="">Все</option>
-                {foreach $service_list as $cat}
-                <optgroup label="{$cat['category_name']}">
-                    <option value="{\serialize(\array_column($cat['services'], 'id'))}"
-                        n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize(\array_column($cat['services'], 'id'))">
-                        Все из "{$cat['category_name']}"</option>
-                    {foreach $cat['services'] as $serv}
-                    <option value="{\serialize($serv['id'])}"
-                        n:attr="selected: !empty($form_data->service) && $form_data->service == \serialize($serv['id'])">
-                        {$serv['name']}
-                    </option>
-                    {/foreach}
-                </optgroup>
-                {/foreach}
-            </select>
-        </div>
-        {*
-        <div class="form_radio_group display-none" id="category_list_js">
-            <p class="my0">Категории:</p>
-            <select name="category" id="categories_list" n:inner-foreach="$service_list as $cat"
-                class="select form_radio_group-item">
-                <option value="{$cat['category_id']}"
-                    n:attr="selected: !empty($form_data->category) && $form_data->category == $cat['category_id']">
-                    {$cat['category_name']}
-                </option>
-            </select>
-        </div>
-
-        <div class="form_radio_group display-none" id="service_list_js">
-            <p class="my0">Услуги:</p>
-            <span class="select" id="for_show_if_cat_not_choose">...</span>
-            {foreach $service_list as $cat}
-            // вместо селекта - дропдаун лист чекбоксов
-            <select name="service" id="cat_{$cat['category_id']}" class="select form_radio_group-item display-none">
-                <option value="9999999" selected>Выбрать все</option>
-                <optgroup label="{$cat['category_name']}" n:inner-foreach="$cat['services'] as $serv">
-                    <option value="{$serv['id']}"
-                        n:attr="selected: !empty($form_data->service) && $form_data->service == $serv['id']">
-                        {$serv['name']}
-                    </option>
-                </optgroup>
-            </select>
-            {/foreach}
-        </div>
-        *}
-
-        <div class="form_radio_group">
-            <div class="inline-block">
-                <p class="filter_form_submit_p">Цена от:</p>
-                {var $price_min = (!empty($form_data->price_min)) ? $form_data->price_min : $price['price_min']}
-                <input type="range" list="pricemarksmin" value="{$price_min}" min="{$price['price_min']}"
-                    max="{$price['price_max']}" step="10" id="pricefiltermin" name="price_min"
-                    oninput="pricevaluemin.value=value" class="block" />
-                <output id="pricevaluemin" class="block">{$price_min}</output>
-            </div>
-            <div class="inline-block">
-                <p class="filter_form_submit_p">Цена до:</p>
-                {var $price_max = (!empty($form_data->price_max)) ? $form_data->price_max : $price['price_max']}
-                <input type="range" value="{$price_max}" min="{$price['price_min']}" max="{$price['price_max']}"
-                    step="10" id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value" class="block" />
-                <output id="pricevaluemax" class="block">{$price_max}</output>
+            <div class="form_radio_group">
+                <div class="inline-block">
+                    <p class="filter_form_submit_p">Цена от:</p>
+                    <input type="range" list="pricemarksmin" value="{$price_min}" min="{$price['price_min']}"
+                        max="{$price['price_max']}" step="10" id="pricefiltermin" name="price_min"
+                        oninput="pricevaluemin.value=value" class="block" />
+                    <output id="pricevaluemin" class="block">{$price_min}</output>
+                </div>
+                <div class="inline-block">
+                    <p class="filter_form_submit_p">Цена до:</p>
+                    <input type="range" value="{$price_max}" min="{$price['price_min']}" max="{$price['price_max']}"
+                        step="10" id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value"
+                        class="block" />
+                    <output id="pricevaluemax" class="block">{$price_max}</output>
+                </div>
             </div>
         </div>
 
@@ -314,5 +317,3 @@
         </div>
     </form>
 </div>
-
-<script></script>

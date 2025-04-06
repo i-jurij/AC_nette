@@ -4,19 +4,19 @@
 
 	<div id="location_div" class="button pseudo">{$geo|noescape}</div>
 
-	<div >
-		<a class="button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>
+	<div class="right-align">
+		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>
 		<a class="pseudo button" n:if="!!$user->getIdentity()" href="#profile">
 			{$user->getIdentity()->username}
 		</a>
-		<a class="button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
+		<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти
 		</a>
 	</div>
 </header>
 
-	<script>
-		let url_js_fetch = {link :Home:Geo:jsFetch};
+<script>
+	let url_js_fetch = {link :Home:Geo:jsFetch};
 		let url_location_to_server_js = {link :Home:saveToBackend};
-    </script>
+</script>
 {/block}
