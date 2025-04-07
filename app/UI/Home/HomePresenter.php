@@ -17,7 +17,7 @@ use Nette\Utils\Paginator;
 final class HomePresenter extends BasePresenter
 {
     protected object $form_data;
-    protected int $items_on_page_paginator = 20;
+    protected int $items_on_page_paginator = 2;
     private array $service_list = [];
 
     public function __construct(
@@ -42,10 +42,16 @@ final class HomePresenter extends BasePresenter
     {
         $this->setPaginator(1);
 
-        $offer = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
-        $data = $this->ts_js($offer);
+        $offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
+        $latte = $this->template->getLatte();
+        $params = [
+            'offers' => $offers,
+            'paginator' => $this->template->paginator,
+        ];
+        $template = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR.'offers_list.latte';
+        $output = $latte->renderToString($template, $params);
 
-        $this->sendJson($data);
+        $this->sendJson($output);
     }
 
     public function renderDefault(int $page = 1)
@@ -60,13 +66,12 @@ final class HomePresenter extends BasePresenter
             'price_max' => $this->offers->priceMinMax()->price_max,
         ];
 
-        $offer = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
-        $this->template->data = $this->ts_js($offer);
+        $this->template->offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
     }
 
     protected function setPaginator(int $page)
     {
-        $offersCount = $this->offers->offersCount(location: $this->locality);
+        $offersCount = $this->offers->offersCount(location: $this->locality, form_data: $this->form_data);
         $paginator = new Paginator();
         $paginator->setItemCount($offersCount);
         $paginator->setItemsPerPage($this->items_on_page_paginator);
@@ -83,57 +88,10 @@ final class HomePresenter extends BasePresenter
 
         $this->redirect('this');
     }
-
-    private function ts_js($data)
-    {
-        $string = '<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">';
-        foreach ($data as $v) {
-            $string .=
-                '<div>
-                <article class="card">
-                <p> ID: ' . $v->id . '</p>
-                <p> Client: ' . $v->client_id . '</p>
-                <p> Type: ' . $v->offers_type . '</p>
-                <p> Location: ' . $v->location . '</p>
-                <p> Price: ' . $v->price . '</p>
-                <p> Message: ' . $v->message . '</p>
-                <p> Updated_at: ' . $v->updated_at . '</p>
-                <p> End_time: ' . $v->end_time . '</p>
-                </article>
-                </div>'
-            ;
-        }
-        $string .= '</div>';
-
-        $first = '';
-        if (!$this->template->paginator->isFirst()) {
-            $first = '
-                <a class="pseudo button" href="' . $this->link(':Home:default', 1) . '">1</a>
-                <a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPage() - 1) . '">&nbsp;&#60;&nbsp;</a>';
-        }
-
-        $last = '';
-        if (!$this->template->paginator->isLast()) {
-            $last = '<a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPage() + 1) . '">&nbsp;&#62;&nbsp;</a>
-                <a class="pseudo button" href="' . $this->link(':Home:default', $this->template->paginator->getPageCount()) . '">'
-                . $this->template->paginator->getPageCount() .
-                '</a>';
-        }
-
-        $string .= '
-            <div class="pagination">'
-            . $first .
-            '&nbsp;Стр.&nbsp;' . $this->template->paginator->getPage() . '&nbsp;из&nbsp;' . $this->template->paginator->getPageCount() . '&nbsp;'
-            . $last .
-            '</div>
-        ';
-
-        return $string;
-    }
 }
 class HomeTemplate extends BaseTemplate
 {
-    public string $data;
+    public array $offers;
     public object $form_data;
     public Paginator $paginator;
     public array $service_list;

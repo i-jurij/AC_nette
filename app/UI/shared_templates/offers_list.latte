@@ -1,0 +1,32 @@
+<div class="flexx one two-600 three-1000 four-1400 five-2000 center ">
+    {foreach $offers as $offer}
+    <div>
+        <article class="card">
+            <p> ID: {$offer->id}</p>
+            <p> Client: {$offer->client_id}</p>
+            <p> Type: {$offer->offers_type}</p>
+            <p> Location: {$offer->location}</p>
+            <p> Price: {$offer->price}</p>
+            <p> Message: {$offer->message}</p>
+            <p> Updated_at: {$offer->updated_at}</p>
+            <p> End_time: {$offer->end_time}</p>
+        </article>
+    </div>
+    {/foreach}
+</div>
+
+
+<!-- Paginator -->
+<div class="pagination">
+    {if !$paginator->isFirst()}
+    <a class="pseudo button" n:href="default, 1">1</a>
+    <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
+    {/if}
+
+    &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
+
+    {if !$paginator->isLast()}
+    <a class="pseudo button" n:href="default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
+    <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
+    {/if}
+</div>

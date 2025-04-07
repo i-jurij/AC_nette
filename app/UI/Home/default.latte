@@ -16,21 +16,7 @@
 
 
 <div id="data_by_location">
-    {$data|noescape}
-
-    {*
-    <div class="pagination">
-        {if !$paginator->isFirst()}
-        <a class="pseudo button" n:href="default, 1">1</a>
-        <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
-        {/if}
-        &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
-        {if !$paginator->isLast()}
-        <a class="pseudo button" n:href="default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
-        <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
-        {/if}
-    </div>
-    *}
+    {include $shared_templates.'offers_list.latte'}
 </div>
 
 {/block}
