@@ -58,7 +58,7 @@ class OfferFact
             .'geolocation.db');
         $dsn = "sqlite:$path_to_geo_db";
         $sqlite = new Connection($dsn);
-        $loc_sql = 'SELECT (`id`) FROM `geo_city`';
+        $loc_sql = 'SELECT `id`, `region_id`, `name` FROM `geo_city`';
         $this->locations = $sqlite->query($loc_sql)->fetchAll();
     }
 
@@ -74,13 +74,15 @@ class OfferFact
         for ($i = 0; $i < $num; ++$i) {
             $offers_type = \array_rand(['workoffer' => 0, 'serviceoffer' => 1], 1);
             $row = \array_rand($this->client_ids, 1);
-            $loc_row = \array_rand($this->client_ids, 1);
+            $loc_row = \array_rand($this->locations, 1);
             $price = Random::generate(5, '0-9');
 
             $res[] = [
                 'offers_type' => $offers_type,
                 'client_id' => $this->client_ids[$row]->id,
-                'location' => $this->locations[$loc_row]->id,
+                'city_id' => $this->locations[$loc_row]->id,
+                'city_name' => $this->locations[$loc_row]->name,
+                'region_id' => $this->locations[$loc_row]->region_id,
                 'price' => $price,
             ];
         }

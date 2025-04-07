@@ -42,7 +42,7 @@ final class ServiceFacade
 
     public function getService(array $params)
     {
-        $this->service = $this->db->table('service');
+        // $this->service = $this->db->table('service')->where($params);
 
         return [];
     }

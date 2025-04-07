@@ -47,7 +47,7 @@ if (PHP_SAPI === 'cli') {
     if ($argc == 2 && $argv[1] === 'create') {
         $serviceFactory = new ServiceFact($connection);
         $serviceFactory->createServices();
-        echo 'Services created';
+        echo "Services created \n";
         exit(1);
     } else {
         echo "Somethig wrong :( \n";

@@ -56,10 +56,40 @@ class OfferFacade
             }
         }
 
+        // LOCATION //
+        /*
         $city_id = $this->getCityId($location);
         if ($city_id != false && is_integer($city_id)) {
-            $this->sql_params[] = "location = {$city_id}";
+            $this->sql_params[] = "city_id = {$city_id}";
         }
+        */
+        if (!empty($location)) {
+            if (!empty($location['city']) && is_string($location['city'])) {
+                /*$city = htmlspecialchars($location['city']);
+                $sql_city = "city_name = '{$city}'";
+                */
+                if (str_contains($location['city'], '(')) {
+                    $city = \trim(\explode('(', \htmlspecialchars($location['city']))[0]);
+                } else {
+                    $city = \htmlspecialchars($location['city']);
+                }
+                $sql_city = "city_name LIKE '{$city}%'";
+            }
+            if (!empty($location['region']) && is_string($location['region'])) {
+                /*
+                 $region = \htmlspecialchars($location['region']);
+                $sql_region = "region_name = '{$region}'";
+                */
+                $region = \explode(' ', \htmlspecialchars($location['region']))[0];
+                $sql_region = "region_name LIKE '{$region}%'";
+            }
+
+            if (!empty($sql_city)) {
+                // $this->sql_params[] = (!empty($sql_region)) ? "($sql_city OR $sql_region)" : $sql_city;
+                $this->sql_params[] = (!empty($sql_region)) ? "(($sql_city AND $sql_region) OR $sql_city)" : $sql_city;
+            }
+        }
+        // END LOCATION
 
         if (!empty($form_data->client_id) && is_integer($form_data->client_id)) {
             $this->sql_params[] = "client_id = {$form_data->client_id}";
@@ -111,7 +141,43 @@ class OfferFacade
 
     public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null)
     {
-        $sql = "SELECT * FROM {$this->table} WHERE";
+        $sql = 'SELECT
+                `offer`.`id`, 
+                `offer`.`offers_type`,
+                `offer`.`city_id`,
+                `offer`.`city_name`,
+                `offer`.`region_id`,
+                `offer`.`region_name`,
+                `offer`.`price`,
+                `offer`.`message`,
+                `offer`.`created_at`,
+                `offer`.`updated_at`,
+                `offer`.`end_time`,
+                `client`.`id` AS client_id,
+                `client`.`username` AS client_name,
+                `client`.`image` AS client_image,
+                `client`.`phone` AS client_phone,
+                `client`.`phone_verified` AS client_phone_verified,
+                `client`.`email` AS client_email,
+                `client`.`email_verified` AS client_email_verified,
+                `client`.`rating` AS client_rating,
+                `service`.`id` AS service_id,
+                `service`.`image` AS service_image,
+                `service`.`name` AS `service_name`,
+                `service`.`description` AS service_description,
+                `service`.`price` AS service_price,
+                `service`.`duration` AS service_duration,
+                `category`.`id` AS category_id,
+                `category`.`image` AS category_image,
+                `category`.`name` AS category_name,
+                `category`.`description` AS category_description
+                FROM `offer`
+                    INNER JOIN `client` ON `offer`.client_id = `client`.id
+                    INNER JOIN `offer_service` ON `offer_service`.offer_id = `offer`.id
+                    INNER JOIN `service` ON `offer_service`.service_id = `service`.id
+                    INNER JOIN `category` ON `service`.category_id = `category`.id
+                    WHERE';
+        // $sql = "SELECT * FROM {$this->table} WHERE";
         $this->setSqlParams(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
 
         $numItems = count($this->sql_params);

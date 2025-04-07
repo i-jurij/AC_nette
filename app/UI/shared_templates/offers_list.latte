@@ -4,8 +4,11 @@
         <article class="card">
             <p> ID: {$offer->id}</p>
             <p> Client: {$offer->client_id}</p>
+            <p n:if="$user->isLoggedIn()"> Client Phone: {$offer->client_name}</p>
             <p> Type: {$offer->offers_type}</p>
-            <p> Location: {$offer->location}</p>
+            <p> Service: {$offer->service_name} {$offer->category_name} </p>
+            <p> City: {$offer->city_name}</p>
+            <p> Region: {$offer->region_name}</p>
             <p> Price: {$offer->price}</p>
             <p> Message: {$offer->message}</p>
             <p> Updated_at: {$offer->updated_at}</p>

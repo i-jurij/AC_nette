@@ -17,7 +17,7 @@ use Nette\Utils\Paginator;
 final class HomePresenter extends BasePresenter
 {
     protected object $form_data;
-    protected int $items_on_page_paginator = 2;
+    protected int $items_on_page_paginator = 20;
     private array $service_list = [];
 
     public function __construct(
