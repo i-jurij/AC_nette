@@ -95,7 +95,6 @@
 {if is_array($serv) && empty(array_diff(array_column($cat['services'],
 'id'),$serv))}
 {var $category_name = 'Все из '. $cat['category_name']}
-Все из {$cat['category_name']}<br>
 {/if}
 {if !is_array($serv) && ctype_digit(strval($serv)) && \in_array($serv, array_column($cat['services'],
 'id'), true)}

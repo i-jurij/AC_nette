@@ -104,6 +104,14 @@ $offer = 'CREATE TABLE IF NOT EXISTS `offer` (
 	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE
 	)';
 
+$offer_image = 'CREATE TABLE `offer_image_thumb` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`offer_id` INTEGER NOT NULL,
+	`caption` VARCHAR(128) NOT NULL,
+	`thumb` LONGBLOB NOT NULL,
+	PRIMARY KEY(`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+
 $comment = 'CREATE TABLE IF NOT EXISTS `comment` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`offer_id` INTEGER UNSIGNED NOT NULL,
@@ -169,6 +177,7 @@ $create_sqls = [
     'role_client' => $role_client,
     'userappliedforregistration' => $userappliedforregistration,
     'offer' => $offer,
+    'offer_image' => $offer_image,
     'comment' => $comment,
     'rating' => $rating,
     'category' => $category,

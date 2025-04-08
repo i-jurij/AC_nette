@@ -139,45 +139,9 @@ class OfferFacade
         return $this->db->query($sql)->fetchField();
     }
 
-    public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null)
+    public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): array
     {
-        $sql = 'SELECT
-                `offer`.`id`, 
-                `offer`.`offers_type`,
-                `offer`.`city_id`,
-                `offer`.`city_name`,
-                `offer`.`region_id`,
-                `offer`.`region_name`,
-                `offer`.`price`,
-                `offer`.`message`,
-                `offer`.`created_at`,
-                `offer`.`updated_at`,
-                `offer`.`end_time`,
-                `client`.`id` AS client_id,
-                `client`.`username` AS client_name,
-                `client`.`image` AS client_image,
-                `client`.`phone` AS client_phone,
-                `client`.`phone_verified` AS client_phone_verified,
-                `client`.`email` AS client_email,
-                `client`.`email_verified` AS client_email_verified,
-                `client`.`rating` AS client_rating,
-                `service`.`id` AS service_id,
-                `service`.`image` AS service_image,
-                `service`.`name` AS `service_name`,
-                `service`.`description` AS service_description,
-                `service`.`price` AS service_price,
-                `service`.`duration` AS service_duration,
-                `category`.`id` AS category_id,
-                `category`.`image` AS category_image,
-                `category`.`name` AS category_name,
-                `category`.`description` AS category_description
-                FROM `offer`
-                    INNER JOIN `client` ON `offer`.client_id = `client`.id
-                    INNER JOIN `offer_service` ON `offer_service`.offer_id = `offer`.id
-                    INNER JOIN `service` ON `offer_service`.service_id = `service`.id
-                    INNER JOIN `category` ON `service`.category_id = `category`.id
-                    WHERE';
-        // $sql = "SELECT * FROM {$this->table} WHERE";
+        $sql = "SELECT * FROM {$this->table} WHERE";
         $this->setSqlParams(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
 
         $numItems = count($this->sql_params);
@@ -197,7 +161,62 @@ class OfferFacade
             $sql .= " {$this->limit_sql}";
         }
 
-        return $this->db->query($sql);
+        $offers = $this->db->query($sql)->fetchAll();
+
+        // getting images and services with category
+        if (!empty($offers)) {
+            $offers_ids = array_column($offers, 'id');
+            $sql_images = 'SELECT * FROM `offer_image_thumb` WHERE';
+            $offer_images = $this->db->query($sql_images, ['id' => $offers_ids])->fetchAll();
+
+            $sql_services = 'SELECT 
+            `offer_service`.`offer_id`,
+            `service`.`id`,
+            `service`.`image`,
+            `service`.`name`,
+            `service`.`description`,
+            `category`.`id` AS category_id,
+            `category`.`image` AS category_image,
+            `category`.`name` AS category_name,
+            `category`.`description` AS category_description
+            FROM `offer_service` 
+                INNER JOIN `service` ON `offer_service`.`service_id` = `service`.`id`
+                INNER JOIN `category` ON `service`.`category_id` = `category`.`id`  WHERE';
+            $offer_services = $this->db->query($sql_services, ['offer_service.offer_id' => $offers_ids])->fetchAll();
+
+            $res_array = [];
+            foreach ($offers as $k => $offer) {
+                $res_array[$k] = [];
+                foreach ($offer as $m => $valu) {
+                    $res_array[$k] += [$m => $valu];
+                }
+
+                if (!empty($offer_services)) {
+                    $res_array[$k] += ['services' => []];
+                    foreach ($offer_services as $r => $serv) {
+                        if ($res_array[$k]['id'] == $serv->offer_id) {
+                            $res_array[$k]['services'][$r] = [];
+                            foreach ($serv as $n => $val) {
+                                $res_array[$k]['services'][$r] += [$n => $val];
+                            }
+                        }
+                    }
+                }
+                if (!empty($offer_images)) {
+                    $res_array[$k] += ['thumbnails' => []];
+                    foreach ($offer_images as $j => $img) {
+                        if ($res_array[$k]['id'] == $img->offer_id) {
+                            $res_array[$k]['thumbnails'][$j] = [];
+                            foreach ($serv as $c => $va) {
+                                $res_array[$k]['thumbnails'][$j] += [$c => $va];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return !empty($res_array) ? $res_array : [];
     }
 
     public function add()

@@ -2,17 +2,24 @@
     {foreach $offers as $offer}
     <div>
         <article class="card">
-            <p> ID: {$offer->id}</p>
-            <p> Client: {$offer->client_id}</p>
-            <p n:if="$user->isLoggedIn()"> Client Phone: {$offer->client_name}</p>
-            <p> Type: {$offer->offers_type}</p>
-            <p> Service: {$offer->service_name} {$offer->category_name} </p>
-            <p> City: {$offer->city_name}</p>
-            <p> Region: {$offer->region_name}</p>
-            <p> Price: {$offer->price}</p>
-            <p> Message: {$offer->message}</p>
-            <p> Updated_at: {$offer->updated_at}</p>
-            <p> End_time: {$offer->end_time}</p>
+            <p> ID: {$offer['id']}</p>
+            <p n:if="!empty($offer['thumbnails'])"> Image: {$offer['thumbnails']['thumb']}</p>
+            <p n:if="!empty($offer['thumbnails'])"> Image caption: {$offer['thumbnails']['caption']}</p>
+            <p> Client: {$offer['client_id']}</p>
+            <p n:if="$user->isLoggedIn()"> Client Phone: {$offer['client_name']}</p>
+            <p> Type: {$offer['offers_type']}</p>
+            <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                <span>Service: </span><br>
+                {foreach $offer['services'] as $service}
+                <span>{$service['name']} {$service['category_name']}</span><br>
+                {/foreach}
+            </p>
+            <p> City: {$offer['city_name']}</p>
+            <p> Region: {$offer['region_name']}</p>
+            <p> Price: {$offer['price']}</p>
+            <p> Message: {$offer['message']}</p>
+            <p> Updated_at: {$offer['updated_at']}</p>
+            <p> End_time: {$offer['end_time']}</p>
         </article>
     </div>
     {/foreach}

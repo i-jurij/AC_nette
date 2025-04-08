@@ -1,6 +1,9 @@
     &#9776; menu icon trigram
         
 MAKE    
+
+table for thumnails of offer and create dir for image of offer "www/images/offers/offer_id_Num"
+
 menu for registerd client:
 profile for client (edit, delete)
 offer add, edit, delete for client

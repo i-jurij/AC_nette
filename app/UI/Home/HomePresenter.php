@@ -42,7 +42,7 @@ final class HomePresenter extends BasePresenter
     {
         $this->setPaginator(1);
 
-        $offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
+        $offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data);
         $latte = $this->template->getLatte();
         $params = [
             'offers' => $offers,
@@ -61,12 +61,13 @@ final class HomePresenter extends BasePresenter
         $this->template->form_data = $this->form_data;
         $this->template->service_list = $this->services->getAllServices();
 
+        $price = $this->offers->priceMinMax();
         $this->template->price = [
-            'price_min' => $this->offers->priceMinMax()->price_min,
-            'price_max' => $this->offers->priceMinMax()->price_max,
+            'price_min' => $price->price_min,
+            'price_max' => $price->price_max,
         ];
 
-        $this->template->offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data)->fetchAll();
+        $this->template->offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data);
     }
 
     protected function setPaginator(int $page)
