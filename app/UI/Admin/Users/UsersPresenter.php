@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace App\UI\Admin\Users;
 
@@ -21,7 +21,8 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
 
     public function __construct(
         protected UserFacade $userfacade,
-        private FormFactory $formFactory) {
+        private FormFactory $formFactory)
+    {
         parent::__construct();
     }
 
@@ -31,16 +32,16 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
 
     public function renderList(int $page = 1): void
     {
-        if (! $this->getUser()->isAllowed('User', 'getAllUsersData')) {
+        if (!$this->getUser()->isAllowed('User', 'getAllUsersData')) {
             $this->error('Forbidden', 403);
         }
-        $users_data            = $this->userfacade->getAllUsersData();
+        $users_data = $this->userfacade->getAllUsersData();
         $this->template->count = count($users_data);
 
-        $lastPage                   = 0;
+        $lastPage = 0;
         $this->template->users_data = $users_data->page($page, 8, $lastPage);
-        $this->template->page       = $page;
-        $this->template->lastPage   = $lastPage;
+        $this->template->page = $page;
+        $this->template->lastPage = $lastPage;
 
         foreach ($users_data as $user) {
             // $roles[$user->id] = $this->roleWithUserId($this->userfacade->db, $user->id);
@@ -51,8 +52,8 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
 
     public function renderProfile(): void
     {
-        $identity                           = $this->getUser()->getIdentity();
-        $this->template->user_data          = $identity->getData();
+        $identity = $this->getUser()->getIdentity();
+        $this->template->user_data = $identity->getData();
         $this->template->user_data['roles'] = $identity->getRoles();
     }
 
@@ -60,12 +61,12 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     {
         $form = new Form();
         $form->addProtection();
-        $renderer                                    = $form->getRenderer();
-        $renderer->wrappers['group']['container']    = 'div class="my1 mx-auto pb2 px2"';
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
         $renderer->wrappers['controls']['container'] = 'div';
-        $renderer->wrappers['pair']['container']     = 'div';
-        $renderer->wrappers['label']['container']    = null;
-        $renderer->wrappers['control']['container']  = null;
+        $renderer->wrappers['pair']['container'] = 'div';
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
 
         $form->setHtmlAttribute('id', 'userUpdateForm')
             ->setHtmlAttribute('class', 'form');
@@ -121,7 +122,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     public function renderEdit(int $id): void
     {
         if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('User', 'update')) {
-            $this->template->user_data  = $this->userfacade->getUserData($id);
+            $this->template->user_data = $this->userfacade->getUserData($id);
             $this->template->user_roles = $this->userfacade->roleWithUserId($id);
         } else {
             $this->flashMessage('You don\'t have permission for this', 'text-warning');
@@ -129,7 +130,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
         }
     }
 
-    #[Requires(methods: 'POST')]
+    #[Requires(methods: 'POST', sameOrigin: true)]
     public function update(Form $form, $data): void
     {
         if (($this->getUser()->getId() == $data->id) || $this->getUser()->isAllowed('User', 'update')) {
@@ -138,23 +139,23 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                 $id = $data->id;
                 unset($data->id);
                 $update = array_filter((array) $data);
-                if (! empty($update)) {
+                if (!empty($update)) {
                     if ($this->getUser()->isInRole('admin') || $this->getUser()->getIdentity()->getId() == $id) {
                         $this->userfacade->update($id, $update);
-                        $this->flashMessage(\json_encode($update) . ' User updated', 'text-success');
+                        $this->flashMessage(\json_encode($update).' User updated', 'text-success');
                     } else {
-                        $this->flashMessage($this->getUser()->getIdentity()->getId() . '/' . $id . '/' . \json_encode($update) . 'You not permissions for user data updating');
+                        $this->flashMessage($this->getUser()->getIdentity()->getId().'/'.$id.'/'.\json_encode($update).'You not permissions for user data updating');
                     }
                 } else {
                     $this->flashMessage('Nothing was updated', 'text-success');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage('Caught Exception!' . PHP_EOL
-                    . 'Error message: ' . $e->getMessage() . PHP_EOL
-                    . 'File: ' . $e->getFile() . PHP_EOL
-                    . 'Line: ' . $e->getLine() . PHP_EOL
-                    . 'Error code: ' . $e->getCode() . PHP_EOL
-                    . 'Trace: ' . $e->getTraceAsString() . PHP_EOL, 'text-danger');
+                $this->flashMessage('Caught Exception!'.PHP_EOL
+                    .'Error message: '.$e->getMessage().PHP_EOL
+                    .'File: '.$e->getFile().PHP_EOL
+                    .'Line: '.$e->getLine().PHP_EOL
+                    .'Error code: '.$e->getCode().PHP_EOL
+                    .'Trace: '.$e->getTraceAsString().PHP_EOL, 'text-danger');
             }
         } else {
             $this->error('Forbidden', 403);
@@ -163,9 +164,10 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
         $this->redirect(':Admin:');
     }
 
+    #[Requires(sameOrigin: true)]
     public function actionDelete(int $id): void
     {
-        if (! $this->getUser()->isAllowed('User', ' deleteUserData')) {
+        if (!$this->getUser()->isAllowed('User', ' deleteUserData')) {
             $this->error('Forbidden', 403);
         }
         try {
@@ -216,17 +218,17 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
         return $form;
     }
 
-    #[Requires(methods: 'POST')]
+    #[Requires(methods: 'POST', sameOrigin: true)]
     public function useradd(Form $form, $data): void
     {
-        if (! $this->getUser()->isAllowed('User', ' add')) {
+        if (!$this->getUser()->isAllowed('User', ' add')) {
             $this->error('Forbidden', 403);
         }
         try {
             $new_user = $this->userfacade->add($data);
             $this->flashMessage('You have successfully user add.', 'text-success');
         } catch (\Exception $e) {
-            $this->flashMessage("Such a name, email or number is already in the database.\nError: " . $e->getMessage(), 'text-danger');
+            $this->flashMessage("Such a name, email or number is already in the database.\nError: ".$e->getMessage(), 'text-danger');
         }
 
         $this->redirect(':Admin:');
@@ -262,35 +264,35 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function verifyapplicationforregistration(Form $form, $data): void
     {
-        if (! $this->getUser()->isAllowed('User', ' add')) {
+        if (!$this->getUser()->isAllowed('User', ' add')) {
             $this->error('Forbidden', 403);
         }
         try {
             $this->absoluteUrls = true;
-            $token              = $data->auth_token;
-            $url                = $this->link(':Admin:Sign:verifyEmail', [
-                'token'           => $token,
+            $token = $data->auth_token;
+            $url = $this->link(':Admin:Sign:verifyEmail', [
+                'token' => $token,
                 Csrf::$token_name => Csrf::getToken(),
             ]);
 
-            if (! empty($data->roles)) {
+            if (!empty($data->roles)) {
                 // send email for verification (url with auth_token)
-                $mail          = new Email();
-                $mail->from    = 'admin@' . SITE_NAME;
-                $mail->to      = $data->email;
-                $mail->subject = 'Register on ' . SITE_NAME;
-                $mail->body    = (string) $url;
+                $mail = new Email();
+                $mail->from = 'admin@'.SITE_NAME;
+                $mail->to = $data->email;
+                $mail->subject = 'Register on '.SITE_NAME;
+                $mail->body = (string) $url;
                 $mail->sendEmail();
                 $message = 'Email for verify received.';
                 // save serialized roles to table userappliedforregistration
 
                 $roles = serialize($data->roles);
-                $upd   = $this->userfacade->db
+                $upd = $this->userfacade->db
                     ->table('userappliedforregistration')
                     ->where('auth_token', $token)
                     ->update([
                         'roles' => $roles,
-                        'csrf'  => Csrf::getToken(),
+                        'csrf' => Csrf::getToken(),
                     ]);
                 if ($upd > 0) {
                     $this->flashMessage("$message Roles of user saved.", 'text-success');
@@ -301,7 +303,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                 $this->flashMessage('Assign a user a role', 'text-warning');
             }
         } catch (\Exception $e) {
-            $this->flashMessage('Error: ' . $e->getMessage(), 'text-danger');
+            $this->flashMessage('Error: '.$e->getMessage(), 'text-danger');
         }
         $this->redirect(':Admin:Users:applicationsforregistration');
     }
@@ -339,13 +341,13 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
     #[Requires(methods: 'POST')]
     public function postSearch(?Form $form = null): void
     {
-        if (! $this->getUser()->isAllowed('User', 'search')) {
+        if (!$this->getUser()->isAllowed('User', 'search')) {
             $this->error('Forbidden', 403);
         }
 
         $httpRequest = $this->getHttpRequest();
 
-        if ($httpRequest->isMethod('POST') && ! empty($form)) {
+        if ($httpRequest->isMethod('POST') && !empty($form)) {
             try {
                 $this->template->show = $this->userfacade->search($form->getValues());
                 if (empty($this->template->show)) {
@@ -353,7 +355,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                     $this->redirect('this');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage("\n" . $e->getMessage(), 'text-danger');
+                $this->flashMessage("\n".$e->getMessage(), 'text-danger');
                 $this->redirect('this');
             }
         }

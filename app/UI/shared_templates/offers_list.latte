@@ -2,8 +2,13 @@
     {foreach $offers as $offer}
     <div>
         <article class="card">
+            {if !empty($offer['thumbnails'])}
+            <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" width="50px"
+                height="50px" />
+            {else}
+            <img src='{$baseUrl}/images/ddd.jpg' />
+            {/if}
             <p> ID: {$offer['id']}</p>
-            <p n:if="!empty($offer['thumbnails'])"> Image: {$offer['thumbnails']['thumb']}</p>
             <p n:if="!empty($offer['thumbnails'])"> Image caption: {$offer['thumbnails']['caption']}</p>
             <p> Client: {$offer['client_id']}</p>
             <p n:if="$user->isLoggedIn()"> Client Phone: {$offer['client_name']}</p>

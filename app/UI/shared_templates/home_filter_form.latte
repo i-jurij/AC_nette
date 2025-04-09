@@ -160,7 +160,8 @@
     <label for="filter_form_wrapper_div-input" id="menu-filter-btn-2" class="clearfix menu-filter-btn">
         <span class="right pb1" style='font-size:2rem;'>&#10006;</span>
     </label>
-    <form name="offers_form" id="offers_form" action="{link filterphp!}" method="post" class="filter_form_mobile">
+    <form name="offersfilterform" id="offersfilterform" action="{link filterphp!}" method="post">
+        <input type="hidden" name="{$csrf_name}" required value="{$csrf}" />
         <div class="form_radio_group filter_form_mobile">
             <div class="form_radio_group clearfix" aria-labelledby="filter_form_type_p">
                 <p class="my0" id="filter_form_type_p">Тип:</p>
@@ -310,7 +311,7 @@
         </div>
 
         <div class="form_radio_group">
-            <input type="submit" class="" value="Применить">
+            <input type="submit" name="apply" class="" value="Применить">
         </div>
     </form>
 </div>

@@ -7,6 +7,7 @@ namespace App\UI\Home;
 // use App\Model\PageFacade;
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
+use Ijurij\Geolocation\Lib\Csrf;
 use Ijurij\Geolocation\Lib\Session;
 use Nette\Database\Explorer;
 use Nette\Utils\Paginator;
@@ -68,6 +69,8 @@ final class HomePresenter extends BasePresenter
         ];
 
         $this->template->offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data);
+        $this->template->csrf_name = Csrf::$token_name;
+        $this->template->csrf = Csrf::getToken();
     }
 
     protected function setPaginator(int $page)
@@ -84,10 +87,14 @@ final class HomePresenter extends BasePresenter
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function handleFilterphp(): void
     {
-        $httpRequest = $this->getHttpRequest();
-        Session::set('form_data', \serialize($httpRequest->getPost()));
+        if (Csrf::isValid() && Csrf::isRecent()) {
+            $httpRequest = $this->getHttpRequest();
+            Session::set('form_data', \serialize($httpRequest->getPost()));
 
-        $this->redirect('this');
+            $this->redirect('this');
+        } else {
+            $this->error();
+        }
     }
 }
 class HomeTemplate extends BaseTemplate
@@ -97,4 +104,6 @@ class HomeTemplate extends BaseTemplate
     public Paginator $paginator;
     public array $service_list;
     public array $price;
+    public string $csrf_name;
+    public string $csrf;
 }
