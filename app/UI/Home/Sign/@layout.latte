@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="description" content="{default $description='Description'}{$description}">
-  	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
+	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
 	<meta name="Robots" content="{default $robots = 'NOINDEX, NOFOLLOW'}{$robots}">
-  	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
+	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="author" content="I-Jurij">
-	 <title>{default $title = "Title"}{$title}</title> 
+	<title>{default $title = "Title"}{$title}</title>
 	<!-- Google Fonts 
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 	-->
@@ -19,26 +20,25 @@
 </head>
 
 <body class="md-flex items-center">
-	
+
 	<div class="flex-auto md-flex">
 		{include flash_for_home from $shared_templates.'flash_for_home.latte'}
-		{include content}	
+		{include content}
 	</div>
 
 	{block scripts}
-		<script src="{webpack js/netteForms.js}"></script>
-		<script defer src="{webpack js/main.js}"></script>
-		<script defer src="{webpack js/maskito.js}"></script>
-		<script>
-			document.addEventListener('DOMContentLoaded', function() {  	
-				/*			
+	<script src="{webpack js/netteForms.js}"></script>
+	<script defer src="{webpack js/main.js}"></script>
+	<script defer src="{webpack js/maskito.js}"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {  
 				let captcha = document.querySelector('input[name="captcha[question]"]');     
 				if (captcha){
 					captcha.placeholder = 'Введите ответ здесь:';
 				}
-				*/
 			});
-		</script>
+	</script>
 	{/block}
 </body>
+
 </html>

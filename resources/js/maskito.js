@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         element.addEventListener('change', function () {
             let phone_value = element.value;
             if (phone_value) {
-                console.log(isValidPhoneNumber(phone_value, country))
+                //console.log(isValidPhoneNumber(phone_value, country))
                 if (isValidPhoneNumber(phone_value, country) != true) {
                     let et = '<small>Ошибка в номере телефона</small>';
                     window.Main.jsModaFlash(et, window.Main.elements);
@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         */
     } else {
-        console.warn('user_phone_input not exist on page')
-    }
+    console.warn('user_phone_input not exist on page')
+}
 });
 
 // Call this function when the element is detached from DOM

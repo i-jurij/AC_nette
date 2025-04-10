@@ -1,17 +1,15 @@
 <div class="flexx one two-600 three-1000 four-1400 five-2000 center ">
     {foreach $offers as $offer}
     <div>
-        <article class="card">
+        <article class="card rounded">
             {if !empty($offer['thumbnails'])}
-            <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" width="50px"
-                height="50px" />
+            <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" />
+            {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
             {else}
             <img src='{$baseUrl}/images/ddd.jpg' />
             {/if}
-            <p> ID: {$offer['id']}</p>
-            <p n:if="!empty($offer['thumbnails'])"> Image caption: {$offer['thumbnails']['caption']}</p>
-            <p> Client: {$offer['client_id']}</p>
-            <p n:if="$user->isLoggedIn()"> Client Phone: {$offer['client_name']}</p>
+            <p n:if="$user->isLoggedIn()"> Client Phone: {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}
+            </p>
             <p> Type: {$offer['offers_type']}</p>
             <p n:if="!empty($offer['services']) && is_array($offer['services'])">
                 <span>Service: </span><br>
@@ -25,6 +23,7 @@
             <p> Message: {$offer['message']}</p>
             <p> Updated_at: {$offer['updated_at']}</p>
             <p> End_time: {$offer['end_time']}</p>
+            <input type="hidden" name="offer_id" value="{$offer['id']}">
         </article>
     </div>
     {/foreach}

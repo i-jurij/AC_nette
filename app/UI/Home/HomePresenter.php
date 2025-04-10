@@ -48,6 +48,7 @@ final class HomePresenter extends BasePresenter
         $params = [
             'offers' => $offers,
             'paginator' => $this->template->paginator,
+            'user' => $this->user,
         ];
         $template = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR.'offers_list.latte';
         $output = $latte->renderToString($template, $params);

@@ -50,9 +50,9 @@ class OfferFacade
             }
             if (!empty($res1)) {
                 $res = '('.\implode(',', \array_values(\array_unique($res1, SORT_REGULAR))).')';
-                $this->sql_params[] = "`id` IN {$res}";
+                $this->sql_params[] = "`{$this->table}`.`id` IN {$res}";
             } else {
-                $this->sql_params[] = '`id` = -1';
+                $this->sql_params[] = "`{$this->table}`.`id` = -1";
             }
         }
 
@@ -141,7 +141,32 @@ class OfferFacade
 
     public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): array
     {
-        $sql = "SELECT * FROM {$this->table} WHERE";
+        // $sql = "SELECT * FROM {$this->table} WHERE";
+        $sql = "SELECT 
+                `{$this->table}`.`id`,
+                `{$this->table}`.`offers_type`,
+                `{$this->table}`.`city_id` ,
+                `{$this->table}`.`city_name`,
+                `{$this->table}`.`region_id`,
+                `{$this->table}`.`region_name`,
+                `{$this->table}`.`district_id`,
+                `{$this->table}`.`district_name`,
+                `{$this->table}`.`price`,
+                `{$this->table}`.`message`,
+                `{$this->table}`.`created_at`,
+                `{$this->table}`.`updated_at`,
+                `{$this->table}`.`end_time`,
+                `client`.`id` AS client_id,
+                `client`.`username` AS client_name,
+                `client`.`image`  AS client_image,
+                `client`.`phone`  AS client_phone,
+                `client`.`phone_verified`  AS client_phone_verified,
+                `client`.`email` AS client_email,
+                `client`.`email_verified` AS client_email_verified,
+                `client`.`rating` AS client_rating
+                FROM {$this->table} 
+                INNER JOIN `client` ON {$this->table}.client_id = `client`.id
+                WHERE";
         $this->setSqlParams(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
 
         $numItems = count($this->sql_params);
@@ -167,7 +192,7 @@ class OfferFacade
         if (!empty($offers)) {
             $offers_ids = array_column($offers, 'id');
             $sql_images = 'SELECT * FROM `offer_image_thumb` WHERE';
-            $offer_images = $this->db->query($sql_images, ['id' => $offers_ids])->fetchAll();
+            $offer_images = $this->db->query($sql_images, ['offer_id' => $offers_ids])->fetchAll();
 
             $sql_services = 'SELECT 
             `offer_service`.`offer_id`,
@@ -206,10 +231,7 @@ class OfferFacade
                     $res_array[$k] += ['thumbnails' => []];
                     foreach ($offer_images as $j => $img) {
                         if ($res_array[$k]['id'] == $img->offer_id) {
-                            $res_array[$k]['thumbnails'][$j] = [];
-                            foreach ($serv as $c => $va) {
-                                $res_array[$k]['thumbnails'][$j] += [$c => $va];
-                            }
+                            $res_array[$k]['thumbnails'] = $img;
                         }
                     }
                 }
