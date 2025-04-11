@@ -1,8 +1,7 @@
 <div class="flexx one two-600 three-1000 four-1400 five-2000 center ">
     {foreach $offers as $offer}
-    <div>
+    <a n:href=":Home:offer $offer['id']" class="">
         <article class="card rounded">
-            <a n:href=":Home:offer_by_id, $offer['id']"></a>
             {if !empty($offer['thumbnails'])}
             <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" />
             {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
@@ -40,7 +39,7 @@
                 <input type="hidden" name="offer_id" value="{$offer['id']}">
             </footer>
         </article>
-    </div>
+    </a>
     {/foreach}
 </div>
 

@@ -1,1 +1,10 @@
-offer
+{*layout '../@layout.latte'*}
+
+{var $title = "AC"}
+{var $description = "AC"}
+{var $keywords = "Keywords of main page"}
+{var $robots = "INDEX,FOLLOW"}
+
+{block content}
+{php var_dump(['
+<pre>', $offers, '</pre>'])}

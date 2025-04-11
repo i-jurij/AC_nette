@@ -31,6 +31,7 @@ final class HomePresenter extends BasePresenter
         $this->form_data->offertype = 'all';
         $this->form_data->order_by = 'end_time';
         $this->form_data->order_type = 'DESC';
+        $this->form_data->moderated = 1;
         if (Session::has('form_data')) {
             $newFD = \unserialize(Session::get('form_data'));
             foreach ($newFD as $key => $value) {
@@ -98,8 +99,12 @@ final class HomePresenter extends BasePresenter
         }
     }
 
-    public function rendeOffer_by_id()
+    public function renderOffer(?int $id = null)
     {
+        $form_data = new \stdClass();
+        $form_data->id = $id;
+
+        $this->template->offers = $this->offers->getOffers(form_data: $form_data);
     }
 }
 class HomeTemplate extends BaseTemplate

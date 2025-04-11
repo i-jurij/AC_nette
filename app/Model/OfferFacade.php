@@ -35,6 +35,15 @@ class OfferFacade
 
     private function setSqlParams(array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
     {
+        // offer id from request "Home:offer $offer_id" for page of offer by user case
+        if (!empty($form_data->id) && is_int($form_data->id)) {
+            $this->sql_params = ["`{$this->table}`.`id` = $form_data->id"];
+            $this->order_sql = '';
+
+            return;
+        }
+
+        // service
         if (!empty($form_data->service)) {
             $ids = \unserialize($form_data->service, ['allowed_classes' => false]);
             $offer_ids = [];
@@ -105,6 +114,10 @@ class OfferFacade
 
         if (!empty($form_data->price_max) && ctype_digit(strval($form_data->price_max))) {
             $this->sql_params[] = "price <= {$form_data->price_max}";
+        }
+
+        if (!empty($form_data->moderated) && ($form_data->moderated === 0 || $form_data->moderated === 1)) {
+            $this->sql_params[] = "moderated = {$form_data->moderated}";
         }
 
         if (!empty($limit) && !empty($offset)) {

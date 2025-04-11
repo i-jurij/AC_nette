@@ -84,6 +84,7 @@ class OfferFact
                 'city_name' => $this->locations[$loc_row]->name,
                 'region_id' => $this->locations[$loc_row]->region_id,
                 'price' => $price,
+                'moderated' => 1,
             ];
         }
 
