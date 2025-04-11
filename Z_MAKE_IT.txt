@@ -1,7 +1,6 @@
     &#9776; menu icon trigram
         
 MAKE    
-
 menu for registerd client:
 profile for client (edit, delete)
 offer add, edit, delete for client

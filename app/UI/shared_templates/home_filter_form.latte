@@ -28,6 +28,11 @@
         margin: 0 1rem 0 0;
     }
 
+    #filter_form_wrapper_div input[type="submit"] {
+        font-size: var(--middle-fontsize);
+        margin: 0 0 1rem 1rem;
+    }
+
     input[type="range"] {
         accent-color: var(--bgcolor);
         width: 8rem;
@@ -36,6 +41,18 @@
     @media screen and (max-width: 1024px) {
         .menu-filter-btn {
             display: block;
+        }
+
+        .filter_form_mobile {
+            width: 100%;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        #filter_form_wrapper_div input[type="submit"] {
+            margin: 1rem 0;
         }
 
         #filter_form_wrapper_div {
@@ -54,7 +71,9 @@
             padding-left: 0;
             list-style-type: none;
         }
+    }
 
+    @media screen and (max-width: 640px) {
         .filter_form_mobile>* {
             display: block;
         }
@@ -62,21 +81,13 @@
         .filter_form_mobile>*:not(:first-child) {
             margin: 1rem 0 0 0;
         }
-
-        .filter_form_mobile:last-child {
-            margin: 0 0 1rem 0;
-        }
-
-        input[type="range"] {
-            width: 100%;
-        }
     }
 </style>
 
 {var $servicetype = (!empty($form_data->offertype))
 ? ($form_data->offertype == 'work'
-? 'Заказы'
-: (($form_data->offertype === 'service') ? 'Услуги' : 'Все услуги' ))
+? 'Заказы | '
+: (($form_data->offertype === 'service') ? 'Услуги | ' : '' ))
 : ''}
 {var $order_by = (!empty($form_data->order_by))
 ? ($form_data->order_by == 'end_time'
@@ -90,25 +101,25 @@
 : ''}
 
 {var $serv = (isset($form_data->service)) ? \unserialize($form_data->service) : ''}
-{var $category_name = 'Все'}
+{var $category_name = ''}
 {foreach $service_list as $cat}
 {if is_array($serv) && empty(array_diff(array_column($cat['services'],
 'id'),$serv))}
-{var $category_name = 'Все из '. $cat['category_name']}
+{var $category_name = 'Все из '. $cat['category_name'].': '}
 {/if}
 {if !is_array($serv) && ctype_digit(strval($serv)) && \in_array($serv, array_column($cat['services'],
 'id'), true)}
-{var $category_name = $cat['category_name']}
+{var $category_name = \Nette\Utils\Strings::firstUpper($cat['category_name'].': ')}
 {/if}
 {/foreach}
 
-{var $service_name = 'Все'}
+{var $service_name = ''}
 {if is_array($serv)}
 {foreach $serv as $sid}
 {foreach $service_list as $cat}
 {foreach $cat['services'] as $service}
 {if $service['id'] === $sid}
-{var $service_name_ar[] = $service['name']}
+{var $service_name_ar[] = \Nette\Utils\Strings::firstLower($service['name'])}
 {/if}
 {/foreach}
 {/foreach}
@@ -117,7 +128,7 @@
 {foreach $service_list as $cat}
 {foreach $cat['services'] as $service}
 {if $service['id'] === $serv}
-{var $service_name = $service['name']}
+{var $service_name = \Nette\Utils\Strings::firstLower($service['name']).' | '}
 {/if}
 {/foreach}
 {/foreach}
@@ -142,23 +153,25 @@
 
     <span class="">
         <span class="">{$servicetype}</span>
-        | <span>{$order_by}&nbsp;{$order_type|noescape}</span>
-        | <span>Раздел:&nbsp;{$category_name}</span>
-        | <span>
+        <span>{$order_by}&nbsp;{$order_type|noescape} |</span>
+        <span>{$category_name}</span>
+        <span>
             {if !empty($service_name_ar) && is_array($service_name_ar)}
             {var $ss = \implode(', ', $service_name_ar)}
-            Услуга:&nbsp;{$ss}
+            {$ss.' | '}
             {else}
-            Услуга:&nbsp;{$service_name}
+            {$service_name}
             {/if}
         </span>
-        | <span>Цена&nbsp;от&nbsp;{$price_min}&nbsp;до&nbsp;{$price_max}</span>
+        <span n:if="!empty($form_data->price_min) || !empty($form_data->price_max)">
+            Цена&nbsp;от&nbsp;{$price_min}&nbsp;до&nbsp;{$price_max}
+        </span>
     </span>
 </label>
 
 <div class="card px2 pt1" id="filter_form_wrapper_div">
     <label for="filter_form_wrapper_div-input" id="menu-filter-btn-2" class="clearfix menu-filter-btn">
-        <span class="right pb1" style='font-size:2rem;'>&#10006;</span>
+        <span class="right" style='font-size:2rem;'>&#10006;</span>
     </label>
     <form name="offersfilterform" id="offersfilterform" action="{link filterphp!}" method="post">
         <input type="hidden" name="{$csrf_name}" required value="{$csrf}" />
@@ -309,7 +322,6 @@
                 </div>
             </div>
         </div>
-
         <div class="form_radio_group">
             <input type="submit" name="apply" class="" value="Применить">
         </div>

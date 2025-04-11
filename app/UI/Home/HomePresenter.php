@@ -97,6 +97,10 @@ final class HomePresenter extends BasePresenter
             $this->error();
         }
     }
+
+    public function rendeOffer_by_id()
+    {
+    }
 }
 class HomeTemplate extends BaseTemplate
 {

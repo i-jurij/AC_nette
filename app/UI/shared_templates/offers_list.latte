@@ -2,28 +2,43 @@
     {foreach $offers as $offer}
     <div>
         <article class="card rounded">
+            <a n:href=":Home:offer_by_id, $offer['id']"></a>
             {if !empty($offer['thumbnails'])}
             <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" />
             {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
             {else}
             <img src='{$baseUrl}/images/ddd.jpg' />
             {/if}
-            <p n:if="$user->isLoggedIn()"> Client Phone: {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}
-            </p>
-            <p> Type: {$offer['offers_type']}</p>
-            <p n:if="!empty($offer['services']) && is_array($offer['services'])">
-                <span>Service: </span><br>
-                {foreach $offer['services'] as $service}
-                <span>{$service['name']} {$service['category_name']}</span><br>
-                {/foreach}
-            </p>
-            <p> City: {$offer['city_name']}</p>
-            <p> Region: {$offer['region_name']}</p>
-            <p> Price: {$offer['price']}</p>
-            <p> Message: {$offer['message']}</p>
-            <p> Updated_at: {$offer['updated_at']}</p>
-            <p> End_time: {$offer['end_time']}</p>
-            <input type="hidden" name="offer_id" value="{$offer['id']}">
+
+            {* <p n:if="$user->isLoggedIn()"> Client Phone:
+                {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}</p> *}
+            <footer>
+                <p class="">
+                    {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                    Ищу работу:
+                    {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                    Предлагаю работу:
+                    {/if}
+                </p>
+                <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                    {foreach $offer['services'] as $ca}
+                    <span>{$ca['category_name']}: </span>
+                    {foreach $ca['services'] as $se}
+                    <span>
+                        {$se['name']}{if !$iterator->last}, {/if}
+                    </span>
+                    {/foreach}
+                    {if !$iterator->last}; {/if}
+                    {/foreach}
+                </p>
+                <p> ⚲ {$offer['city_name']}</p>
+                {* <p> Region: {$offer['region_name']}</p> *}
+                <p>{$offer['price']}</p>
+                {* <p> Message: {$offer['message']}</p> *}
+                {* <p> Updated_at: {$offer['updated_at']}</p> *}
+                {* <p> End_time: {$offer['end_time']}</p> *}
+                <input type="hidden" name="offer_id" value="{$offer['id']}">
+            </footer>
         </article>
     </div>
     {/foreach}

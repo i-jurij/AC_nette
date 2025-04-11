@@ -142,6 +142,7 @@ class OfferFacade
     public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): array
     {
         // $sql = "SELECT * FROM {$this->table} WHERE";
+        // FORMAT(`{$this->table}`.`price`, 0, 'ru_RU') AS 'price',
         $sql = "SELECT 
                 `{$this->table}`.`id`,
                 `{$this->table}`.`offers_type`,
@@ -207,23 +208,38 @@ class OfferFacade
             FROM `offer_service` 
                 INNER JOIN `service` ON `offer_service`.`service_id` = `service`.`id`
                 INNER JOIN `category` ON `service`.`category_id` = `category`.`id`  WHERE';
-            $offer_services = $this->db->query($sql_services, ['offer_service.offer_id' => $offers_ids])->fetchAll();
+            $offer_services = $this->db->query($sql_services, ['offer_service.offer_id' => $offers_ids]);
 
+            $categories = [];
+            foreach ($offer_services as $vos) {
+                $categories[$vos->offer_id][$vos->category_id] = [
+                    'category_id' => $vos->category_id,
+                    'category_image' => $vos->category_image,
+                    'category_name' => $vos->category_name,
+                    'category_description' => $vos->category_description,
+                ];
+                $categories[$vos->offer_id][$vos->category_id]['services'][$vos->id] = [
+                    'id' => $vos->id,
+                    'image' => $vos->image,
+                    'name' => $vos->name,
+                    'description' => $vos->description,
+                ];
+            }
+            $fmt = new \NumberFormatter('ru_RU', \NumberFormatter::CURRENCY);
+            $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
             $res_array = [];
             foreach ($offers as $k => $offer) {
                 $res_array[$k] = [];
+                $offer->price = $fmt->formatCurrency((float) $offer->price, 'RUR');
                 foreach ($offer as $m => $valu) {
                     $res_array[$k] += [$m => $valu];
                 }
 
-                if (!empty($offer_services)) {
+                if (!empty($categories)) {
                     $res_array[$k] += ['services' => []];
-                    foreach ($offer_services as $r => $serv) {
-                        if ($res_array[$k]['id'] == $serv->offer_id) {
-                            $res_array[$k]['services'][$r] = [];
-                            foreach ($serv as $n => $val) {
-                                $res_array[$k]['services'][$r] += [$n => $val];
-                            }
+                    foreach ($categories as $offer_id => $cat) {
+                        if ($res_array[$k]['id'] == $offer_id) {
+                            $res_array[$k]['services'] = $cat;
                         }
                     }
                 }
