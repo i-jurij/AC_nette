@@ -6,3 +6,4 @@ database:
 		autowired: true
 		options:
 			lazy: yes
+			charset: utf8mb4

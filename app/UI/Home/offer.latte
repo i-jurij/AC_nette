@@ -144,7 +144,7 @@
 
 {var $offer = $offers[0]}
 
-<article class="bgcontent p1 rounded">
+<article class="bgcontent px2 pb1 rounded">
     <header class="">
         <h3 class="">
             {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
@@ -153,20 +153,6 @@
             Предлагаю работу
             {/if}
         </h3>
-        <p n:if="!empty($offer['services']) && is_array($offer['services'])">
-            {foreach $offer['services'] as $ca}
-            {if $iterator->first}
-            {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
-            {else}
-            {$ca['category_name']}:
-            {/if}
-            {foreach $ca['services'] as $se}
-            {$se['name']}
-            {if !$iterator->last}, {/if}
-            {/foreach}
-            {if !$iterator->last}и {/if}
-            {/foreach}
-        </p>
     </header>
 
     <main class="flexx one two-600">
@@ -201,11 +187,25 @@
                 </div>
             </div>
             {else}
-            <img src='{$baseUrl}/images/ddd.jpg' width=" 40%" height="auto" />
+            <img src='{$baseUrl}/images/ddd.jpg' width=" 80%" height="auto" />
             {/if}
         </div>
 
         <div>
+            <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                {foreach $offer['services'] as $ca}
+                {if $iterator->first}
+                {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                {else}
+                {$ca['category_name']}:
+                {/if}
+                {foreach $ca['services'] as $se}
+                {$se['name']}
+                {if !$iterator->last}, {/if}
+                {/foreach}
+                {if !$iterator->last}и {/if}
+                {/foreach}
+            </p>
             <p>{$offer['price']}</p>
             <p class="">
                 <button>Показать телефон</button>
@@ -248,24 +248,30 @@
     }
 
     function showSlides(n) {
-        var i;
-        var slides = document.getElementsByClassName("mySlides");
-        var dots = document.getElementsByClassName("thumbnails");
-        var captionText = document.getElementById("caption");
-        if (n > slides.length) {
-            slideIndex = 1
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        let dots = document.getElementsByClassName("thumbnails");
+        let captionText = document.getElementById("caption");
+        if (slides) {
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex=slides.length } 
+            for (i=0; i < slides.length; i++) { 
+                slides[i].style.display="none" ;
+            }
+            if (slides[slideIndex - 1]) {
+                slides[slideIndex - 1].style.display = "block";
+            }
         }
-        if (n < 1) {
-            slideIndex = slides.length
+        if (dots) {
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            if (dots[slideIndex - 1]) {
+                dots[slideIndex - 1].className += " active";
+            }
+            if (captionText) {
+                captionText.innerHTML = dots[slideIndex-1].alt;
+            }
         }
-        for (i = 0; i < slides.length; i++) {
-            slides[i].style.display = "none";
-        }
-        for (i = 0; i < dots.length; i++) {
-            dots[i].className = dots[i].className.replace(" active", "");
-        }
-        slides[slideIndex - 1].style.display = "block";
-        dots[slideIndex - 1].className += " active";
-        //captionText.innerHTML = dots[slideIndex-1].alt;
     }
 </script>

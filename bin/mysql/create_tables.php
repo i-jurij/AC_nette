@@ -3,19 +3,19 @@
 $role = 'CREATE TABLE IF NOT EXISTS `role`
 	(	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
 		`role_name` CHAR(255) UNIQUE NOT NULL
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 $permission = 'CREATE TABLE IF NOT EXISTS `permission`
 	(	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
 		`resource` CHAR(255) NOT NULL,
 		`action` CHAR(255) DEFAULT NULL
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 $role_permission = 'CREATE TABLE IF NOT EXISTS `role_permission`
 	(	`role_id` INTEGER UNSIGNED NOT NULL,
 		`permission_id` INTEGER UNSIGNED NOT NULL,
 		PRIMARY KEY (`role_id`, `permission_id`),
 		FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE CASCADE,
 		FOREIGN KEY (`permission_id`) REFERENCES `permission`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 $user = 'CREATE TABLE IF NOT EXISTS `user`
 	(	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
 		`username` VARCHAR(512) NOT NULL UNIQUE,
@@ -31,7 +31,7 @@ $user = 'CREATE TABLE IF NOT EXISTS `user`
 		`updated_at` TIMESTAMP NOT NULL
                            DEFAULT CURRENT_TIMESTAMP
                            ON UPDATE CURRENT_TIMESTAMP
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $role_user = 'CREATE TABLE IF NOT EXISTS `role_user`
 	(
@@ -40,7 +40,7 @@ $role_user = 'CREATE TABLE IF NOT EXISTS `role_user`
 		PRIMARY KEY (`role_id`, `user_id`),
 		FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
 		FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $client = 'CREATE TABLE IF NOT EXISTS `client`
 	(	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -58,7 +58,7 @@ $client = 'CREATE TABLE IF NOT EXISTS `client`
 		`updated_at` TIMESTAMP NOT NULL
                            DEFAULT CURRENT_TIMESTAMP
                            ON UPDATE CURRENT_TIMESTAMP
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $role_client = 'CREATE TABLE IF NOT EXISTS `role_client`
 	(
@@ -67,7 +67,7 @@ $role_client = 'CREATE TABLE IF NOT EXISTS `role_client`
 		PRIMARY KEY (`role_id`, `user_id`),
 		FOREIGN KEY (`user_id`) REFERENCES `client`(`id`) ON DELETE CASCADE,
 		FOREIGN KEY (`role_id`) REFERENCES `role`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $userappliedforregistration = 'CREATE TABLE IF NOT EXISTS `userappliedforregistration` (
   `id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -103,7 +103,7 @@ $offer = 'CREATE TABLE IF NOT EXISTS `offer` (
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`end_time` TIMESTAMP NOT NULL,
 	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $offer_image = 'CREATE TABLE `offer_image_thumb` (
 	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -123,7 +123,7 @@ $comment = 'CREATE TABLE IF NOT EXISTS `comment` (
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE
-)';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $rating = 'CREATE TABLE IF NOT EXISTS `rating` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -134,7 +134,7 @@ $rating = 'CREATE TABLE IF NOT EXISTS `rating` (
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (`client_id_who`) REFERENCES `client`(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`client_id_to_whom`) REFERENCES `client`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $category = 'CREATE TABLE IF NOT EXISTS `category` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
@@ -167,7 +167,7 @@ $offer_service = 'CREATE TABLE IF NOT EXISTS `offer_service`
 		PRIMARY KEY (`offer_id`, `service_id`),
 		FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE,
 		FOREIGN KEY (`service_id`) REFERENCES `service`(`id`) ON DELETE CASCADE
-	)';
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $create_sqls = [
     'role' => $role,
