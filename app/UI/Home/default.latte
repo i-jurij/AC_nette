@@ -6,11 +6,6 @@
 {var $robots = "INDEX,FOLLOW"}
 
 {block content}
-<h1 n:if="!$user->isLoggedIn()" class="rounded center shadow bgcontent main_title mb1">
-    <span class="mx1">
-        Сервис объявлений о работе и услугах
-    </span>
-</h1>
 
 {include filter_form from $shared_templates.'home_filter_form.latte'}
 

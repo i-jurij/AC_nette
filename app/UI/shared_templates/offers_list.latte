@@ -3,31 +3,35 @@
     <a n:href=":Home:offer $offer['id']" class="">
         <article class="card rounded">
             {if !empty($offer['thumbnails'])}
-            <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}" />
+            <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
+                alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" />
             {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
             {else}
-            <img src='{$baseUrl}/images/ddd.jpg' />
+            <img src='{$baseUrl}/images/ddd.jpg' alt="Default offers picture" loading="lazy" />
             {/if}
 
             {* <p n:if="$user->isLoggedIn()"> Client Phone:
                 {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}</p> *}
             <footer>
-                <p class="">
+                <p class="bold">
                     {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
-                    Ищу работу:
+                    Ищу работу
                     {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
-                    Предлагаю работу:
+                    Предлагаю работу
                     {/if}
                 </p>
                 <p n:if="!empty($offer['services']) && is_array($offer['services'])">
                     {foreach $offer['services'] as $ca}
-                    <span>{$ca['category_name']}: </span>
+                    {if $iterator->first}
+                    {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                    {else}
+                    {$ca['category_name']}:
+                    {/if}
                     {foreach $ca['services'] as $se}
-                    <span>
-                        {$se['name']}{if !$iterator->last}, {/if}
-                    </span>
+                    {$se['name']}
+                    {if !$iterator->last}, {/if}
                     {/foreach}
-                    {if !$iterator->last}; {/if}
+                    {if !$iterator->last}и {/if}
                     {/foreach}
                 </p>
                 <p> ⚲ {$offer['city_name']}</p>

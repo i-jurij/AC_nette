@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="description" content="{default $description='Description'}{$description}">
-  	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
+	<meta name="keywords" content="{default $keywords='Keywords'}{$keywords}">
 	<meta name="Robots" content="{default $robots = 'INDEX, FOLLOW'}{$robots}">
-  	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">  
+	<!--  <meta name="referrer" content="origin-when-cross-origin"> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<!-- <meta http-equiv="Accept-CH" content="Sec-CH-DPR, Sec-CH-Width, Sec-CH-Viewport-Width"> -->
 	<meta name="author" content="I-Jurij">
-	 <title>{default $title = "Title"}{$title}</title> 
+	<title>{default $title = "Title"}{$title}</title>
 	<!-- Google Fonts 
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 	-->
@@ -22,8 +24,8 @@
 
 	{include flash_for_home from $shared_templates.'flash_for_home.latte'}
 
-{*
-	<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash"  id="flash_message">
+	{*
+	<div n:ifcontent n:inner-foreach="$flashes as $flash" class="flash" id="flash_message">
 		<div class="bgcontent flash_child ">
 			<p class="m2 p2 round {$flash->type}">{$flash->message}</p>
 			<p id="for_button_close_insert">
@@ -33,18 +35,52 @@
 			</p>
 		</div>
 	</div>
-*}
+	*}
 	<!-- header and main -->
 	<div>
 
 		{include header from '@layout-header.latte'}
-		
+
 		<main class="my0 mx1 p2 round shadow bgcolor">
 			{include breadcrumbMenuHome from $shared_templates.'breadcrumb_home.latte'}
-			
+
 			<!-- <h1 class="rounded center shadow bgcontent main_title">{$title}</h1> -->
-			<div class="center">
-				{include content}	
+			<div class="">
+
+				<div class="modal">
+					<input id="default_info_div_modal" type="checkbox" n:attr="checked: !$user->isLoggedIn()" />
+					<label for="default_info_div_modal" class="overlay"></label>
+					<article>
+						<header>
+							<h2 class="center">Сервис объявлений о работе и услугах</h2>
+							<label for="default_info_div_modal" class="close">&times;</label>
+						</header>
+						<section class="justify">
+							<p>
+								Сервис рассчитан на объявления c предложениями работы или предоставляемых услуг.
+							</p>
+							<p>
+								Зарегистрированные пользователи могут давать объявления, видеть контактные данные,
+								рейтинг и пользоваться другими возможностями.
+							</p>
+							<p>
+								На сайте используются coockie. Без них ничего не работает.
+							</p>
+							<p>
+								На сайте используется javascript.
+							</p>
+						</section>
+						<footer>
+							<a n:href=':Home:Sign:up' class="button">Зарегистрироваться</a>
+							<a n:href=':Home:Sign:in' class="button">Войти</a>
+							<label for="default_info_div_modal" class="button dangerous">
+								Закрыть
+							</label>
+						</footer>
+					</article>
+				</div>
+
+				{include content}
 			</div>
 		</main>
 	</div>
@@ -52,10 +88,11 @@
 	<div class="spacer"></div>
 
 	<footer class="main_footer">
-		{include footer from '@layout-footer.latte'} 
+		{include footer from '@layout-footer.latte'}
 	</footer>
-	
+
 	<script src="{webpack js/main.js}"></script>
 	<script src="{webpack js/geolocation.js}"></script>
 </body>
+
 </html>
