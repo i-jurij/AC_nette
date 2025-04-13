@@ -216,12 +216,34 @@
                 {$offer['client_name']}
             </p>
             *}
-            <p class="">
-                <button>Показать телефон</button>
-                {*
-            <p n:if="$user->isLoggedIn()"> Client Phone:
-                {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}</p> *}
-            </p>
+            <div class="">
+                <label for="offfer_client_phone" class="button">Показать телефон</label>
+                <div class="modal">
+                    <input id="offfer_client_phone" type="checkbox" />
+                    <label for="offfer_client_phone" class="overlay"></label>
+                    <article>
+                        <section class="content mx3 my2">
+                            <div n:if="$user->isLoggedIn()" class="center">
+                                <h4>Телефон пользователя:</h4>
+                                <a href="tel:+{$offer['client_phone']}" class="h3 border-bottom nowrap bold ">
+                                    {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}
+                                </a>
+                            </div>
+                            <p n:else>Телефон и другие контактные данные доступны только зарегистрированным
+                                пользователям.
+                            </p>
+                        </section>
+                        <footer class="">
+                            <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>
+                            <a class="button" n:if="!$user->isLoggedIn()"
+                                n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
+                            <label for="offfer_client_phone" class="button dangerous">
+                                Закрыть
+                            </label>
+                        </footer>
+                    </article>
+                </div>
+            </div>
             <p class="">
                 <button>Написать в чат на сайте</button>
             </p>

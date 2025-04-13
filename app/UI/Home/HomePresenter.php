@@ -107,6 +107,7 @@ final class HomePresenter extends BasePresenter
         $this->template->offers = $this->offers->getOffers(form_data: $form_data);
         $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
         $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
+        $this->template->backlink = $this->storeRequest();
     }
 }
 class HomeTemplate extends BaseTemplate
@@ -118,5 +119,6 @@ class HomeTemplate extends BaseTemplate
     public array $price;
     public string $csrf_name;
     public string $csrf;
+    public string $backlink;
     public array $offer_images;
 }

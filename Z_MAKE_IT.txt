@@ -6,10 +6,21 @@ menu for registerd client:
 profile for client (edit, delete)
 
 for offer and comments put to offer.request_data serialized $_SERVER
+
 offer add (publish after moderate), edit (publish after moderate), delete for client
 comments for offer-client (publish after moderate)
 
 rating for client
+
+похожие объявления по региону
+-------------------
+CHAT
+table
+id
+who_client_id
+whom_client_id
+message
+created_at
 ------
 
     why menu not work???
