@@ -54,12 +54,16 @@
     .offer_figure {
         padding: 0;
         margin: 0;
+        text-align: left;
     }
 
     .offer_figure img {
         cursor: pointer;
         width: 80%;
         height: auto;
+        max-height: 250px;
+        object-fit: cover;
+        object-position: center;
     }
 
     .mySlides {
@@ -141,23 +145,19 @@
     .hover-shadow:hover {
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
+
+    .details_div {
+        width: 100%;
+        max-width: 50em;
+        text-align: justify;
+    }
 </style>
 
 {var $offer = $offers[0]}
 
 <article class="bgcontent px2 pb1 rounded">
-    <header class="">
-        <h3 class="">
-            {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
-            Ищу работу
-            {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
-            Предлагаю работу
-            {/if}
-        </h3>
-    </header>
-
     <main class="flexx one two-600">
-        <div class="">
+        <div class="mt2">
             {if !empty($offer['thumbnails']['thumb'])}
             {var $count = \count($offer_images)}
             <figure class="offer_figure">
@@ -194,10 +194,20 @@
             {else}
             <img src='{$baseUrl}/images/ddd.jpg' width=" 80%" height="auto" />
             {/if}
+            <p> ⚲ {$offer['city_name']} {$offer['region_name']}</p>
         </div>
 
-        <div>
-            <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+        <div class="">
+            <h3 class="">
+                {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                {var $short = 'Ищу работу'}
+                Ищу работу
+                {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                {var $short = 'Предлагаю работу'}
+                Предлагаю работу
+                {/if}
+            </h3>
+            <p n:if="!empty($offer['services']) && is_array($offer['services'])" class="mt0 pt0">
                 {foreach $offer['services'] as $ca}
                 {if $iterator->first}
                 {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
@@ -222,10 +232,10 @@
                     <input id="offfer_client_phone" type="checkbox" />
                     <label for="offfer_client_phone" class="overlay"></label>
                     <article>
-                        <section class="content mx3 my2">
+                        <section class="content">
                             <div n:if="$user->isLoggedIn()" class="center">
-                                <h4>Телефон пользователя:</h4>
-                                <a href="tel:+{$offer['client_phone']}" class="h3 border-bottom nowrap bold ">
+                                <p class="pb2">Телефон пользователя:</p>
+                                <a href="tel:+{$offer['client_phone']}" class="h3 border-bottom nowrap bold">
                                     {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}
                                 </a>
                             </div>
@@ -233,7 +243,7 @@
                                 пользователям.
                             </p>
                         </section>
-                        <footer class="">
+                        <footer n:class="$user->isLoggedIn() ? 'mt2'">
                             <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>
                             <a class="button" n:if="!$user->isLoggedIn()"
                                 n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
@@ -247,19 +257,19 @@
             <p class="">
                 <button>Написать в чат на сайте</button>
             </p>
-
         </div>
     </main>
-    <footer>
-        <p> ⚲ {$offer['city_name']} {$offer['region_name']}</p>
-        <p> Подробности: {$offer['message']}</p>
-        {* <p> Updated_at: {$offer['updated_at']}</p> *}
-        {* <p> End_time: {$offer['end_time']}</p> *}
-        <div id="similar_offer_div">
-            <button id="similar_offer_button">Похожие объявления</button>
-        </div>
-        <input type="hidden" name="offer_id" value="{$offer['id']}">
-    </footer>
+    <div class="mt0 pt0">
+        <h4 class="mt0 pt0"> Подробности:</h4>
+        <p class="mt0 pt0 details_div">{$offer['message']}</p>
+    </div>
+
+    {* <p> Updated_at: {$offer['updated_at']}</p> *}
+    {* <p> End_time: {$offer['end_time']}</p> *}
+    <div id="similar_offer_div">
+        <button id="similar_offer_button">Похожие объявления</button>
+    </div>
+    <input type="hidden" name="offer_id" value="{$offer['id']}">
 </article>
 
 <script n:syntax="double">
