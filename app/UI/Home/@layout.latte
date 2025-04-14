@@ -38,14 +38,13 @@
 	*}
 	<!-- header and main -->
 	<div>
-
 		{include header from '@layout-header.latte'}
 
 		<main class="my0 mx1 p2 round shadow bgcolor">
-			{include breadcrumbMenuHome from $shared_templates.'breadcrumb_home.latte'}
-
 			<!-- <h1 class="rounded center shadow bgcontent main_title">{$title}</h1> -->
 			<div class="">
+
+				{include breadcrumbMenuHome from $shared_templates.'breadcrumb_home.latte'}
 
 				<div class="modal">
 					<input id="default_info_div_modal" type="checkbox" n:attr="checked: !$user->isLoggedIn()" />

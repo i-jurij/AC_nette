@@ -12,7 +12,7 @@ comments for offer-client (publish after moderate)
 
 rating for client
 
-похожие объявления по региону
+похожие объявления по региону (js fetch by region, type, services, price)
 -------------------
 CHAT
 table
@@ -21,6 +21,15 @@ who_client_id
 whom_client_id
 message
 created_at
+
+
+interface
+Входящие / Исходящие
+список:     список:
+
+имя         имя
+посл сооб   посл сооб
+...         ...
 ------
 
     why menu not work???
