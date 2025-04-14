@@ -59,9 +59,9 @@
 
     .offer_figure img {
         cursor: pointer;
-        width: 80%;
+        width: 90%;
         height: auto;
-        max-height: 250px;
+        max-height: 322px;
         object-fit: cover;
         object-position: center;
     }
@@ -226,6 +226,16 @@
                 {$offer['client_name']}
             </p>
             *}
+            <div>
+                <p>Рейтинг пользователя:</p>
+                {if $offer['client_rating'] === null}
+                {var $rating = '☆☆☆☆☆ ★★★★★'}
+                {else}
+                {var $rating = 'function rating'}
+                {/if}
+                <p>{$rating}</p>
+            </div>
+
             <div class="">
                 <label for="offfer_client_phone" class="button">Показать телефон</label>
                 <div class="modal">
@@ -267,6 +277,7 @@
     {* <p> Updated_at: {$offer['updated_at']}</p> *}
     {* <p> End_time: {$offer['end_time']}</p> *}
     <div id="similar_offer_div">
+        <button id="similar_offer_button">Комментарии&ensp;<span class="">1</span></button>
         <button id="similar_offer_button">Похожие объявления</button>
     </div>
     <input type="hidden" name="offer_id" value="{$offer['id']}">

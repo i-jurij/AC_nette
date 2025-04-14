@@ -6,9 +6,8 @@
 
 	<div class="right-align">
 		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>
-		<button class="" n:if="$user->isLoggedIn()" onclick="">
-			&#128276;
-			<span class="">1</span>
+		<button class="pseudo" n:if="$user->isLoggedIn()" onclick="">
+			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 		<a class="pseudo button" n:if="!!$user->getIdentity()" href="#profile">
 			{$user->getIdentity()->username}

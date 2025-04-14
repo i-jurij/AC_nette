@@ -52,7 +52,7 @@ $client = 'CREATE TABLE IF NOT EXISTS `client`
 		`email` TEXT UNIQUE DEFAULT null,
 		`email_verified` TINYINT DEFAULT NULL,
 		`auth_token` TEXT NOT NULL,
-		`rating` INTEGER DEFAULT NULL,
+		`rating` INTEGER DEFAULT 0,
 		`created_at` TIMESTAMP NOT NULL
                            DEFAULT CURRENT_TIMESTAMP,
 		`updated_at` TIMESTAMP NOT NULL
