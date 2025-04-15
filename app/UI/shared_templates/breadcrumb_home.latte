@@ -1,10 +1,16 @@
 {block breadcrumbMenuHome}
+{if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
+{var $short = 'Ищу работу'}
+{elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
+{var $short = 'Предлагаю работу'}
+{/if}
+
 {foreach $breadcrumb as $key => $item}
 {if \in_array($item['short'], ['Home', 'home'])}
 {var $breadcrumb[$key]['short'] = 'Главная'}
 {/if}
 {if \in_array($item['short'], ['Offer', 'offer'])}
-{var $breadcrumb[$key]['short'] = 'Объявление'}
+{var $breadcrumb[$key]['short'] = $short}
 {/if}
 {/foreach}
 

@@ -9,7 +9,6 @@ use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
 use Ijurij\Geolocation\Lib\Csrf;
 use Ijurij\Geolocation\Lib\Session;
-use Nette\Database\Explorer;
 use Nette\Utils\Paginator;
 
 /**
@@ -22,7 +21,6 @@ final class HomePresenter extends BasePresenter
     private array $service_list = [];
 
     public function __construct(
-        private Explorer $db,
         private OfferFacade $offers,
         private ServiceFacade $services,
     ) {
