@@ -1,20 +1,85 @@
 {block header}
+<style>
+	#profile_div {
+		position: relative;
+	}
 
-<header class="p1 flex justify-between content-center">
+	#profile_input+.menu-item {
+		position: absolute;
+		left: 0;
+		z-index: 1;
+		width: 100%;
+		padding: 0;
+		opacity: 0;
+		visibility: hidden;
+		background: transparent;
+		overflow: hidden;
+		transform-origin: 50% 0%;
+	}
 
-	<div id="location_div" class="button pseudo">{$geo|noescape}</div>
+	#profile_input:checked+.menu-item {
+		padding: 1rem;
+		background-color: var(--bgcolor-content, rgb(44, 46, 43));
+		opacity: 1;
+		visibility: visible;
+		animation-name: swingdown;
+		animation-duration: 1s;
+		animation-timing-function: ease;
+	}
+
+	@keyframes swingdown {
+		0% {
+			opacity: .99999;
+			transform: rotateX(90deg);
+		}
+
+		30% {
+			transform: rotateX(-20deg) rotateY(5deg);
+			animation-timing-function: ease-in-out;
+		}
+
+		65% {
+			transform: rotateX(20deg) rotateY(-3deg);
+			animation-timing-function: ease-in-out;
+		}
+
+		100% {
+			transform: rotateX(0);
+			animation-timing-function: ease-in-out;
+		}
+	}
+
+	.menu-item li a:hover {
+		color: rgb(20, 180, 25);
+	}
+</style>
+<header class="p1 sm-flex justify-between content-center">
+
+	<div id="location_div" class="button pseudo" aria-label="Кнопка выбора города">{$geo|noescape}</div>
 
 	<div class="right-align">
-		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in">Войти</a>
-		<button class="pseudo" n:if="$user->isLoggedIn()" onclick="">
+		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in" aria-label="Кнопка входа">Войти</a>
+		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка сообщения">
 			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
-		<a class="pseudo button" n:if="!!$user->getIdentity()" href="#profile">
-			{$user->getIdentity()->username}
-		</a>
-		<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
+
+		<div class="inline-block" id="profile_div">
+			<label class="pseudo button underline" n:if="!!$user->getIdentity()" for="profile_input"
+				aria-label="Кнопка меню профиля">
+				{$user->getIdentity()->username}
+			</label>
+			<input id="profile_input" type="checkbox" style="display: none">
+			<ul class="menu-item list-reset round shadow left-align mt0">
+				<li class=""><a href="#" aria-label="Кнопка " class="py1 pl1">Sida 1</a></li>
+				<li class="my2"><a href="#" aria-label="Кнопка " class="py1 pl1">Sida 2</a></li>
+				<li class=" "><a href="#" aria-label="Кнопка " class="py1 pl1">sida 3</a></li>
+			</ul>
+		</div>
+		{*<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти
-		</a>
+		</a> *}
+		<a class="button " n:if="$user->isLoggedIn()" href=":Home:Offer:add"
+			aria-label="Кнопка Разместить объявление">Разместить объявление</a>
 	</div>
 </header>
 
