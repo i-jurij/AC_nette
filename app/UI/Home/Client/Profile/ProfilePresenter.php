@@ -14,6 +14,8 @@ use Nette\Application\UI\Form;
  */
 final class ProfilePresenter extends \App\UI\Home\BasePresenter
 {
+    // use \App\UI\Accessory\RequireLoggedUser;
+
     // Dependency injection of form factory and user management facade
     public function __construct(
         protected UserFacade $userfacade,

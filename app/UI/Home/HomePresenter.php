@@ -99,13 +99,17 @@ final class HomePresenter extends BasePresenter
 
     public function renderOffer(?int $id = null)
     {
-        $form_data = new \stdClass();
-        $form_data->id = $id;
+        if (!empty($id) && is_integer($id)) {
+            $form_data = new \stdClass();
+            $form_data->id = $id;
 
-        $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-        $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-        $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
-        $this->template->backlink = $this->storeRequest();
+            $this->template->offers = $this->offers->getOffers(form_data: $form_data);
+            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
+            $this->template->backlink = $this->storeRequest();
+        } else {
+            $this->redirect(':Home:default');
+        }
     }
 }
 class HomeTemplate extends BaseTemplate

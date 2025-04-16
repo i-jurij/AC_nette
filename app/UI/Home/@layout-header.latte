@@ -8,7 +8,7 @@
 		position: absolute;
 		left: 0;
 		z-index: 1;
-		width: 100%;
+		width: auto;
 		padding: 0;
 		opacity: 0;
 		visibility: hidden;
@@ -18,7 +18,6 @@
 	}
 
 	#profile_input:checked+.menu-item {
-		padding: 1rem;
 		background-color: var(--bgcolor-content, rgb(44, 46, 43));
 		opacity: 1;
 		visibility: visible;
@@ -49,7 +48,13 @@
 		}
 	}
 
-	.menu-item li a:hover {
+	.menu-item a {
+		display: block;
+		padding: 0.5rem 1rem;
+		margin: 0.5rem 0;
+	}
+
+	.menu-item a:hover {
 		color: rgb(20, 180, 25);
 	}
 </style>
@@ -69,11 +74,11 @@
 				{$user->getIdentity()->username}
 			</label>
 			<input id="profile_input" type="checkbox" style="display: none">
-			<ul class="menu-item list-reset round shadow left-align mt0">
-				<li class=""><a href="#" aria-label="Кнопка " class="py1 pl1">Sida 1</a></li>
-				<li class="my2"><a href="#" aria-label="Кнопка " class="py1 pl1">Sida 2</a></li>
-				<li class=" "><a href="#" aria-label="Кнопка " class="py1 pl1">sida 3</a></li>
-			</ul>
+			<div class="menu-item round shadow left-align mt0">
+				<a href="#" aria-label="Кнопка ">Объявления</a>
+				<a href="#" aria-label="Кнопка ">Профиль</a>
+				<a n:href=":Home:Sign:out" aria-label="Кнопка Выход">Выход</a>
+			</div>
 		</div>
 		{*<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти

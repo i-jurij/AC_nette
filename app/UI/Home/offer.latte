@@ -1,6 +1,10 @@
 {*layout '../@layout.latte'*}
-
-{var $title = "Offer"}
+{if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
+{var $short = 'Ищу работу'}
+{elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
+{var $short = 'Предлагаю работу'}
+{/if}
+{var $title = (!empty($short)) ? $short : "Offer"}
 {var $description = "Offer"}
 {var $keywords = "Keywords of Offer"}
 {var $robots = "INDEX,FOLLOW"}

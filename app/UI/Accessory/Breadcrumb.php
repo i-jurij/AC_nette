@@ -33,8 +33,8 @@ trait Breadcrumb
 
         $url_host = $url->getHost();
         $url_path = trim($url->getPath(), " \/");
-        $url_query = $httpRequest->getQuery();
-        $url_fragment = $url->getFragment();
+        // $url_query = $httpRequest->getQuery();
+        // $url_fragment = $url->getFragment();
         // $method = $httpRequest->getMethod();
 
         if ($url_host === SITE_NAME) {
@@ -49,7 +49,6 @@ trait Breadcrumb
         $controls_method_param = explode('/', $url_path_relative);
 
         $pre_controls = explode('.', array_shift($controls_method_param));
-        $method = $this->upperAfterDash(array_shift($controls_method_param));
         $count_pre_controls = count($pre_controls);
         for ($i = 0; $i < $count_pre_controls; ++$i) {
             $ic = Strings::firstUpper($this->upperAfterDash($pre_controls[$i]));
@@ -65,6 +64,8 @@ trait Breadcrumb
                 'full' => $full,
             ];
         }
+
+        $method = $this->upperAfterDash(array_shift($controls_method_param));
         if (!empty($method)) {
             $count_controls = count($controls);
             $controls[$count_controls] = [
@@ -72,6 +73,15 @@ trait Breadcrumb
                 'full' => $controls[$count_controls - 1]['full'].$method,
             ];
         }
+        /*
+        $param = \end($controls_method_param);
+        if (!empty($param)) {
+            \array_push($controls, [
+                'short' => $param,
+                'full' => '',
+            ]);
+        }
+        */
 
         return $controls;
     }
