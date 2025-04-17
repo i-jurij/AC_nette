@@ -7,6 +7,7 @@ namespace App\UI\Home;
 // use App\Model\PageFacade;
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
+use App\UI\Accessory\FormFactory;
 use Ijurij\Geolocation\Lib\Csrf;
 use Ijurij\Geolocation\Lib\Session;
 use Nette\Utils\Paginator;
@@ -23,6 +24,7 @@ final class HomePresenter extends BasePresenter
     public function __construct(
         private OfferFacade $offers,
         private ServiceFacade $services,
+        private FormFactory $formFactory,
     ) {
         parent::__construct();
         $this->form_data = new \stdClass();
@@ -96,21 +98,6 @@ final class HomePresenter extends BasePresenter
             $this->error();
         }
     }
-
-    public function renderOffer(?int $id = null)
-    {
-        if (!empty($id) && is_integer($id)) {
-            $form_data = new \stdClass();
-            $form_data->id = $id;
-
-            $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
-            $this->template->backlink = $this->storeRequest();
-        } else {
-            $this->redirect(':Home:default');
-        }
-    }
 }
 class HomeTemplate extends BaseTemplate
 {
@@ -121,6 +108,4 @@ class HomeTemplate extends BaseTemplate
     public array $price;
     public string $csrf_name;
     public string $csrf;
-    public string $backlink;
-    public array $offer_images;
 }

@@ -12,7 +12,7 @@ $offer_end_time_update = 'CREATE TRIGGER IF NOT EXISTS offer_end_time_update
     SET NEW.`end_time` =  DATE_ADD(CURRENT_TIMESTAMP,INTERVAL 30 DAY);
 ';
 
-//make trigger for table 'rating'
+// make trigger for table 'rating'
 // on ins del upd
 // get client.id by offer_id from offer then upd field 'client.rating' where id=client.id by offer_id
 
@@ -24,7 +24,7 @@ $rating_insert = 'CREATE TRIGGER IF NOT EXISTS rating_insert
         DECLARE row_count INT;
         SELECT SUM(`rating`.`rating_value`) INTO sum FROM `rating` WHERE `rating`.`client_id_to_whom` = NEW.`client_id_to_whom`;
         SELECT COUNT(*) INTO row_count FROM `rating` WHERE `rating`.`client_id_to_whom` = NEW.`client_id_to_whom`;
-        UPDATE `client` SET `client`.`rating` = (sum DIV row_count) WHERE `client`.`id` = NEW.`client_id_to_whom`;
+        UPDATE `client` SET `client`.`rating` = (ROUND(sum / row_count)) WHERE `client`.`id` = NEW.`client_id_to_whom`;
     END
 ';
 
@@ -36,7 +36,7 @@ $rating_update = 'CREATE TRIGGER IF NOT EXISTS rating_update
         DECLARE row_count INT;
         SELECT SUM(`rating`.`rating_value`) INTO sum FROM `rating` WHERE `rating`.`client_id_to_whom` = NEW.`client_id_to_whom`;
         SELECT COUNT(*) INTO row_count FROM `rating` WHERE `rating`.`client_id_to_whom` = NEW.`client_id_to_whom`;
-        UPDATE `client` SET `client`.`rating` = (sum DIV row_count) WHERE `client`.`id` = NEW.`client_id_to_whom`;
+        UPDATE `client` SET `client`.`rating` = (ROUND(sum / row_count)) WHERE `client`.`id` = NEW.`client_id_to_whom`;
     END
 ';
 $rating_delete = 'CREATE TRIGGER IF NOT EXISTS rating_delete
@@ -47,7 +47,7 @@ $rating_delete = 'CREATE TRIGGER IF NOT EXISTS rating_delete
         DECLARE row_count INT;
         SELECT SUM(`rating`.`rating_value`) INTO sum FROM `rating` WHERE `rating`.`client_id_to_whom` = OLD.`client_id_to_whom`;
         SELECT COUNT(*) INTO row_count FROM `rating` WHERE `rating`.`client_id_to_whom` = OLD.`client_id_to_whom`;
-        UPDATE `client` SET `client`.`rating` = (sum DIV row_count) WHERE `client`.`id` = OLD.`client_id_to_whom`;
+        UPDATE `client` SET `client`.`rating` = (ROUND(sum / row_count)) WHERE `client`.`id` = OLD.`client_id_to_whom`;
     END
 ';
 

@@ -102,4 +102,22 @@ final class FormFactory
 
         return $form;
     }
+
+    public function createClientRatingForm()
+    {
+        $form = $this->create();
+
+        $form->setHtmlAttribute('id', 'client_rating_form')
+            ->setHtmlAttribute('class', 'center mb2 mr2');
+
+        $form->addGroup('');
+        $form->addRadioList('rating_value', null, [1, 2, 3, 4, 5]);
+
+        $form->addGroup('');
+        $form->addHidden('client_id_who', null);
+        $form->addHidden('client_id_to_whom', null);
+        $form->addSubmit('client_rating_form_submit', 'Оценить ');
+
+        return $form;
+    }
 }

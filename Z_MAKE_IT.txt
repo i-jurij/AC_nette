@@ -2,6 +2,9 @@
         
 MAKE  
 
+in rating table make client_id_who, client_id_to_whom unic primary index on duplicate update rating_value
+create Rating model
+
 menu for registerd client:
 profile for client (edit, delete)
 
@@ -9,8 +12,6 @@ for offer and comments put to offer.request_data serialized $_SERVER
 
 offer add (publish after moderate), edit (publish after moderate), delete for client
 comments for offer-client (publish after moderate)
-
-rating for client
 
 похожие объявления по региону (js fetch by region, type, services, price)
 -------------------
@@ -32,19 +33,15 @@ interface
 ...         ...
 ------
 
-    why menu not work???
 --------------------------------
 admin clients customers executors, offers punkt "by location" make
 
 для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
 
-список предложений работы справа (моб сверху) три самых больших прайса
-список предложений услуг слева (моб снизу) 3 миним прайса
+? список предложений работы справа (моб сверху) три самых больших прайса
+? список предложений услуг слева (моб снизу) 3 миним прайса
 
-пункт меню "средние расценки": мин, макс, средние
-
-у исполнителей и заказчиков рейтинг (оценка) и комментарии (make trigger for
-table rating on ins del upd +)
+? пункт меню "средние расценки": мин, макс, средние
 
 чат между клиентами 
 

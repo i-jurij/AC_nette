@@ -1,43 +1,24 @@
 {block breadcrumbMenuHome}
 
-{*
-{if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
-{var $short = 'Ищу работу'}
-{elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
-{var $short = 'Предлагаю работу'}
-{/if}
-
-{foreach $breadcrumb as $key => $item}
-{if \in_array($item['short'], ['Home', 'home'])}
-{var $breadcrumb[$key]['short'] = 'Главная'}
-{/if}
-{if \in_array($item['short'], ['Offer', 'offer'])}
-{if !empty($short)}
-{var $breadcrumb[$key]['short'] = $short}
-{elseif $breadcrumb[$key - 1]['short'] === 'Client'}
-{var $breadcrumb[$key]['short'] = 'Объявления'}
-{var $breadcrumb[$key - 1]['short'] = $user->getIdentity()->username}
-{/if}
-{/if}
-{/foreach}
-*}
-
-{if !empty($breadcrumb[3]) && $breadcrumb[3]['short'] === 'add'}
-{var $breadcrumb[3]['short'] = 'Создать'}
-{/if}
-
-{if !empty($breadcrumb[2]) && \in_array($breadcrumb[2]['short'], ['Offer', 'offer'])}
+{*if !empty($breadcrumb[2]) && \in_array($breadcrumb[2]['short'], ['Offer', 'offer'])}
 {var $breadcrumb[2]['short'] = 'Объявления'}
-{/if}
+{/if*}
+
 {if !empty($breadcrumb[1]) && \in_array($breadcrumb[1]['short'], ['Client'])}
 {var $breadcrumb[1]['short'] = $user->getIdentity()->username}
 {/if}
 
 {if !empty($breadcrumb[1]) && \in_array($breadcrumb[1]['short'], ['Offer', 'offer'])}
+{var $breadcrumb[1]['short'] = 'Объявления'}
+
 {if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
-{var $breadcrumb[1]['short'] = 'Ищу работу'}
+{var $breadcrumb[2]['short'] = 'Ищу работу'}
 {elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
-{var $breadcrumb[1]['short'] = 'Предлагаю работу'}
+{var $breadcrumb[2]['short'] = 'Предлагаю работу'}
+{/if}
+
+{if !empty($breadcrumb[2]) && $breadcrumb[2]['short'] === 'add'}
+{var $breadcrumb[2]['short'] = 'Создать'}
 {/if}
 {/if}
 

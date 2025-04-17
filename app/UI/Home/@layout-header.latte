@@ -1,63 +1,4 @@
 {block header}
-<style>
-	#profile_div {
-		position: relative;
-	}
-
-	#profile_input+.menu-item {
-		position: absolute;
-		left: 0;
-		z-index: 1;
-		width: auto;
-		padding: 0;
-		opacity: 0;
-		visibility: hidden;
-		background: transparent;
-		overflow: hidden;
-		transform-origin: 50% 0%;
-	}
-
-	#profile_input:checked+.menu-item {
-		background-color: var(--bgcolor-content, rgb(44, 46, 43));
-		opacity: 1;
-		visibility: visible;
-		animation-name: swingdown;
-		animation-duration: 1s;
-		animation-timing-function: ease;
-	}
-
-	@keyframes swingdown {
-		0% {
-			opacity: .99999;
-			transform: rotateX(90deg);
-		}
-
-		30% {
-			transform: rotateX(-20deg) rotateY(5deg);
-			animation-timing-function: ease-in-out;
-		}
-
-		65% {
-			transform: rotateX(20deg) rotateY(-3deg);
-			animation-timing-function: ease-in-out;
-		}
-
-		100% {
-			transform: rotateX(0);
-			animation-timing-function: ease-in-out;
-		}
-	}
-
-	.menu-item a {
-		display: block;
-		padding: 0.5rem 1rem;
-		margin: 0.5rem 0;
-	}
-
-	.menu-item a:hover {
-		color: rgb(20, 180, 25);
-	}
-</style>
 <header class="p1 sm-flex justify-between content-center">
 
 	<div id="location_div" class="button pseudo" aria-label="Кнопка выбора города">{$geo|noescape}</div>
@@ -68,13 +9,13 @@
 			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 
-		<div class="inline-block" id="profile_div">
+		<div class="inline-block dropdown_div">
 			<label class="pseudo button underline" n:if="!!$user->getIdentity()" for="profile_input"
 				aria-label="Кнопка меню профиля">
 				{$user->getIdentity()->username}
 			</label>
 			<input id="profile_input" type="checkbox" style="display: none">
-			<div class="menu-item round shadow left-align mt0">
+			<div class="dropdown_menu round shadow left-align mt0">
 				<a href="#" aria-label="Кнопка ">Объявления</a>
 				<a href="#" aria-label="Кнопка ">Профиль</a>
 				<a n:href=":Home:Sign:out" aria-label="Кнопка Выход">Выход</a>
@@ -83,8 +24,8 @@
 		{*<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти
 		</a> *}
-		<a class="button " n:if="$user->isLoggedIn()" n:href=":Home:Client:Offer:add"
-			aria-label="Кнопка Разместить объявление">Разместить объявление</a>
+		<a class="button " n:if="$user->isLoggedIn() && !$presenter->isLinkCurrent(':Home:Offer:add')"
+			n:href=":Home:Offer:add" aria-label="Кнопка Разместить объявление">Разместить объявление</a>
 	</div>
 </header>
 

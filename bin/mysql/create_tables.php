@@ -128,12 +128,12 @@ $comment = 'CREATE TABLE IF NOT EXISTS `comment` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $rating = 'CREATE TABLE IF NOT EXISTS `rating` (
-	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	`client_id_who` INTEGER UNSIGNED NOT NULL,
 	`client_id_to_whom` INTEGER UNSIGNED NOT NULL,
 	`rating_value` INTEGER NOT NULL,
 	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`client_id_who`, `client_id_to_whom`),
 	FOREIGN KEY (`client_id_who`) REFERENCES `client`(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`client_id_to_whom`) REFERENCES `client`(`id`) ON DELETE CASCADE
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
