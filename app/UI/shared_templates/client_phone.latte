@@ -1,0 +1,28 @@
+{block client_phone}    
+            <div class="">
+                <label for="offfer_client_phone" class="button">Показать телефон</label>
+                <div class="modal">
+                    <input id="offfer_client_phone" type="checkbox" />
+                    <label for="offfer_client_phone" class="overlay"></label>
+                    <article>
+                        <section class="content">
+                            <div n:if="$user->isLoggedIn()" class="center pt1 px2">
+                                <a href="tel:+{$offers[0]['client_phone']}" class="h3 border-bottom nowrap bold">
+                                    {\App\UI\Accessory\PhoneNumber::fromDb($offers[0]['client_phone'])}
+                                </a>
+                            </div>
+                            <p n:else>Телефон и другие контактные данные доступны только зарегистрированным
+                                пользователям.
+                            </p>
+                        </section>
+                        <footer n:class="$user->isLoggedIn() ? 'mt2'">
+                            <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>
+                            <a class="button" n:if="!$user->isLoggedIn()"
+                                n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
+                            <label for="offfer_client_phone" class="button dangerous">
+                                Закрыть
+                            </label>
+                        </footer>
+                    </article>
+                </div>
+            </div>

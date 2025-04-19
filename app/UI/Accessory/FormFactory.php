@@ -69,7 +69,7 @@ final class FormFactory
      */
     public function create(): Form
     {
-        $this->form->addProtection();
+        $this->form->addProtection('Csrf error');
         // $form->setTranslator($this->translator);
         $renderer = $this->form->getRenderer();
         $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
@@ -111,7 +111,8 @@ final class FormFactory
             ->setHtmlAttribute('class', 'center mb2 mr2');
 
         $form->addGroup('');
-        $form->addRadioList('rating_value', null, [1, 2, 3, 4, 5]);
+        $form->addRadioList('rating_value', null, [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5])
+        ->setRequired('Пожалуйста, выберите оценку');
 
         $form->addGroup('');
         $form->addHidden('client_id_who', null);

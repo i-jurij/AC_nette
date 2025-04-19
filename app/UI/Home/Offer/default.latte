@@ -160,12 +160,10 @@
     }
 </style>
 
-{var $offer = $offers[0]}
-
 <article class="bgcontent px2 pb1 rounded">
     <main class="flexx one two-600">
         <div class="mt2">
-            {if !empty($offer['thumbnails']['thumb'])}
+            {if !empty($offers[0]['thumbnails']['thumb'])}
             {var $count = \count($offer_images)}
             <figure class="offer_figure">
                 <img src="data:image/png;base64, {base64_encode($offers[0]['thumbnails']['thumb'])}"
@@ -201,21 +199,21 @@
             {else}
             <img src='{$baseUrl}/images/ddd.jpg' width=" 80%" height="auto" />
             {/if}
-            <p> ⚲ {$offer['city_name']} {$offer['region_name']}</p>
+            <p> ⚲ {$offers[0]['city_name']} {$offers[0]['region_name']}</p>
         </div>
 
         <div class="">
-            <dl class="">
+                <dl class="">
                 <dt class="h3">
-                    {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                    {if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
                     {var $short = 'Ищу работу'}
                     Ищу работу
-                    {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                    {elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
                     {var $short = 'Предлагаю работу'}
                     Предлагаю работу
                     {/if}</dt>
-                <dd n:if="!empty($offer['services']) && is_array($offer['services'])" class="ml0">
-                    {foreach $offer['services'] as $ca}
+                <dd n:if="!empty($offers[0]['services']) && is_array($offers[0]['services'])" class="ml0">
+                    {foreach $offers[0]['services'] as $ca}
                     {if $iterator->first}
                     {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
                     {else}
@@ -230,98 +228,12 @@
                 </dd>
             </dl>
 
-            <p>{$offer['price']}</p>
+            <p>{$offers[0]['price']}</p>
 
-            <dl>
-                <dt>Рейтинг пользователя:</dt>
-                <dd class="ml0">
-                    {if !empty($offer['client_rating']) && is_int($offer['client_rating'])}
-                    {var $rating = ''}
-                    {for $i = 1; $i < 6; $i++} {if $offer['client_rating']>= $i}
-                        {var $rating=$rating.'★' }
-                        {else}
-                        {var $rating=$rating.'☆' }
-                        {/if}
-                        {/for}
-                        {/if}
-                        {$rating}
-                        &emsp;
-                        <label for="offer_client_rating" class="button">Оценить</label>
-                        <div class="modal">
-                            <input id="offer_client_rating" type="checkbox" />
-                            <label for="offer_client_rating" class="overlay"></label>
-                            <article>
-                                {if !$user->isLoggedIn()}
-                                <p>Изменение рейтинга доступно только зарегистрированным
-                                    пользователям.
-                                </p>
-                                <footer n:class="$user->isLoggedIn() ? 'mt2'">
-                                    <a class="button" n:if="!$user->isLoggedIn()"
-                                        n:href=":Home:Sign:up">Зарегистрироваться</a>
-                                    <a class="button" n:if="!$user->isLoggedIn()"
-                                        n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
-                                    <label for="offer_client_rating" class="button dangerous">
-                                        Закрыть
-                                    </label>
-                                </footer>
-                                {else}
-                                <form n:name=clientRatingForm class="mt2">
-                                    <section class="center">
-                                        <ul class="errors" n:ifcontent>
-                                            <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
-                                        </ul>
-                                        {foreach $form[rating_value]->getItems() as $key => $label}
-                                        <label n:name="rating_value:$key" class="button">
-                                            <input n:name="rating_value:$key" value="{$label}">
-                                            <span class="checkable">{$label}</span>
-                                        </label>
-                                        &ensp;
-                                        {/foreach}
-                                    </section>
-                                    <footer class="mt2">
-                                        <input type="hidden" n:name="client_id_who" value="{$user->getId()}">
-                                        <input type="hidden" n:name="client_id_to_whom" value="{$offer['client_id']}">
-                                        <input n:name=client_rating_form_submit type="submit" form="client_rating_form"
-                                            class="button" value="Оценить">
-                                        <label for="offer_client_rating" class="button dangerous">
-                                            Закрыть
-                                        </label>
-                                    </footer>
-                                </form>
-                                {/if}
-                            </article>
-                        </div>
+            {include rating from $shared_templates.'rating.latte'}
 
-                </dd>
-            </dl>
+            {include client_phone from $shared_templates.'client_phone.latte'}
 
-            <div class="">
-                <label for="offfer_client_phone" class="button">Показать телефон</label>
-                <div class="modal">
-                    <input id="offfer_client_phone" type="checkbox" />
-                    <label for="offfer_client_phone" class="overlay"></label>
-                    <article>
-                        <section class="content">
-                            <div n:if="$user->isLoggedIn()" class="center pt1 px2">
-                                <a href="tel:+{$offer['client_phone']}" class="h3 border-bottom nowrap bold">
-                                    {\App\UI\Accessory\PhoneNumber::fromDb($offer['client_phone'])}
-                                </a>
-                            </div>
-                            <p n:else>Телефон и другие контактные данные доступны только зарегистрированным
-                                пользователям.
-                            </p>
-                        </section>
-                        <footer n:class="$user->isLoggedIn() ? 'mt2'">
-                            <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>
-                            <a class="button" n:if="!$user->isLoggedIn()"
-                                n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
-                            <label for="offfer_client_phone" class="button dangerous">
-                                Закрыть
-                            </label>
-                        </footer>
-                    </article>
-                </div>
-            </div>
             <p class="">
                 <button>Написать в чат на сайте</button>
             </p>
@@ -329,16 +241,16 @@
     </main>
     <div class="mt0 pt0">
         <h4 class="mt0 pt0"> Подробности:</h4>
-        <p class="mt0 pt0 details_div">{$offer['message']}</p>
+        <p class="mt0 pt0 details_div">{$offers[0]['message']}</p>
     </div>
 
-    {* <p> Updated_at: {$offer['updated_at']}</p> *}
-    {* <p> End_time: {$offer['end_time']}</p> *}
+    {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}
+    {* <p> End_time: {$offers[0]['end_time']}</p> *}
     <div id="similar_offer_div">
         <button id="similar_offer_button">Комментарии&ensp;<span class="">1</span></button>
         <button id="similar_offer_button">Похожие объявления</button>
     </div>
-    <input type="hidden" name="offer_id" value="{$offer['id']}">
+    <input type="hidden" name="offer_id" value="{$offers[0]['id']}">
 </article>
 
 <script n:syntax="double">
@@ -387,4 +299,45 @@
             }
         }
     }
+
+    const client_rating_form = document.getElementById('client_rating_form');
+    if (client_rating_form) {
+        client_rating_form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(client_rating_form);
+            
+            let url_rating = {{link :Home:Offer:jsFetchRatingForm}};
+
+            fetch(url_rating, { 
+                responseType: 'json',
+                method: 'POST', 
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: formData }
+            ).then(response => response.json())
+                .then(json => {
+                    let mods = document.querySelectorAll('.modal > [type=checkbox]');
+                    [].forEach.call(mods, function (mod) { mod.checked = false; });
+
+                    let client_rating_span = document.getElementById('client_rating_span');
+                    if (client_rating_span) {
+                        let r = parseInt(json);
+                        let rating = '';
+                        if (r !== NaN) {
+                            for (let index = 1; index < 6; index++) { 
+                                if (r >= index) {
+                                    rating += '★';
+                                } else {
+                                    rating += '☆';
+                                }
+                            }
+                        }
+                        client_rating_span.innerText = rating;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    }
+
 </script>

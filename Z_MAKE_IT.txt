@@ -2,9 +2,6 @@
         
 MAKE  
 
-in rating table make client_id_who, client_id_to_whom unic primary index on duplicate update rating_value
-create Rating model
-
 menu for registerd client:
 profile for client (edit, delete)
 
