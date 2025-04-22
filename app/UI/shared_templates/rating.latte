@@ -27,10 +27,8 @@
                     пользователям.
                 </p>
                 <footer n:class="$user->isLoggedIn() ? 'mt2'">
-                    <a class="button" n:if="!$user->isLoggedIn()"
-                        n:href=":Home:Sign:up">Зарегистрироваться</a>
-                    <a class="button" n:if="!$user->isLoggedIn()"
-                        n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
+                    <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>
+                    <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink">Войти</a>
                     <label for="offer_client_rating" class="button dangerous">
                         Закрыть
                     </label>
@@ -52,8 +50,8 @@
                     <footer class="mt2">
                         <input type="hidden" n:name="client_id_who" value="{$user->getId()}">
                         <input type="hidden" n:name="client_id_to_whom" value="{$offers[0]['client_id']}">
-                        <input n:name=client_rating_form_submit type="submit" form="client_rating_form"
-                            class="button" value="Оценить">
+                        <input n:name=client_rating_form_submit type="submit" form="client_rating_form" class="button"
+                            value="Оценить">
                         <label for="offer_client_rating" class="button dangerous">
                             Закрыть
                         </label>
@@ -65,3 +63,42 @@
 
     </dd>
 </dl>
+
+<script>
+    const client_rating_form = document.getElementById('client_rating_form');
+    if (client_rating_form) {
+    client_rating_form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(client_rating_form);
+    
+    fetch(url_rating, {
+    responseType: 'json',
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {'X-Requested-With': 'XMLHttpRequest'},
+    body: formData }
+    ).then(response => response.json())
+    .then(json => {
+    let mods = document.querySelectorAll('.modal > [type=checkbox]');
+    [].forEach.call(mods, function (mod) { mod.checked = false; });
+    
+    let client_rating_span = document.getElementById('client_rating_span');
+    if (client_rating_span) {
+    let r = parseInt(json);
+    let rating = '';
+    if (r !== NaN) {
+    for (let index = 1; index < 6; index++) { if (r>= index) {
+        rating += '★';
+        } else {
+        rating += '☆';
+        }
+        }
+        }
+        client_rating_span.innerText = rating;
+        }
+        })
+        .catch(error => console.error('Error:', error));
+        });
+        }
+</script>

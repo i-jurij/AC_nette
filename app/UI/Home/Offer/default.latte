@@ -203,7 +203,7 @@
         </div>
 
         <div class="">
-                <dl class="">
+            <dl class="">
                 <dt class="h3">
                     {if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
                     {var $short = 'Ищу работу'}
@@ -246,14 +246,47 @@
 
     {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}
     {* <p> End_time: {$offers[0]['end_time']}</p> *}
-    <div id="similar_offer_div">
-        <button id="similar_offer_button">Комментарии&ensp;<span class="">1</span></button>
-        <button id="similar_offer_button">Похожие объявления</button>
+    <div>
+        <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top"
+            data-tooltip="Показать комментарии">
+            Комментарии
+            &ensp;
+            <span class="">{$comments_count}</span>
+        </button>
+        <button class="tooltip-top" data-tooltip="Добавить комментарий" aria-label="Добавить комментарий"
+            onclick="offer_comment_form_show();">
+            +
+        </button>
+        &emsp;
+        <button id="similar_offer_button" onclick="getSimilar(json_encode({$offers[0]}))" class="tooltip-top"
+            data-tooltip="Показать похожие">
+            Похожие объявления
+        </button>
+
+        <ul id="comment_or_similar" class="bgcolor round p1 display-none"></ul>
+
+        <div class="modal">
+            <input id="offer_comment_form_input" type="checkbox" />
+            <label for="offer_comment_form_input" class="overlay"></label>
+            <article class="card" style="max-width:1024px">
+                <header>
+                    <h4>Ваш комментарий:</h4>
+                    <label for="offer_comment_form_input" class="close">&times;</label>
+                </header>
+                <section>{control offerCommentForm}</section>
+                <footer>
+                    <button onclick="commentAdd()">Комментировать</button>
+                </footer>
+            </article>
+        </div>
     </div>
-    <input type="hidden" name="offer_id" value="{$offers[0]['id']}">
 </article>
 
 <script n:syntax="double">
+    // js fetch url to change the rating
+    let url_rating = {{link :Home:Offer:jsFetchRatingForm}};   
+
+    //// gallery //////////////
     function openModal() {
         document.getElementById("offer_pictures_gallery_modal").style.display = "block";
     }
@@ -299,45 +332,172 @@
             }
         }
     }
+    //// end gallery //////////////
 
-    const client_rating_form = document.getElementById('client_rating_form');
-    if (client_rating_form) {
-        client_rating_form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(client_rating_form);
-            
-            let url_rating = {{link :Home:Offer:jsFetchRatingForm}};
+    //// comment ////////////////
+    let url_comment = {{link :Home:Offer:getComment}};
+    let url_comment_add = {{link :Home:Offer:offerCommentAdd}};
 
-            fetch(url_rating, { 
-                responseType: 'json',
-                method: 'POST', 
-                credentials: 'same-origin',
-                headers: {'X-Requested-With': 'XMLHttpRequest'},
-                body: formData }
-            ).then(response => response.json())
-                .then(json => {
-                    let mods = document.querySelectorAll('.modal > [type=checkbox]');
-                    [].forEach.call(mods, function (mod) { mod.checked = false; });
+    function offer_comment_form_show(){
+        document.querySelector('input[type="hidden"][name="parent_id"]').value = '';
+        document.querySelector('textarea[name="comment_text"]').value = '';
+        document.getElementById('offer_comment_form_input').checked = true;
+    }
+    function offer_comment_form_hide(){
+        document.getElementById('offer_comment_form_input').checked = false;
+    }
 
-                    let client_rating_span = document.getElementById('client_rating_span');
-                    if (client_rating_span) {
-                        let r = parseInt(json);
-                        let rating = '';
-                        if (r !== NaN) {
-                            for (let index = 1; index < 6; index++) { 
-                                if (r >= index) {
-                                    rating += '★';
-                                } else {
-                                    rating += '☆';
-                                }
-                            }
-                        }
-                        client_rating_span.innerText = rating;
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+    function replyForm(parent_id){
+        offer_comment_form_show();
+        const parent_id_input = document.querySelector('input[type="hidden"][name="parent_id"]');
+        if (parent_id_input) {
+            parent_id_input.value = parent_id;
+        }
+    }
+
+    function sort_comments( comments_array ) {
+        var map = {}, node, roots = [], i;
+
+        for (i = 0; i < comments_array.length; i += 1) {
+            map[comments_array[i].id] = i; 
+            comments_array[i].children = []; 
+        }
+
+        for (i = 0; i < comments_array.length; i += 1) {
+            node = comments_array[i];
+            if (node.parent_id) {
+                comments_array[map[node.parent_id]].children.push(node);
+            } else {
+                roots.push(node);
+            }
+        }
+        return roots;
+    }
+
+    function recBuild(parentUl,arr){
+        arr.forEach((el)=>{
+            let li = document.createElement("li");
+
+            let def_img = {{$baseUrl}} + "/images/ddd_thumb.png";
+            let image = '';
+            let size = 'width = "48px" height="auto"';
+            let style = 'style="vertical-align: middle"';
+            let onerror = 'onError="this.onerror=null;this.src="' + def_img + '";"';
+
+            if (el.image !== null) {
+                let image_path = {{$baseUrl}} + '/images/persons/' + el.image;
+                
+                image = '<img ' + size + ' src="' + image_path + '" alt="" loading="lazy"' + style + onerror +' />';
+            } else {
+                image = '<img ' + size + ' src="' + def_img + '" alt="" loading="lazy"' + style +' />';
+            }
+
+            let clname = '';
+
+            if (/^\d+$/.test(el.username)) {
+                clname = el.username.toString();
+                clname = clname.slice(-4);
+            } else {
+                clname = el.username;
+            }
+
+            li.innerHTML = '<article class="card" style="max-width:1024px">\
+                <header>\
+                    <span class="h4">' + image + '&emsp;***' + clname + '&emsp;' + el.created_at + '</span>\
+                </header>\
+                <section class="flex">\
+                    <p class="flex-auto">' + el.comment_text + '</p>\
+                    <p class="flex items-center justify-center">\
+                        <button class="tooltip-left self-center" data-tooltip="Ответить" onclick="replyForm('+el.id+');">↶</button>\
+                    </p>\
+                </section>\
+            </article>';
+
+            if(el.children.length > 0 ){    
+                let ul = document.createElement("ul");
+                ul.style.cssText = 'list-style: none outside none; padding: 0 0 0 2rem;';
+                recBuild(ul,el.children);
+                li.append(ul);
+            }
+            parentUl.appendChild(li);    
         });
     }
 
+    function getComment(offer_id){
+        let formData = new FormData();
+        formData.set('offer_id', offer_id);
+
+        fetch(url_comment, {
+                responseType: 'json',
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: formData 
+            }
+        ).then(response => response.json())
+        .then(json => {
+            let comments = sort_comments(json); 
+                
+            const comment_or_similar = document.querySelector("#comment_or_similar");
+            if (comment_or_similar) {
+                comment_or_similar.classList.remove('display-none');
+                comment_or_similar.style.cssText = 'list-style: none outside none;';
+
+                let comment_button = document.getElementById('comment_offer_button');
+                if (comment_button) {
+                    comment_button.classList.add('bg-olive');
+                }
+
+                if (comments.length > 0) {
+                    comment_or_similar.innerHTML = "";
+                    recBuild(document.querySelector("#comment_or_similar"),comments);
+                } else {
+                    comment_or_similar.innerHTML = "Комментариев пока нет";
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function clearAllFormInputs(form_id) {
+        let formm = document.getElementById(form_id);
+        let inputs = formm.getElementsByTagName('input');
+        let tas = formm.getElementsByTagName('textarea');
+        for (let inp of inputs) {
+            inp.value = '';
+        }
+        for (let ta of tas) ta.value = '';
+    }
+
+    // offer_comment_form comment add
+    function commentAdd(parent_id = null) {
+        event.preventDefault();
+
+        offer_comment_form_hide();
+    
+        const formData = new FormData(offer_comment_form);
+        formData.set('offer_id', {{$offers[0]['id']}});
+        formData.set('client_id', {{$user->getId()}});
+
+        if (parent_id) {
+            formData.set('parent_id', parent_id);
+        }
+        
+        if (formData.get('comment_text') && formData.get('offer_id') && formData.get('client_id')) {
+            fetch(url_comment_add, {
+                responseType: 'json',
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: formData }
+                ).then(response => response.json())
+                .then(json => {
+                    if (json === true) {
+                        getComment({{$offers[0]['id']}});
+                    }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+    //// end comment ////////////////
 </script>

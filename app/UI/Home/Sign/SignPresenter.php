@@ -2,7 +2,8 @@
 
 namespace App\UI\Home\Sign;
 
-use App\Model\UserFacade;
+// use App\Model\UserFacade;
+use App\Model\ClientFacade;
 use App\UI\Accessory\Email;
 use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\IsBot;
@@ -11,7 +12,6 @@ use Ijurij\Geolocation\Lib\Csrf;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
-use Nette\Utils\Html;
 
 final class SignPresenter extends \App\UI\BasePresenter
 {
@@ -28,7 +28,8 @@ final class SignPresenter extends \App\UI\BasePresenter
     // Dependency injection of form factory and user management facade
     public function __construct(
         private FormFactory $formFactory,
-        protected UserFacade $userfacade,
+        // protected UserFacade $userfacade,
+        protected ClientFacade $userfacade,
     ) {
         $this->onStartup[] = function () {
             if (IsBot::check()) {
@@ -198,10 +199,10 @@ final class SignPresenter extends \App\UI\BasePresenter
             if (!empty($res->auth_token)) {
                 // create or get and receive passsword or url with token to email;
                 $this->absoluteUrls = true;
-                $redirect_url = $this->link(':Home:Sign:restorelink') . '?token=' . $res->auth_token . '&' . Csrf::$token_name . '=' . Csrf::getToken();
+                $redirect_url = $this->link(':Home:Sign:restorelink').'?token='.$res->auth_token.'&'.Csrf::$token_name.'='.Csrf::getToken();
 
                 $mail = new Email();
-                $mail->from = 'admin@' . SITE_NAME;
+                $mail->from = 'admin@'.SITE_NAME;
                 $mail->to = $email;
                 $mail->subject = 'Restore password';
                 $mail->body = $redirect_url;

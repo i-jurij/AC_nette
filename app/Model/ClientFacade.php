@@ -70,7 +70,7 @@ class ClientFacade
             $email = $data->email;
         }
 
-        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$/', $data->username)) {
+        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_ ]{3,25}$/', $data->username)) {
             $username = $data->username;
         }
 
@@ -183,7 +183,7 @@ class ClientFacade
             }
 
             if (!empty($data['roles']) && is_array($data['roles'])) {
-                if ($user->get($id)->related($this->table_role_user . '.user_id')->delete() > 0) {
+                if ($user->get($id)->related($this->table_role_user.'.user_id')->delete() > 0) {
                     unset($user);
                 }
                 $roles = [];
@@ -286,7 +286,7 @@ class ClientFacade
                     'updated_at' => $user->updated_at,
                 ];
 
-                foreach ($user->related($this->table_role_user . '.user_id') as $row) {
+                foreach ($user->related($this->table_role_user.'.user_id') as $row) {
                     $users_data[$user->id]['roles'][] = $row->ref('role', 'role_id');
                 }
             }
@@ -317,13 +317,13 @@ class ClientFacade
         }
         $query = $this->db->table($this->table);
 
-        return $query->where($field . $like, $pro . $data . $pro)->fetch();
+        return $query->where($field.$like, $pro.$data.$pro)->fetch();
     }
 
     /**
-     * Summary of getCl
+     * Summary of getCl.
+     *
      * @param string $type 'customer' or 'executor'
-     * @return Nette\Database\Table\Selection
      */
     public function getCl(string $type): Selection
     {

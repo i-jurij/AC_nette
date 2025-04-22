@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Home\Offer;
 
+use App\Model\CommentFacade;
 use App\Model\OfferFacade;
 use App\Model\RatingFacade;
 use App\UI\Accessory\FormFactory;
@@ -18,7 +19,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function __construct(
         private OfferFacade $offers,
         private FormFactory $formFactory,
-        private RatingFacade $rf
+        private RatingFacade $rf,
+        private CommentFacade $cf
     ) {
         parent::__construct();
     }
@@ -38,9 +40,10 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form_data->id = $id;
 
             $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-            $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
+            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
             $this->template->backlink = $this->storeRequest();
+            $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
         } else {
             $this->redirectPermanent(':Home:default');
         }
@@ -94,6 +97,79 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         exit;
     }
 
+    public function actionGetComment()
+    {
+        $comments = [];
+        $httpRequest = $this->getHttpRequest();
+        $offer_id = (int) htmlspecialchars($httpRequest->getPost('offer_id'));
+        $column = "`comment`.`id`, parent_id, client_id, comment_text, DATE_FORMAT(`comment`.created_at, '%e.%m.%Y %H:%i') AS created_at";
+        $client_column = '`username`, `image`, `phone`, `phone_verified`, `email`, `email_verified`, `rating`';
+        $inner_join = 'INNER JOIN `client` ON `comment`.`client_id` = `client`.`id`';
+        $where_offer = '`moderated` = 1 AND `offer_id` = ?';
+        $sql = "SELECT $column, $client_column FROM `comment` $inner_join WHERE $where_offer";
+
+        $comments = $this->offers->db->query($sql, $offer_id)->fetchAll();
+
+        $this->sendJson($comments);
+        exit;
+    }
+
+    public function createComponentOfferCommentForm()
+    {
+        $form = new Form();
+        $form->addProtection('Csrf error');
+        // $form->setTranslator($this->translator);
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
+        $renderer->wrappers['controls']['container'] = 'div';
+        $renderer->wrappers['pair']['container'] = 'div';
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+        $form->setHtmlAttribute('id', 'offer_comment_form');
+
+        $form->addTextArea('comment_text')
+            ->setHtmlAttribute('rows', '4')
+            ->setHtmlAttribute('cols', '100')
+            ->setHtmlAttribute('class', 'offer_comment_form_input')
+            ->setRequired();
+
+        $form->addHidden('offer_id')->setHtmlAttribute('class', 'offer_comment_form_input')->setRequired();
+        $form->addHidden('client_id')->setHtmlAttribute('class', 'offer_comment_form_input')->setRequired();
+        $form->addHidden('parent_id')->setHtmlAttribute('class', 'offer_comment_form_input')->setRequired();
+
+        // $form->addSubmit('offer_comment_form_submit', 'Комментировать');
+        $form->onSuccess[] = [$this, 'actionOfferCommentAdd'];
+
+        return $form;
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionOfferCommentAdd()
+    {
+        $httpRequest = $this->getHttpRequest();
+        $data = $httpRequest->getPost();
+
+        $d = new \Nette\Utils\ArrayHash();
+        $d->offer_id = (int) htmlspecialchars(strip_tags($data['offer_id']));
+        $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
+        if (!empty($data['parent_id'])) {
+            $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
+        }
+        // moderate comment_text here or into other method
+        if ($data['comment_text']) {
+            $d->comment_text = htmlspecialchars(strip_tags($data['comment_text']));
+            // $d->moderated = 1;
+        }
+
+        try {
+            $this->cf->create($d);
+            $this->sendJson(true);
+            exit;
+        } catch (\Throwable $th) {
+            $this->sendJson(false);
+        }
+    }
+
     public function renderAdd()
     {
     }
@@ -104,4 +180,5 @@ class OfferTemplate extends \App\UI\Home\BaseTemplate
     public array $offers;
     public string $backlink;
     public array $offer_images;
+    public int $comments_count;
 }

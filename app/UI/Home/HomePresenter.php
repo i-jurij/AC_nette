@@ -42,7 +42,7 @@ final class HomePresenter extends BasePresenter
 
     public function actionSaveToBackend()
     {
-        $this->setPaginator(1);
+        $this->setOfferPaginator(1);
 
         $offers = $this->offers->getOffers($this->locality, $this->template->paginator->getLength(), $this->template->paginator->getOffset(), $this->form_data);
         $latte = $this->template->getLatte();
@@ -59,7 +59,7 @@ final class HomePresenter extends BasePresenter
 
     public function renderDefault(int $page = 1)
     {
-        $this->setPaginator($page);
+        $this->setOfferPaginator($page);
 
         $this->template->form_data = $this->form_data;
         $this->template->service_list = $this->services->getAllServices();
@@ -75,7 +75,7 @@ final class HomePresenter extends BasePresenter
         $this->template->csrf = Csrf::getToken();
     }
 
-    protected function setPaginator(int $page)
+    protected function setOfferPaginator(int $page)
     {
         $offersCount = $this->offers->offersCount(location: $this->locality, form_data: $this->form_data);
         $paginator = new Paginator();

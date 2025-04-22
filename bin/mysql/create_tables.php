@@ -106,7 +106,7 @@ $offer = 'CREATE TABLE IF NOT EXISTS `offer` (
 	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
-$offer_image = 'CREATE TABLE `offer_image_thumb` (
+$offer_image = 'CREATE TABLE IF NOT EXISTS `offer_image_thumb` (
 	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 	`offer_id` INTEGER NOT NULL,
 	`caption` VARCHAR(128) NOT NULL,
@@ -116,6 +116,7 @@ $offer_image = 'CREATE TABLE `offer_image_thumb` (
 
 $comment = 'CREATE TABLE IF NOT EXISTS `comment` (
 	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`parent_id` INTEGER UNSIGNED DEFAULT NULL,
 	`offer_id` INTEGER UNSIGNED NOT NULL,
 	`client_id` INTEGER UNSIGNED NOT NULL,
 	`comment_text` text NOT NULL,
@@ -123,6 +124,7 @@ $comment = 'CREATE TABLE IF NOT EXISTS `comment` (
 	`request_data` TEXT DEFAULT NULL,
 	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (`parent_id`) REFERENCES `comment`(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE,
 	FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
