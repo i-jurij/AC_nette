@@ -160,7 +160,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         // moderate comment_text here or into other method
         if ($data['comment_text']) {
             $text = htmlspecialchars(strip_tags($data['comment_text']));
-            $isBad = ModeratingText::parse(s: $text, delta: '3', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
+            $isBad = ModeratingText::parse(s: $text, delta: '0', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
             if ($isBad === false) {
                 $d->comment_text = $text;
                 $d->moderated = 1;

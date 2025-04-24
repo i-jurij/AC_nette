@@ -318,11 +318,14 @@ class ModeratingText
                                    \x20?+
                                    (?> (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)++ \x20 ){0,'.$delta.'}+
                                 /sxSX', $s2, $m2);
-                    $fragment = (ltrim(@$m1[0]) !== ltrim($s1) ? $continue : '').
-                        trim((isset($m1[0]) ? $m1[0] : '').'['.trim($word).']'.(isset($m2[0]) ? $m2[0] : '')).
-                        (rtrim(@$m2[0]) !== rtrim($s2) ? $continue : '');
-                }
+								if (!empty($m1[0]) && !empty($s1)) {
+									$fragment = (ltrim(@$m1[0]) !== ltrim($s1) ? $continue : '').
+                        			trim((isset($m1[0]) ? $m1[0] : '').'['.trim($word).']'.(isset($m2[0]) ? $m2[0] : '')).
+                        			(rtrim(@$m2[0]) !== rtrim($s2) ? $continue : '');
+								}
 
+                }
+				$fragment = (!isset($fragment)) ? $fragment : '';
                 return UTF8::convert_to($fragment, $charset);
             }
 

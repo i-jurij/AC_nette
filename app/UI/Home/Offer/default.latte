@@ -247,8 +247,8 @@
     {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}
     {* <p> End_time: {$offers[0]['end_time']}</p> *}
     <div>
-        <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top"
-            data-tooltip="Показать комментарии">
+        {* <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top" *} <button
+            id="comment_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть комментарии">
             Комментарии
             &ensp;
             <span class="" id="comments_count_span">{$comments_count}</span>
@@ -259,7 +259,7 @@
         </button>
         &emsp;
         <button id="similar_offer_button" onclick="getSimilar(json_encode({$offers[0]}))" class="tooltip-top"
-            data-tooltip="Показать похожие">
+            data-tooltip="Показать / скрыть похожие">
             Похожие объявления
         </button>
 
@@ -425,9 +425,6 @@
 
     function getComment(offer_id){
         const comment_or_similar = document.querySelector("#comment_or_similar");
-        const comment_button = document.getElementById('comment_offer_button');
-
-        if (comment_or_similar.classList.contains('display-none') ) {
             let formData = new FormData();
             formData.set('offer_id', offer_id);
 
@@ -444,13 +441,6 @@
                 let comments = sort_comments(json); 
                 
                 if (comment_or_similar) {
-                        comment_or_similar.classList.remove('display-none');
-                        comment_or_similar.style.cssText = 'list-style: none outside none;';
-                        
-                        if (comment_button) {
-                            comment_button.classList.add('bg-olive');
-                        }
-
                         if (comments.length > 0) {
                             const comments_count_span = document.getElementById('comments_count_span');
                             if (comments_count_span) {
@@ -465,12 +455,6 @@
                 }
             })
             .catch(error => console.error('Error:', error));
-        } else {
-            comment_or_similar.classList.add('display-none');
-            if (comment_button) {
-                comment_button.classList.remove('bg-olive');
-            }
-        }
     }
 
     function clearAllFormInputs(form_id) {
@@ -514,4 +498,25 @@
         }
     }
     //// end comment ////////////////
+
+    const comment_button = document.getElementById('comment_offer_button');
+    const comment_or_similar = document.querySelector("#comment_or_similar");
+    if (comment_button) {
+        comment_button.addEventListener('pointerup', function (event) {
+            if (comment_or_similar.classList.contains('display-none') ) {
+                getComment({{$offers[0]['id']}});
+                comment_or_similar.classList.remove('display-none');
+                comment_or_similar.style.cssText = 'list-style: none outside none;';
+                if (comment_button) {
+                comment_button.classList.add('bg-olive');
+                }
+            } else {
+                comment_or_similar.classList.add('display-none');
+                if (comment_button) {
+                    comment_button.classList.remove('bg-olive');
+                }
+            }
+        });
+    }
+
 </script>

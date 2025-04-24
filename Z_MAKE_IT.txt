@@ -2,26 +2,22 @@
         
 MAKE  
 
-цензура сообщений комментариев в cjmment qnd foffer message   comment +   offer -
-
-menu for registerd client:
-profile for client (edit, delete)
-
 for offer and comments put to offer.request_data serialized $_SERVER
 
 offer add (publish after moderate), edit (publish after moderate), delete for client
 comments for offer-client (publish after moderate)
 
-для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
+цензура сообщений комментариев в cjmment qnd foffer message   comment +   offer -
+
+menu for registerd client:
+profile for client (edit, delete)
+
 
 чат между клиентами 
 
 избранное для клиентов
 
 похожие объявления по региону (js fetch by region, type, services, price)
-
-auto moderating comments (clear not allowed words etc )
-auto moderating offers message (clear not allowed words etc )
 
 -------------------
 CHAT
@@ -41,6 +37,8 @@ interface
 посл сооб   посл сооб
 ...         ...
 ------
+
+для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
 
 --------------------------------
 admin clients customers executors, offers punkt "by location" make
