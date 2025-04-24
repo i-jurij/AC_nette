@@ -2,6 +2,8 @@
         
 MAKE  
 
+цензура сообщений комментариев в cjmment qnd foffer message   comment +   offer -
+
 menu for registerd client:
 profile for client (edit, delete)
 
@@ -10,7 +12,17 @@ for offer and comments put to offer.request_data serialized $_SERVER
 offer add (publish after moderate), edit (publish after moderate), delete for client
 comments for offer-client (publish after moderate)
 
+для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
+
+чат между клиентами 
+
+избранное для клиентов
+
 похожие объявления по региону (js fetch by region, type, services, price)
+
+auto moderating comments (clear not allowed words etc )
+auto moderating offers message (clear not allowed words etc )
+
 -------------------
 CHAT
 table
@@ -32,17 +44,6 @@ interface
 
 --------------------------------
 admin clients customers executors, offers punkt "by location" make
-
-для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 
-
-? список предложений работы справа (моб сверху) три самых больших прайса
-? список предложений услуг слева (моб снизу) 3 миним прайса
-
-? пункт меню "средние расценки": мин, макс, средние
-
-чат между клиентами 
-
-избранное для клиентов
 
 remove client (and him comments) from db if he dont have orders in 3 month eg
 remove from db orders from customers if it is 3 month old eg

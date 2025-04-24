@@ -251,7 +251,7 @@
             data-tooltip="Показать комментарии">
             Комментарии
             &ensp;
-            <span class="">{$comments_count}</span>
+            <span class="" id="comments_count_span">{$comments_count}</span>
         </button>
         <button class="tooltip-top" data-tooltip="Добавить комментарий" aria-label="Добавить комментарий"
             onclick="offer_comment_form_show();">
@@ -424,39 +424,53 @@
     }
 
     function getComment(offer_id){
-        let formData = new FormData();
-        formData.set('offer_id', offer_id);
+        const comment_or_similar = document.querySelector("#comment_or_similar");
+        const comment_button = document.getElementById('comment_offer_button');
 
-        fetch(url_comment, {
-                responseType: 'json',
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {'X-Requested-With': 'XMLHttpRequest'},
-                body: formData 
-            }
-        ).then(response => response.json())
-        .then(json => {
-            let comments = sort_comments(json); 
+        if (comment_or_similar.classList.contains('display-none') ) {
+            let formData = new FormData();
+            formData.set('offer_id', offer_id);
+
+            fetch(url_comment, {
+                    responseType: 'json',
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    body: formData 
+                }
+            ).then(response => response.json())
+            .then(json => {
+                let count_comm = json.length;
+                let comments = sort_comments(json); 
                 
-            const comment_or_similar = document.querySelector("#comment_or_similar");
-            if (comment_or_similar) {
-                comment_or_similar.classList.remove('display-none');
-                comment_or_similar.style.cssText = 'list-style: none outside none;';
+                if (comment_or_similar) {
+                        comment_or_similar.classList.remove('display-none');
+                        comment_or_similar.style.cssText = 'list-style: none outside none;';
+                        
+                        if (comment_button) {
+                            comment_button.classList.add('bg-olive');
+                        }
 
-                let comment_button = document.getElementById('comment_offer_button');
-                if (comment_button) {
-                    comment_button.classList.add('bg-olive');
-                }
+                        if (comments.length > 0) {
+                            const comments_count_span = document.getElementById('comments_count_span');
+                            if (comments_count_span) {
+                                comments_count_span.innerHTML = count_comm;
+                            }
+                            comment_or_similar.innerHTML = "";
+                            recBuild(document.querySelector("#comment_or_similar"),comments);
+                        } else {
+                            comment_or_similar.innerHTML = "Комментариев пока нет";
+                        }
 
-                if (comments.length > 0) {
-                    comment_or_similar.innerHTML = "";
-                    recBuild(document.querySelector("#comment_or_similar"),comments);
-                } else {
-                    comment_or_similar.innerHTML = "Комментариев пока нет";
                 }
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            comment_or_similar.classList.add('display-none');
+            if (comment_button) {
+                comment_button.classList.remove('bg-olive');
             }
-        })
-        .catch(error => console.error('Error:', error));
+        }
     }
 
     function clearAllFormInputs(form_id) {

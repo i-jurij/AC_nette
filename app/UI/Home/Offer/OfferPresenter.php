@@ -9,6 +9,7 @@ use App\Model\OfferFacade;
 use App\Model\RatingFacade;
 use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\Ip;
+use App\UI\Accessory\ModeratingText;
 use Nette\Application\UI\Form;
 
 /**
@@ -106,7 +107,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $client_column = '`username`, `image`, `phone`, `phone_verified`, `email`, `email_verified`, `rating`';
         $inner_join = 'INNER JOIN `client` ON `comment`.`client_id` = `client`.`id`';
         $where_offer = '`moderated` = 1 AND `offer_id` = ?';
-        $sql = "SELECT $column, $client_column FROM `comment` $inner_join WHERE $where_offer";
+        $sql = "SELECT $column, $client_column FROM `comment` $inner_join WHERE $where_offer ORDER BY `comment`.created_at DESC";
 
         $comments = $this->offers->db->query($sql, $offer_id)->fetchAll();
 
@@ -155,17 +156,21 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         if (!empty($data['parent_id'])) {
             $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
         }
+        $d->request_data = \serialize($_SERVER);
         // moderate comment_text here or into other method
         if ($data['comment_text']) {
-            $d->comment_text = htmlspecialchars(strip_tags($data['comment_text']));
-            // $d->moderated = 1;
+            $text = htmlspecialchars(strip_tags($data['comment_text']));
+            $isBad = ModeratingText::parse(s: $text, delta: '3', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
+            if ($isBad === false) {
+                $d->comment_text = $text;
+                $d->moderated = 1;
+            }
         }
 
-        try {
+        if (!empty($d->comment_text)) {
             $this->cf->create($d);
             $this->sendJson(true);
-            exit;
-        } catch (\Throwable $th) {
+        } else {
             $this->sendJson(false);
         }
     }
