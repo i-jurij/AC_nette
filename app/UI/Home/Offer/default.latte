@@ -247,13 +247,14 @@
     {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}
     {* <p> End_time: {$offers[0]['end_time']}</p> *}
     <div>
-        {* <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top" *} <button
+        {* <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top" *} 
+        <button
             id="comment_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть комментарии">
             Комментарии
             &ensp;
             <span class="" id="comments_count_span">{$comments_count}</span>
         </button>
-        <button class="tooltip-top" data-tooltip="Добавить комментарий" aria-label="Добавить комментарий"
+        <button n:if="$user->isLoggedIn()" class="tooltip-top" data-tooltip="Добавить комментарий" aria-label="Добавить комментарий"
             onclick="offer_comment_form_show();">
             +
         </button>
@@ -265,7 +266,7 @@
 
         <ul id="comment_or_similar" class="bgcolor round p1 display-none"></ul>
 
-        <div class="modal">
+        <div  n:if="$user->isLoggedIn()"  class="modal">
             <input id="offer_comment_form_input" type="checkbox" />
             <label for="offer_comment_form_input" class="overlay"></label>
             <article class="card" style="max-width:1024px">
@@ -504,7 +505,13 @@
     if (comment_button) {
         comment_button.addEventListener('pointerup', function (event) {
             if (comment_or_similar.classList.contains('display-none') ) {
-                getComment({{$offers[0]['id']}});
+
+                if ({{$user->isLoggedIn()}}) {
+                    getComment({{$offers[0]['id']}});
+                } else {
+                    comment_or_similar.innerHTML = "Комментарии доступны после входа";
+                }
+                
                 comment_or_similar.classList.remove('display-none');
                 comment_or_similar.style.cssText = 'list-style: none outside none;';
                 if (comment_button) {

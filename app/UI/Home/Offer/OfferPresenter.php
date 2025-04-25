@@ -41,8 +41,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form_data->id = $id;
 
             $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
+            $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
             $this->template->backlink = $this->storeRequest();
             $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
         } else {
@@ -100,18 +100,22 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function actionGetComment()
     {
-        $comments = [];
-        $httpRequest = $this->getHttpRequest();
-        $offer_id = (int) htmlspecialchars($httpRequest->getPost('offer_id'));
-        $column = "`comment`.`id`, parent_id, client_id, comment_text, DATE_FORMAT(`comment`.created_at, '%e.%m.%Y %H:%i') AS created_at";
-        $client_column = '`username`, `image`, `phone`, `phone_verified`, `email`, `email_verified`, `rating`';
-        $inner_join = 'INNER JOIN `client` ON `comment`.`client_id` = `client`.`id`';
-        $where_offer = '`moderated` = 1 AND `offer_id` = ?';
-        $sql = "SELECT $column, $client_column FROM `comment` $inner_join WHERE $where_offer ORDER BY `comment`.created_at DESC";
+        if ($this->getUser()->isLoggedIn()) {
+            $comments = [];
+            $httpRequest = $this->getHttpRequest();
+            $offer_id = (int) htmlspecialchars($httpRequest->getPost('offer_id'));
+            $column = "`comment`.`id`, parent_id, client_id, comment_text, DATE_FORMAT(`comment`.created_at, '%e.%m.%Y %H:%i') AS created_at";
+            $client_column = '`username`, `image`, `phone`, `phone_verified`, `email`, `email_verified`, `rating`';
+            $inner_join = 'INNER JOIN `client` ON `comment`.`client_id` = `client`.`id`';
+            $where_offer = '`moderated` = 1 AND `offer_id` = ?';
+            $sql = "SELECT $column, $client_column FROM `comment` $inner_join WHERE $where_offer ORDER BY `comment`.created_at DESC";
 
-        $comments = $this->offers->db->query($sql, $offer_id)->fetchAll();
+            $comments = $this->offers->db->query($sql, $offer_id)->fetchAll();
 
-        $this->sendJson($comments);
+            $this->sendJson($comments);
+            exit;
+        }
+        $this->sendJson([]);
         exit;
     }
 
@@ -132,6 +136,9 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             ->setHtmlAttribute('rows', '4')
             ->setHtmlAttribute('cols', '100')
             ->setHtmlAttribute('class', 'offer_comment_form_input')
+            ->addCondition($form::Length, [8, 500])
+            // ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[а-яА-Яa-zA-Z0-9\s?!,.\'Ёё]+$')
+            ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\":;!]+$')
             ->setRequired();
 
         $form->addHidden('offer_id')->setHtmlAttribute('class', 'offer_comment_form_input')->setRequired();
@@ -147,29 +154,33 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function actionOfferCommentAdd()
     {
-        $httpRequest = $this->getHttpRequest();
-        $data = $httpRequest->getPost();
+        if ($this->user->isLoggedIn()) {
+            $httpRequest = $this->getHttpRequest();
+            $data = $httpRequest->getPost();
 
-        $d = new \Nette\Utils\ArrayHash();
-        $d->offer_id = (int) htmlspecialchars(strip_tags($data['offer_id']));
-        $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
-        if (!empty($data['parent_id'])) {
-            $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
-        }
-        $d->request_data = \serialize($_SERVER);
-        // moderate comment_text here or into other method
-        if ($data['comment_text']) {
-            $text = htmlspecialchars(strip_tags($data['comment_text']));
-            $isBad = ModeratingText::parse(s: $text, delta: '0', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
-            if ($isBad === false) {
-                $d->comment_text = $text;
-                $d->moderated = 1;
+            $d = new \Nette\Utils\ArrayHash();
+            $d->offer_id = (int) htmlspecialchars(strip_tags($data['offer_id']));
+            $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
+            if (!empty($data['parent_id'])) {
+                $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
             }
-        }
+            $d->request_data = \serialize($_SERVER);
+            // moderate comment_text here or into other method
+            if ($data['comment_text']) {
+                $text = htmlspecialchars(strip_tags($data['comment_text']));
+                $isBad = ModeratingText::parse(s: $text, delta: '0', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
+                if ($isBad === false) {
+                    $d->comment_text = $text;
+                    $d->moderated = 1;
+                }
+            }
 
-        if (!empty($d->comment_text)) {
-            $this->cf->create($d);
-            $this->sendJson(true);
+            if (!empty($d->comment_text)) {
+                $this->cf->create($d);
+                $this->sendJson(true);
+            } else {
+                $this->sendJson(false);
+            }
         } else {
             $this->sendJson(false);
         }

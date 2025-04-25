@@ -23,8 +23,7 @@
             <label for="offer_client_rating" class="overlay"></label>
             <article>
                 {if !$user->isLoggedIn()}
-                <p>Изменение рейтинга доступно только зарегистрированным
-                    пользователям.
+                <p>Изменение рейтинга доступно после входа.
                 </p>
                 <footer n:class="$user->isLoggedIn() ? 'mt2'">
                     <a class="button" n:if="!$user->isLoggedIn()" n:href=":Home:Sign:up">Зарегистрироваться</a>

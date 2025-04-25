@@ -11,8 +11,7 @@
                                     {\App\UI\Accessory\PhoneNumber::fromDb($offers[0]['client_phone'])}
                                 </a>
                             </div>
-                            <p n:else>Телефон и другие контактные данные доступны только зарегистрированным
-                                пользователям.
+                            <p n:else>Телефон и другие контактные данные доступны после входа.
                             </p>
                         </section>
                         <footer n:class="$user->isLoggedIn() ? 'mt2'">

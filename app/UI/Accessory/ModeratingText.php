@@ -199,7 +199,6 @@ class ModeratingText
                 // FUCK
                 '(?<=\PL) f_?u_?[cс]_?k',  // fuck, fucking
 
-                /*
                 #ЛОХ
                 ' л_?[оo]_?[хx]',
 
@@ -212,7 +211,8 @@ class ModeratingText
 
                 #ЗАЛУПА
                 ' [зz3]_?[аa]_?[лl]_?[уy]_?[пp]_?[аa]',
-                */
+
+				' [нтН]_?[аa]_?[рРrR]_?[кkКK]_?[оo]_?[тt]*',
             ];
 
             $trans = [
