@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\Accessory;
+namespace App\UI\Accessory\Moderating;
 
 /**
  * Определение наличия мата (нецензурных слов) в тексте, матотест
@@ -30,7 +30,7 @@ namespace App\UI\Accessory;
  *
  * @version  3.2.7
  */
-class ModeratingText
+class CensureText
 {
     // запрещаем создание экземпляра класса, вызов методов этого класса только статически!
     private function __construct()
@@ -38,7 +38,7 @@ class ModeratingText
     }
 
     /**
-     * @param string      $s        строка для проверки
+     * @param string      $string        строка для проверки
      * @param string      $delta    ширина найденного фрагмента в словах
      *                              (кол-во слов от матного слова слева и справа, максимально 10)
      * @param string      $continue строка, которая будет вставлена в начале и в конце фрагмента
@@ -58,7 +58,7 @@ class ModeratingText
      *                              * PREG_BAD_UTF8_OFFSET_ERROR (since PHP 5.3.0)
      */
     public static function parse(
-        $s,
+        $string,
         $delta = 3,
         $continue = "\xe2\x80\xa6",
         $is_html = true,
@@ -66,7 +66,7 @@ class ModeratingText
         $charset = 'UTF-8')
     {
 
-        if ($s === null) {
+        if ($string === null) {
             return null;
         }
 
@@ -231,18 +231,18 @@ class ModeratingText
             $re_badwords = strtr($re_badwords, $trans);
         }
 
-        $s = UTF8::convert_from($s, $charset);
+        $string = UTF8::convert_from($string, $charset);
         $replace = UTF8::convert_from($replace, $charset);
 
-        $ss = $s;  // saves original string
+        $ss = $string;  // saves original string
 
         if ($is_html) {
             // скрипты не вырезаем, т.к. м.б. обходной маневр на с кодом на javascript:
             // <script>document.write('сло'+'во')</script>
             // хотя давать пользователю возможность использовать код на javascript нехорошо
-            $s = strip_tags($s);
+            $string = strip_tags($string);
             // заменяем html-сущности в "чистый" UTF-8
-            $s = UTF8::html_entity_decode($s, $is_htmlspecialchars = true);
+            $string = UTF8::html_entity_decode($string, $is_htmlspecialchars = true);
         }
 
         if (strtoupper(substr($charset, 0, 3)) === 'UTF') {  // UTF-8, UTF-16, UTF-32
@@ -250,17 +250,17 @@ class ModeratingText
             $additional_chars = [
                 "\xc2\xad",  // "мягкие" переносы строк (&shy;)
             ];
-            $s = UTF8::diactrical_remove($s, $additional_chars);
+            $string = UTF8::diactrical_remove($string, $additional_chars);
         }
 
         // ВотБ/\яПидорыОхуелиБлятьНахуйПохуйПи3децПолный
         if (version_compare(PHP_VERSION, '5.2.0', '>=')) {
-            $s = preg_replace('~     [\p{Lu}3] (?>\p{Ll}+|/|[@36]+)++   #Вот
+            $string = preg_replace('~     [\p{Lu}3] (?>\p{Ll}+|/|[@36]+)++   #Вот
 								 (?= [\p{Lu}3] (?:\p{Ll} |/|[@36] ) )   #Бля
-							   ~sxuSX', '$0 ', $s);
+							   ~sxuSX', '$0 ', $string);
         }
 
-        $s = UTF8::lowercase($s);
+        $string = UTF8::lowercase($string);
 
         // получаем в массив только буквы и цифры
         // "с_л@о#во,с\xc2\xa7лово.Слово" -> "с л о во с лово слово слово слово слово"
@@ -269,31 +269,31 @@ class ModeratingText
 						  |  @         #а
 						  |  [a-z\d]+
 						  )+
-						~sxSX', $s, $m);
-        $s = ' '.implode(' ', $m[0]).' ';
+						~sxSX', $string, $m);
+        $string = ' '.implode(' ', $m[0]).' ';
 
         $trans = [
             '/\\' => 'л',  // Б/\ЯТЬ --> БЛЯТЬ
             '@' => 'а',  // пизд@  --> пизда
         ];
-        $s = strtr($s, $trans);
+        $string = strtr($string, $trans);
 
         // цифровые подделки под буквы
         $trans = [
             '~ [3з]++ [3з\x20]*+ ~sxuSX' => 'з',
             '~ [6б]++ [6б\x20]*+ ~sxuSX' => 'б',
         ];
-        $s = preg_replace(array_keys($trans), array_values($trans), $s);
+        $string = preg_replace(array_keys($trans), array_values($trans), $string);
 
         // убираем все повторяющиеся символы, ловим обман типа "х-у-у-й"
         // "сллоооовоо   слово  х у у й" --> "слово слово х у й"
-        $s = preg_replace('/(  [\xd0\xd1][\x80-\xbf] \x20?  #optimized [а-я]
+        $string = preg_replace('/(  [\xd0\xd1][\x80-\xbf] \x20?  #optimized [а-я]
                              | [a-z\d] \x20?
                              ) \\1+
-                           /sxSX', '$1', $s);
+                           /sxSX', '$1', $string);
 
         if ($replace === null || version_compare(PHP_VERSION, '5.2.0', '<')) {
-            $result = preg_match($re_badwords, $s, $m, PREG_OFFSET_CAPTURE);
+            $result = preg_match($re_badwords, $string, $m, PREG_OFFSET_CAPTURE);
             if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
                 return preg_last_error();
             }
@@ -302,8 +302,8 @@ class ModeratingText
             }  // PREG_INTERNAL_ERROR = 1
             if ($result && $replace === null) {
                 list($word, $offset) = $m[0];
-                $s1 = substr($s, 0, $offset);
-                $s2 = substr($s, $offset + strlen($word));
+                $s1 = substr($string, 0, $offset);
+                $s2 = substr($string, $offset + strlen($word));
                 $delta = intval($delta);
                 if ($delta === 0) {
                     $fragment = '['.trim($word).']';
@@ -325,14 +325,14 @@ class ModeratingText
 								}
 
                 }
-				$fragment = (!isset($fragment)) ? $fragment : '';
+				$fragment = (isset($fragment)) ? $fragment : '';
                 return UTF8::convert_to($fragment, $charset);
             }
 
             return false;
         }
 
-        $result = preg_match_all($re_badwords, $s, $m);
+        $result = preg_match_all($re_badwords, $string, $m);
         if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
             return preg_last_error();
         }
@@ -340,16 +340,16 @@ class ModeratingText
             return 1;
         }  // PREG_INTERNAL_ERROR = 1
         if ($result > 0) {
-            // d($s, $m[0]);
-            $s = $ss;
+            // d($string, $m[0]);
+            $string = $ss;
             // замена матного фрагмента на $replace
             foreach ($m[0] as $w) {
-                $re_w = '~'.preg_replace_callback('~(?:/|[^\x20])~suSX', ['self', '_make_regexp_callback'], $w).'~sxuiSX';
+                $re_w = '~'.preg_replace_callback('~(?:/|[^\x20])~suSX', fn($w) => self::class::_make_regexp_callback($w), $w).'~sxuiSX';
                 $ss = preg_replace($re_w, $replace, $ss);
                 // d($re_w);
             }
-            while ($ss !== $s) {
-                $ss = self::parse($s = $ss, $delta, $continue, $is_html, $replace, 'UTF-8');
+            while ($ss !== $string) {
+                $ss = self::class::parse($string = $ss, $delta, $continue, $is_html, $replace, 'UTF-8');
             }
         }
 
@@ -413,8 +413,8 @@ class ModeratingText
  *   * PHP >= 5.3.x
  *
  * Example:
- *   $s = 'Hello, Привет';
- *   if (UTF8::is_utf8($s)) echo UTF8::strlen($s);
+ *   $string = 'Hello, Привет';
+ *   if (UTF8::is_utf8($string)) echo UTF8::strlen($string);
  *
  * UTF-8 encoding scheme:
  *   2^7   0x00000000 — 0x0000007F  0xxxxxxx
@@ -2615,71 +2615,71 @@ class UTF8
 	 * Remove combining diactrical marks, with possibility of the restore
 	 * Удаляет диакритические знаки в тексте, с возможностью восстановления (опция)
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   array|null        $additional_chars   for example: "\xc2\xad"  #soft hyphen = discretionary hyphen
 	 * @param   bool              $is_can_restored
 	 * @param   array|null        &$restore_table
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function diactrical_remove($s, $additional_chars = null, $is_can_restored = false, &$restore_table = null)
+	public static function diactrical_remove($string, $additional_chars = null, $is_can_restored = false, &$restore_table = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		if ($additional_chars)
 		{
 			foreach ($additional_chars as $k => &$v) $v = preg_quote($v, '/');
-			$re = '/((?>' . self::$diactrical_re . '|' . implode('|', $additional_chars) . ')+)/sxSX';
+			$re = '/((?>' . self::class::$diactrical_re . '|' . implode('|', $additional_chars) . ')+)/sxSX';
 		}
-		else $re = '/((?>' . self::$diactrical_re . ')+)/sxSX';
-		if (! $is_can_restored) return preg_replace($re, '', $s);
+		else $re = '/((?>' . self::class::$diactrical_re . ')+)/sxSX';
+		if (! $is_can_restored) return preg_replace($re, '', $string);
 
 		$restore_table = array();
-		$a = preg_split($re, $s, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$a = preg_split($re, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$c = count($a);
-		if ($c === 1) return $s;
+		if ($c === 1) return $string;
 		$pos = 0;
 		$s2 = '';
 		for ($i = 0; $i < $c - 1; $i += 2)
 		{
 			$s2 .= $a[$i];
 			#запоминаем символьные (не байтовые!) позиции
-			$pos += self::strlen($a[$i]);
+			$pos += self::class::strlen($a[$i]);
 			$restore_table['offsets'][$pos] = $a[$i + 1];
 		}
-		$restore_table['length'] = $pos + self::strlen(end($a));
+		$restore_table['length'] = $pos + self::class::strlen(end($a));
 		return $s2 . end($a);
 	}
 
 	/**
-	 * Restore combining diactrical marks, removed by self::diactrical_remove()
+	 * Restore combining diactrical marks, removed by self::class::diactrical_remove()
 	 * In Russian:
 	 * Восстанавливает диакритические знаки в тексте, при условии, что их символьные позиции и кол-во символов не изменились!
 	 *
-	 * @see     self::diactrical_remove()
-	 * @param   string|null       $s
+	 * @see     self::class::diactrical_remove()
+	 * @param   string|null       $string
 	 * @param   array             $restore_table
 	 * @return  string|bool|null  Returns FALSE if error occurred (broken $restore_table)
 	 */
-	public static function diactrical_restore($s, array $restore_table)
+	public static function diactrical_restore($string, array $restore_table)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		if (! $restore_table) return $s;
+		if (! $restore_table) return $string;
 		if (! is_int(@$restore_table['length']) ||
 			! is_array(@$restore_table['offsets']) ||
-			$restore_table['length'] !== self::strlen($s)) return false;
+			$restore_table['length'] !== self::class::strlen($string)) return false;
 		$a = array();
 		$length = $offset = 0;
 		$s2 = '';
 		foreach ($restore_table['offsets'] as $pos => $diactricals)
 		{
 			$length = $pos - $offset;
-			$s2 .= self::substr($s, $offset, $length) . $diactricals;
+			$s2 .= self::class::substr($string, $offset, $length) . $diactricals;
 			$offset = $pos;
 		}
-		return $s2 . self::substr($s, $offset, strlen($s));
+		return $s2 . self::class::substr($string, $offset, strlen($string));
 	}
 
 	/**
@@ -2692,7 +2692,7 @@ class UTF8
 	public static function convert_from($data, $charset = 'cp1251')
 	{
 		
-		return self::_convert($data, $charset, 'UTF-8');
+		return self::class::_convert($data, $charset, 'UTF-8');
 	}
 
 	/**
@@ -2705,7 +2705,7 @@ class UTF8
 	public static function convert_to($data, $charset = 'cp1251')
 	{
 		
-		return self::_convert($data, 'UTF-8', $charset);
+		return self::class::_convert($data, 'UTF-8', $charset);
 	}
 
 	/**
@@ -2727,9 +2727,9 @@ class UTF8
 			$d = array();
 			foreach ($data as $k => &$v)
 			{
-				$k = self::_convert($k, $charset_from, $charset_to);
+				$k = self::class::_convert($k, $charset_from, $charset_to);
 				if ($k === false) return false;
-				$d[$k] = self::_convert($v, $charset_from, $charset_to);
+				$d[$k] = self::class::_convert($v, $charset_from, $charset_to);
 				if ($d[$k] === false && ! is_bool($v)) return false;
 			}
 			return $d;
@@ -2737,29 +2737,29 @@ class UTF8
 		if (is_string($data))
 		{
 			#smart behaviour for errors protected + speed improve
-			if ($charset_from === 'UTF-8' && ! self::is_utf8($data)) return $data;
-			if ($charset_to === 'UTF-8' && self::is_utf8($data)) return $data;
+			if ($charset_from === 'UTF-8' && ! self::class::is_utf8($data)) return $data;
+			if ($charset_to === 'UTF-8' && self::class::is_utf8($data)) return $data;
 
 			#since PHP-5.3.x iconv() faster then mb_convert_encoding()
 			if (function_exists('iconv')) return iconv($charset_from, $charset_to . '//IGNORE//TRANSLIT', $data);
 			if (function_exists('mb_convert_encoding')) return mb_convert_encoding($data, $charset_to, $charset_from);
 
 			#charset_from
-			if ($charset_from === 'UTF-16' || $charset_from === 'UCS-2')  return self::_convert_from_utf16($data);
-			if ($charset_from === 'cp1251' || $charset_from === 'cp1259') return strtr($data, self::$cp1259_table);
-			if ($charset_from === 'koi8-r' || $charset_from === 'KOI8-R') return strtr(mb_convert_encoding($data, 'koi8-r', 'windows-1251'), self::$cp1259_table);
-			if ($charset_from === 'iso8859-5') return strtr(mb_convert_encoding($data, 'iso8859-5', 'windows-1251'), self::$cp1259_table);
-			if ($charset_from === 'cp866') return strtr(mb_convert_encoding($data, 'x-cp866', 'windows-1251'), self::$cp1259_table);
-			if ($charset_from === 'mac-cyrillic') return strtr(mb_convert_encoding($data, 'x-mac-cyrillic', 'windows-1251'), self::$cp1259_table);
+			if ($charset_from === 'UTF-16' || $charset_from === 'UCS-2')  return self::class::_convert_from_utf16($data);
+			if ($charset_from === 'cp1251' || $charset_from === 'cp1259') return strtr($data, self::class::$cp1259_table);
+			if ($charset_from === 'koi8-r' || $charset_from === 'KOI8-R') return strtr(mb_convert_encoding($data, 'koi8-r', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'iso8859-5') return strtr(mb_convert_encoding($data, 'iso8859-5', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'cp866') return strtr(mb_convert_encoding($data, 'x-cp866', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'mac-cyrillic') return strtr(mb_convert_encoding($data, 'x-mac-cyrillic', 'windows-1251'), self::class::$cp1259_table);
 
 			#charset_to
-			if ($charset_to === 'cp1251' || $charset_to === 'cp1259') return strtr($data, array_flip(self::$cp1259_table));
+			if ($charset_to === 'cp1251' || $charset_to === 'cp1259') return strtr($data, array_flip(self::class::$cp1259_table));
 
 			#last trying
 			if (function_exists('recode_string'))
 			{
-				$s = @recode_string($charset_from . '..' . $charset_to, $data);
-				if (is_string($s)) return $s;
+				$string = @recode_string($charset_from . '..' . $charset_to, $data);
+				if (is_string($string)) return $string;
 			}
 
 			trigger_error('Convert "' . $charset_from . '" --> "' . $charset_to . '" is not supported native, "iconv" or "mbstring" extension required', E_USER_WARNING);
@@ -2776,13 +2776,13 @@ class UTF8
 	 * Преобразует строку из кодировки UTF-16 / UCS-2 в UTF-8.
 	 * Суррогаты UTF-16 поддерживаются!
 	 *
-	 * @param    string        $s
+	 * @param    string        $string
 	 * @param    string        $type      'BE' -- big endian byte order
 	 *                                    'LE' -- little endian byte order
 	 * @param    bool          $to_array  returns array chars instead whole string?
 	 * @return   string|array|bool        UTF-8 string, array chars or FALSE if error occurred
 	 */
-	private static function _convert_from_utf16($s, $type = 'BE', $to_array = false)
+	private static function _convert_from_utf16($string, $type = 'BE', $to_array = false)
 	{
 		static $types = array(
 			'BE' => 'n',  #unsigned short (always 16 bit, big endian byte order)
@@ -2796,10 +2796,10 @@ class UTF8
 		#the fastest way:
 		if (function_exists('iconv') || function_exists('mb_convert_encoding'))
 		{
-			if (function_exists('iconv'))                   $s = iconv('UTF-16' . $type, 'UTF-8', $s);
-			elseif (function_exists('mb_convert_encoding')) $s = mb_convert_encoding($s, 'UTF-8', 'UTF-16' . $type);
-			if (! $to_array) return $s;
-			return self::str_split($s);
+			if (function_exists('iconv'))                   $string = iconv('UTF-16' . $type, 'UTF-8', $string);
+			elseif (function_exists('mb_convert_encoding')) $string = mb_convert_encoding($string, 'UTF-8', 'UTF-16' . $type);
+			if (! $to_array) return $string;
+			return self::class::str_split($string);
 		}
 
 		/*
@@ -2834,7 +2834,7 @@ class UTF8
 		*/
 		$a = array();
 		$hi = false;
-		foreach (unpack($types[$type] . '*', $s) as $codepoint)
+		foreach (unpack($types[$type] . '*', $string) as $codepoint)
 		{
 			#surrogate process
 			if ($hi !== false)
@@ -2844,11 +2844,11 @@ class UTF8
 				else
 				{
 					$codepoint = (($hi - 0xD800) * 0x400) + ($lo - 0xDC00) + 0x10000;
-					$a[] = self::chr($codepoint);
+					$a[] = self::class::chr($codepoint);
 				}
 				$hi = false;
 			}
-			elseif ($codepoint < 0xD800 || $codepoint > 0xDBFF) $a[] = self::chr($codepoint); #not surrogate
+			elseif ($codepoint < 0xD800 || $codepoint > 0xDBFF) $a[] = self::class::chr($codepoint); #not surrogate
 			else $hi = $codepoint; #surrogate was found
 		}
 		return $to_array ? $a : implode('', $a);
@@ -2860,11 +2860,11 @@ class UTF8
 	 * @param   string|null       String to clean
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function strict($s)
+	public static function strict($string)
 	{
 		
-		if (is_null($s)) return $s;
-		return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]+/sSX', '', $s);
+		if (is_null($string)) return $string;
+		return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]+/sSX', '', $string);
 	}
 
 	/**
@@ -2884,7 +2884,7 @@ class UTF8
 		{
 			foreach ($data as $k => &$v)
 			{
-				if (! self::is_ascii($k) || ! self::is_ascii($v)) return false;
+				if (! self::class::is_ascii($k) || ! self::class::is_ascii($v)) return false;
 			}
 			return true;
 		}
@@ -2917,7 +2917,7 @@ class UTF8
 		{
 			foreach ($data as $k => &$v)
 			{
-				if (! self::is_utf8($k, $is_strict) || ! self::is_utf8($v, $is_strict)) return false;
+				if (! self::class::is_utf8($k, $is_strict) || ! self::class::is_utf8($v, $is_strict)) return false;
 			}
 			return true;
 		}
@@ -2937,18 +2937,18 @@ class UTF8
 	/**
 	 * Tries to detect if a string is in Unicode encoding
 	 *
-	 * @deprecated  Slowly, use self::is_utf8() instead
-	 * @see     self::is_utf8()
-	 * @param   string   $s          текст
+	 * @deprecated  Slowly, use self::class::is_utf8() instead
+	 * @see     self::class::is_utf8()
+	 * @param   string   $string          текст
 	 * @param   bool     $is_strict  строгая проверка диапазона ASCII?
 	 * @return  bool
 	 */
-	public static function check($s, $is_strict = true)
+	public static function check($string, $is_strict = true)
 	{
 		
-		for ($i = 0, $len = strlen($s); $i < $len; $i++)
+		for ($i = 0, $len = strlen($string); $i < $len; $i++)
 		{
-			$c = ord($s[$i]);
+			$c = ord($string[$i]);
 			if ($c < 0x80) #1 byte  0bbbbbbb
 			{
 				if ($is_strict === false || ($c > 0x1F && $c < 0x7F) || $c == 0x09 || $c == 0x0A || $c == 0x0D) continue;
@@ -2963,7 +2963,7 @@ class UTF8
 			for ($j = 0; $j < $n; $j++)
 			{
 				$i++;
-				if ($i == $len || ((ord($s[$i]) & 0xC0) != 0x80) ) return false;
+				if ($i == $len || ((ord($string[$i]) & 0xC0) != 0x80) ) return false;
 			}
 		}
 		return true;
@@ -3003,21 +3003,21 @@ class UTF8
 		{
 			foreach ($data as $k => &$v)
 			{
-				if (! self::blocks_check($k, $blocks) || ! self::blocks_check($v, $blocks)) return false;
+				if (! self::class::blocks_check($k, $blocks) || ! self::class::blocks_check($v, $blocks)) return false;
 			}
 			return true;
 		}
 
 		if (is_string($data))
 		{
-			$chars = self::str_split($data);
+			$chars = self::class::str_split($data);
 			if ($chars === false) return false; #broken UTF-8
 			unset($data); #memory free
 			$skip = array(); #save to cache already checked symbols
 			foreach ($chars as $i => $char)
 			{
 				if (array_key_exists($char, $skip)) continue; #speed improve
-				$codepoint = self::ord($char);
+				$codepoint = self::class::ord($char);
 				if ($codepoint === false) return false; #broken UTF-8
 				$is_valid = false;
 				$blocks = (array)$blocks;
@@ -3025,12 +3025,12 @@ class UTF8
 				{
 					if (is_string($block))
 					{
-						if (! array_key_exists($block, self::$unicode_blocks))
+						if (! array_key_exists($block, self::class::$unicode_blocks))
 						{
 							trigger_error('Unknown block "' . $block . '"!', E_USER_WARNING);
 							return false;
 						}
-						list ($min, $max) = self::$unicode_blocks[$block];
+						list ($min, $max) = self::class::$unicode_blocks[$block];
 					}
 					elseif (is_array($block)) list ($min, $max) = $block;
 					elseif (is_int($block)) $min = $max = $block;
@@ -3065,9 +3065,9 @@ class UTF8
 	 *    Если данные опять не в кодировке UTF-8, то они считаются разбитыми и функция возвращает FALSE.
 	 *
 	 * NOTICE
-	 *   Функция должна вызываться после self::unescape_request()!
+	 *   Функция должна вызываться после self::class::unescape_request()!
 	 *
-	 * @see     self::unescape_request()
+	 * @see     self::class::unescape_request()
 	 * @param   bool    $is_hex2bin  Декодировать HEX-данные?
 	 *                               Пример: 0xd09ec2a0d0bad0bed0bcd0bfd0b0d0bdd0b8d0b8 => О компании
 	 *                               Параметры в URL адресах иногда бывает удобно кодировать не функцией rawurlencode(),
@@ -3087,7 +3087,7 @@ class UTF8
 			if (! array_key_exists($v, $GLOBALS)) continue;
 			#использовать array_walk_recursive() не предоставляется возможным,
 			#т.к. его callback функция не поддерживает передачу ключа по ссылке
-			$GLOBALS[$v] = self::_autoconvert_request_recursive($GLOBALS[$v], $is_converted, $is_broken, $is_hex2bin, $charset);
+			$GLOBALS[$v] = self::class::_autoconvert_request_recursive($GLOBALS[$v], $is_converted, $is_broken, $is_hex2bin, $charset);
 			if ($is_broken)
 			{
 				trigger_error('Array $' . $v . ' does not have keys/values in UTF-8 charset!', E_USER_WARNING);
@@ -3112,36 +3112,36 @@ class UTF8
 			$d = array();
 			foreach ($data as $k => &$v)
 			{
-				$k = self::_autoconvert_request($k, $is_converted, $is_broken, $is_hex2bin, $charset);
+				$k = self::class::_autoconvert_request($k, $is_converted, $is_broken, $is_hex2bin, $charset);
 				if ($is_broken) return $data;  #speed improve
-				$d[$k] = self::_autoconvert_request_recursive($v, $is_converted, $is_broken, $is_hex2bin, $charset);
+				$d[$k] = self::class::_autoconvert_request_recursive($v, $is_converted, $is_broken, $is_hex2bin, $charset);
 				if ($is_broken) return $data;  #speed improve
 			}
 			return $d;
 		}
-		return self::_autoconvert_request($data, $is_converted, $is_broken, $is_hex2bin, $charset);
+		return self::class::_autoconvert_request($data, $is_converted, $is_broken, $is_hex2bin, $charset);
 	}
 
-	private static function _autoconvert_request(&$s, &$is_converted, &$is_broken, $is_hex2bin, $charset)
+	private static function _autoconvert_request(&$string, &$is_converted, &$is_broken, $is_hex2bin, $charset)
 	{
 		#regexp speed improve by using strpos()
-		if ($is_hex2bin && strpos($s, '0x') === 0 && preg_match('/^0x((?:[\da-fA-F]{2})+)$/sSX', $s, $m))
+		if ($is_hex2bin && strpos($string, '0x') === 0 && preg_match('/^0x((?:[\da-fA-F]{2})+)$/sSX', $string, $m))
 		{
-			$s = pack('H' . strlen($m[1]), $m[1]); #hex2bin()
+			$string = pack('H' . strlen($m[1]), $m[1]); #hex2bin()
 			$is_converted = true;
 		}
-		if (! self::is_utf8($s))
+		if (! self::class::is_utf8($string))
 		{
-			$s = self::convert_from($s, $charset);
-			if ($s === false) $is_broken = true;
-			elseif (! self::is_utf8($s))
+			$string = self::class::convert_from($string, $charset);
+			if ($string === false) $is_broken = true;
+			elseif (! self::class::is_utf8($string))
 			{
-				trigger_error('String 0x ' . substr(bin2hex($s), 0, 100) . '... is not UTF-8!', E_USER_WARNING);
+				trigger_error('String 0x ' . substr(bin2hex($string), 0, 100) . '... is not UTF-8!', E_USER_WARNING);
 				$is_broken = true;
 			}
 			else $is_converted = true;
 		}
-		return $s;
+		return $string;
 	}
 
 	/**
@@ -3187,7 +3187,7 @@ class UTF8
 	{
 		
 		if (is_null($s1) || is_null($s2)) return null;
-		return self::strcmp(self::substr($s1, 0, $length), self::substr($s2, 0, $length));
+		return self::class::strcmp(self::class::substr($s1, 0, $length), self::class::substr($s2, 0, $length));
 	}
 
 	/**
@@ -3204,29 +3204,29 @@ class UTF8
 	{
 		
 		if (is_null($s1) || is_null($s2)) return null;
-		return self::strcmp(self::lowercase($s1), self::lowercase($s2));
+		return self::class::strcmp(self::class::lowercase($s1), self::class::lowercase($s2));
 	}
 
 	/**
 	 * Converts a UTF-8 string to a UNICODE codepoints
 	 *
-	 * @param   string|null     $s  UTF-8 string
+	 * @param   string|null     $string  UTF-8 string
 	 * @return  array|bool|null     Unicode codepoints
-	 *                              Returns FALSE if $s broken (not UTF-8)
+	 *                              Returns FALSE if $string broken (not UTF-8)
 	 */
-	public static function to_unicode($s)
+	public static function to_unicode($string)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		$s2 = null;
 		#since PHP-5.3.x iconv() little faster then mb_convert_encoding()
-		if (function_exists('iconv')) $s2 = @iconv('UTF-8', 'UCS-4BE', $s);
-		elseif (function_exists('mb_convert_encoding')) $s2 = @mb_convert_encoding($s, 'UCS-4BE', 'UTF-8');
+		if (function_exists('iconv')) $s2 = @iconv('UTF-8', 'UCS-4BE', $string);
+		elseif (function_exists('mb_convert_encoding')) $s2 = @mb_convert_encoding($string, 'UCS-4BE', 'UTF-8');
 		if (is_string($s2)) return array_values(unpack('N*', $s2));
 		if ($s2 !== null) return false;
 
-		$a = self::str_split($s);
+		$a = self::class::str_split($string);
 		if ($a === false) return false;
 		return array_map(array(__CLASS__, 'ord'), $a);
 	}
@@ -3247,16 +3247,16 @@ class UTF8
 		if (function_exists('iconv'))
 		{
 			array_walk($a, function(&$cp) { $cp = pack('N', $cp); });
-			$s = @iconv('UCS-4BE', 'UTF-8', implode('', $a));
-			if (! is_string($s)) return false;
-			return $s;
+			$string = @iconv('UCS-4BE', 'UTF-8', implode('', $a));
+			if (! is_string($string)) return false;
+			return $string;
 		}
 		if (function_exists('mb_convert_encoding'))
 		{
 			array_walk($a, function(&$cp) { $cp = pack('N', $cp); });
-			$s = mb_convert_encoding(implode('', $a), 'UTF-8', 'UCS-4BE');
-			if (! is_string($s)) return false;
-			return $s;
+			$string = mb_convert_encoding(implode('', $a), 'UTF-8', 'UCS-4BE');
+			if (! is_string($string)) return false;
+			return $string;
 		}
 
 		return implode('', array_map(array(__CLASS__, 'chr'), $a));
@@ -3327,21 +3327,21 @@ class UTF8
 	/**
 	 * Implementation chunk_split() function for UTF-8 encoding string.
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   int|float|null    $length
 	 * @param   string|null       $glue
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function chunk_split($s, $length = null, $glue = null)
+	public static function chunk_split($string, $length = null, $glue = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		$length = intval($length);
 		$glue   = strval($glue);
 		if ($length < 1) $length = 76;
 		if ($glue === '') $glue = "\r\n";
-		if (! is_array($a = self::str_split($s, $length))) return false;
+		if (! is_array($a = self::class::str_split($string, $length))) return false;
 		return implode($glue, $a);
 	}
 
@@ -3361,7 +3361,7 @@ class UTF8
 		{
 			if (is_string($k))
 			{
-				$k = self::convert_case($k, $mode);
+				$k = self::class::convert_case($k, $mode);
 				if ($k === false) return false;
 			}
 			$a2[$k] = $v;
@@ -3373,9 +3373,9 @@ class UTF8
 	 * Конвертирует регистр букв в данных в кодировке UTF-8.
 	 * Массивы обходятся рекурсивно, при этом конвертируются только значения
 	 * в элементах массива, а ключи остаются без изменений.
-	 * Для конвертирования только ключей используйте метод self::array_change_key_case().
+	 * Для конвертирования только ключей используйте метод self::class::array_change_key_case().
 	 *
-	 * @see     self::array_change_key_case()
+	 * @see     self::class::array_change_key_case()
 	 * @link    http://www.unicode.org/charts/PDF/U0400.pdf
 	 * @link    http://ru.wikipedia.org/wiki/ISO_639-1
 	 * @param   array|scalar|null $data  Данные произвольной структуры
@@ -3390,24 +3390,24 @@ class UTF8
 
 		if (is_array($data))
 		{
-			foreach ($data as $k => &$v) $v = self::convert_case($v, $mode);
+			foreach ($data as $k => &$v) $v = self::class::convert_case($v, $mode);
 			return $data;
 		}
 		if (! is_string($data) || ! $data) return $data;
 
 		if ($mode === CASE_UPPER)
 		{
-			if ($is_ascii_optimization && self::is_ascii($data)) return strtoupper($data); #speed improve!
+			if ($is_ascii_optimization && self::class::is_ascii($data)) return strtoupper($data); #speed improve!
 			#deprecated, since PHP-5.3.x strtr() 2-3 times faster then mb_strtolower()
 			#if (function_exists('mb_strtoupper')) return mb_strtoupper($data, 'utf-8');
-			return strtr($data, array_flip(self::$convert_case_table));
+			return strtr($data, array_flip(self::class::$convert_case_table));
 		}
 		if ($mode === CASE_LOWER)
 		{
-			if ($is_ascii_optimization && self::is_ascii($data)) return strtolower($data); #speed improve!
+			if ($is_ascii_optimization && self::class::is_ascii($data)) return strtolower($data); #speed improve!
 			#deprecated, since PHP-5.3.x strtr() 2-3 times faster then mb_strtolower()
 			#if (function_exists('mb_strtolower')) return mb_strtolower($data, 'utf-8');
-			return strtr($data, self::$convert_case_table);
+			return strtr($data, self::class::$convert_case_table);
 		}
 		trigger_error('Parameter 2 should be a constant of CASE_LOWER or CASE_UPPER!', E_USER_WARNING);
 		return $data;
@@ -3421,7 +3421,7 @@ class UTF8
 	public static function lowercase($data)
 	{
 		
-		return self::convert_case($data, CASE_LOWER);
+		return self::class::convert_case($data, CASE_LOWER);
 	}
 
 	/**
@@ -3433,7 +3433,7 @@ class UTF8
 	public static function uppercase($data)
 	{
 		
-		return self::convert_case($data, CASE_UPPER);
+		return self::class::convert_case($data, CASE_UPPER);
 	}
 
 	/**
@@ -3445,7 +3445,7 @@ class UTF8
 	public static function strtolower($data)
 	{
 		
-		return self::convert_case($data, CASE_LOWER);
+		return self::class::convert_case($data, CASE_LOWER);
 	}
 
 	/**
@@ -3457,7 +3457,7 @@ class UTF8
 	public static function strtoupper($data)
 	{
 		
-		return self::convert_case($data, CASE_UPPER);
+		return self::class::convert_case($data, CASE_UPPER);
 	}
 
 
@@ -3474,43 +3474,43 @@ class UTF8
 	 * @link    http://msdn.microsoft.com/workshop/author/dhtml/reference/charsets/charset2.asp?frame=true
 	 * @link    http://msdn.microsoft.com/workshop/author/dhtml/reference/charsets/charset3.asp?frame=true
 	 *
-	 * @param   scalar|null  $s
+	 * @param   scalar|null  $string
 	 * @param   bool         $is_special_chars   Дополнительно обрабатывать специальные html сущности? (&lt; &gt; &amp; &quot;)
 	 * 
 	 *  Returns FALSE if error occurred
 	 */
-	public static function html_entity_decode($s, $is_special_chars = false): array|bool|float|int|string|null
+	public static function html_entity_decode($string, $is_special_chars = false): array|bool|float|int|string|null
 	{
 		
-		if (! is_string($s)) return $s;
+		if (! is_string($string)) return $string;
 
 		#speed improve
-		$amp = strpos($s, '&');
+		$amp = strpos($string, '&');
 		$pos = ($amp === false) ? null : $amp;
 
-		if (strlen($s) < 4  #по минимальной длине сущности - 4 байта: &#d; &xx;
-			|| ($amp === false) || strpos($s, ';', $pos) === false) return $s;
+		if (strlen($string) < 4  #по минимальной длине сущности - 4 байта: &#d; &xx;
+			|| ($amp === false) || strpos($string, ';', $pos) === false) return $string;
 
-		$table = self::$html_entity_table;
-		if ($is_special_chars) $table += self::$html_special_chars_table;
+		$table = self::class::$html_entity_table;
+		if ($is_special_chars) $table += self::class::$html_special_chars_table;
 
 		#replace named entities
-		$s = strtr($s, $table);
+		$string = strtr($string, $table);
 		#block below deprecated, since PHP-5.3.x strtr() 1.5 times faster
-		if (0 && preg_match_all(pattern: '/&[a-zA-Z]++\d*+;/sSX', subject: $s, matches: $m, flags: 0, offset: $pos))
+		if (0 && preg_match_all(pattern: '/&[a-zA-Z]++\d*+;/sSX', subject: $string, matches: $m, flags: 0, offset: $pos))
 		{
 			foreach (array_unique($m[0]) as $entity)
 			{
-				if (array_key_exists($entity, $table)) $s = str_replace($entity, $table[$entity], $s);
+				if (array_key_exists($entity, $table)) $string = str_replace($entity, $table[$entity], $string);
 			}
 		}
 
 		#заменяем числовые dec и hex сущности:
-		if (strpos($s, '&#') !== false)  #speed improve
+		if (strpos($string, '&#') !== false)  #speed improve
 		{
 			$class = __CLASS__;
-			$html_special_chars_table_flipped = array_flip(self::$html_special_chars_table);
-			$s = preg_replace_callback('/&#((x)[\da-fA-F]{1,6}+|\d{1,7}+);/sSX',
+			$html_special_chars_table_flipped = array_flip(self::class::$html_special_chars_table);
+			$string = preg_replace_callback('/&#((x)[\da-fA-F]{1,6}+|\d{1,7}+);/sSX',
 										function (array $m) use ($class, $html_special_chars_table_flipped, $is_special_chars)
 										{
 											$codepoint = isset($m[2]) && $m[2] === 'x' ? hexdec($m[1]) : $m[1];
@@ -3520,9 +3520,9 @@ class UTF8
 												if (array_key_exists($char, $html_special_chars_table_flipped)) return $html_special_chars_table_flipped[$char];
 											}
 											return $class::chr($codepoint);
-										}, $s);
+										}, $string);
 		}
-		return $s;
+		return $string;
 	}
 
 	/**
@@ -3535,34 +3535,34 @@ class UTF8
 	 * @link  http://msdn.microsoft.com/workshop/author/dhtml/reference/charsets/charset2.asp?frame=true
 	 * @link  http://msdn.microsoft.com/workshop/author/dhtml/reference/charsets/charset3.asp?frame=true
 	 *
-	 * @param   scalar|null  $s
+	 * @param   scalar|null  $string
 	 * @param   bool         $is_special_chars_only          Обрабатывать только специальные html сущности? (&lt; &gt; &amp; &quot;)
 	 * @return  scalar|null  Returns FALSE if error occurred
 	 */
-	public static function html_entity_encode($s, $is_special_chars_only = false)
+	public static function html_entity_encode($string, $is_special_chars_only = false)
 	{
 		
-		if (! is_string($s)) return $s;
+		if (! is_string($string)) return $string;
 
-		#if ($is_special_chars_only) return strtr($s, array_flip(self::$html_special_chars_table));
-		if ($is_special_chars_only) return htmlspecialchars($s);
+		#if ($is_special_chars_only) return strtr($string, array_flip(self::class::$html_special_chars_table));
+		if ($is_special_chars_only) return htmlspecialchars($string);
 
 		#replace UTF-8 chars to named entities:
-		$s = strtr($s, array_flip(self::$html_entity_table));
+		$string = strtr($string, array_flip(self::class::$html_entity_table));
 		#block below deprecated, since PHP-5.3.x strtr() 3 times faster
 		if (0 && preg_match_all('~(?>	[\xc2\xc3\xc5\xc6\xcb\xce\xcf][\x80-\xbf]  #2 bytes
 									|	\xe2[\x80-\x99][\x82-\xac]                 #3 bytes
 								  )
-								~sxSX', $s, $m))
+								~sxSX', $string, $m))
 		{
-			$table = array_flip(self::$html_entity_table);
+			$table = array_flip(self::class::$html_entity_table);
 			foreach (array_unique($m[0]) as $char)
 			{
-				if (array_key_exists($char, $table)) $s = str_replace($char, $table[$char], $s);
+				if (array_key_exists($char, $table)) $string = str_replace($char, $table[$char], $string);
 			}
 		}
 
-		return $s;
+		return $string;
 	}
 
 	/**
@@ -3570,22 +3570,22 @@ class UTF8
 	 * Example (non ASCII): "123_слово_test" => "123_(с|С)(л|Л)(о|О)(в|В)(о|О)_[tT][eE][sS][tT]"
 	 * Example (only ASCII): "123_test" => "(?i:123_test)"
 	 *
-	 * @param  string $s
+	 * @param  string $string
 	 * @param  string|null $delimiter  If the optional delimiter is specified, it will also be escaped.
 	 *                                 This is useful for escaping the delimiter that is required by the PCRE functions.
 	 *                                 The / is the most commonly used delimiter.
 	 * @return string|bool|null        Returns FALSE if error occurred
 	 */
-	public static function preg_quote_case_insensitive($s, $delimiter = null)
+	public static function preg_quote_case_insensitive($string, $delimiter = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		if (self::is_ascii($s)) return '(?i:' . preg_quote($s, $delimiter) . ')'; #speed improve
+		if (self::class::is_ascii($string)) return '(?i:' . preg_quote($string, $delimiter) . ')'; #speed improve
 
 		$s_re = '';
-		$s_lc = UTF8::lowercase($s); if ($s_lc === false) return false;
-		$s_uc = UTF8::uppercase($s); if ($s_uc === false) return false;
+		$s_lc = UTF8::lowercase($string); if ($s_lc === false) return false;
+		$s_uc = UTF8::uppercase($string); if ($s_uc === false) return false;
 
 		$chars_lc = UTF8::str_split($s_lc); if ($chars_lc === false) return false;
 		$chars_uc = UTF8::str_split($s_uc); if ($chars_uc === false) return false;
@@ -3594,7 +3594,7 @@ class UTF8
 		{
 			if ($chars_lc[$i] === $chars_uc[$i])
 				$s_re .= preg_quote($chars_lc[$i], $delimiter);
-			elseif (self::is_ascii($chars_lc[$i]))
+			elseif (self::class::is_ascii($chars_lc[$i]))
 				$s_re .= '[' . preg_quote($chars_lc[$i] . $chars_uc[$i], $delimiter) . ']';
 			else
 				$s_re .= '(' . preg_quote($chars_lc[$i], $delimiter) . '|'
@@ -3621,7 +3621,7 @@ class UTF8
 		
 		if (is_null($subject)) return null;
 
-		$byte_offset = ($char_offset > 0) ? strlen(self::substr($subject, 0, $char_offset)) : $char_offset;
+		$byte_offset = ($char_offset > 0) ? strlen(self::class::substr($subject, 0, $char_offset)) : $char_offset;
 
 		$return = preg_match_all($pattern, $subject, $matches, $flags, $byte_offset);
 		if ($return === false) return false;
@@ -3630,17 +3630,17 @@ class UTF8
 		{
 			foreach ($matches as &$match)
 			{
-				foreach ($match as &$a) $a[1] = self::strlen(substr($subject, 0, $a[1]));
+				foreach ($match as &$a) $a[1] = self::class::strlen(substr($subject, 0, $a[1]));
 			}
 		}
 
 		return $return;
 	}
 
-	#alias for self::str_limit()
-	public static function truncate($s, $maxlength = null, $continue = "\xe2\x80\xa6", &$is_cutted = null, $tail_min_length = 20)
+	#alias for self::class::str_limit()
+	public static function truncate($string, $maxlength = null, $continue = "\xe2\x80\xa6", &$is_cutted = null, $tail_min_length = 20)
 	{
-		return self::str_limit($s, $maxlength, $continue, $is_cutted, $tail_min_length);
+		return self::class::str_limit($string, $maxlength, $continue, $is_cutted, $tail_min_length);
 	}
 
 	/**
@@ -3648,7 +3648,7 @@ class UTF8
 	 * причём последнее слово показывается целиком, а не обрывается на середине.
 	 * Html сущности корректно обрабатываются.
 	 *
-	 * @param   string|null     $s                Текст в кодировке UTF-8
+	 * @param   string|null     $string                Текст в кодировке UTF-8
 	 * @param   int|null  $maxlength        Ограничение длины текста
 	 * @param   string          $continue         Завершающая строка, которая будет вставлена после текста, если он обрежется
 	 * @param   bool|null       &$is_cutted       Текст был обрезан?
@@ -3656,10 +3656,10 @@ class UTF8
 	 *                                            то текст возвращается без изменений
 	 * @return  string|bool|null                  Returns FALSE if error occurred
 	 */
-	public static function str_limit($s, $maxlength = null, $continue = "\xe2\x80\xa6", &$is_cutted = null, $tail_min_length = 20) #"\xe2\x80\xa6" = "&hellip;"
+	public static function str_limit($string, $maxlength = null, $continue = "\xe2\x80\xa6", &$is_cutted = null, $tail_min_length = 20) #"\xe2\x80\xa6" = "&hellip;"
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		$is_cutted = false;
 		if ($continue === null) $continue = "\xe2\x80\xa6";
@@ -3667,15 +3667,15 @@ class UTF8
 
 		#speed improve block
 		#{{{
-		if (strlen($s) <= $maxlength) return $s;
-		$s2 = str_replace("\r\n", '?', $s);
+		if (strlen($string) <= $maxlength) return $string;
+		$s2 = str_replace("\r\n", '?', $string);
 		$s2 = preg_replace('/&(?> [a-zA-Z][a-zA-Z\d]+
                                 | \#(?> \d{1,4}
                                       | x[\da-fA-F]{2,4}
                                     )
                               );  # html сущности (&lt; &gt; &amp; &quot;)
                             /sxSX', '?', $s2);
-		if (strlen($s2) <= $maxlength || self::strlen($s2) <= $maxlength) return $s;
+		if (strlen($s2) <= $maxlength || self::class::strlen($s2) <= $maxlength) return $string;
 		#}}}
 
 		$r = preg_match_all('/(?> \r\n   # переносы строк
@@ -3686,11 +3686,11 @@ class UTF8
 									  );  # html сущности (&lt; &gt; &amp; &quot;)
 								   | .
 								 )
-								/sxuSX/', $s, $m);
+								/sxuSX/', $string, $m);
 		if ($r === false) return false;
 
 		#d($m);
-		if (count($m[0]) <= $maxlength) return $s;
+		if (count($m[0]) <= $maxlength) return $string;
 
 		$left = implode('', array_slice($m[0], 0, $maxlength));
 		#из диапазона ASCII исключаем буквы, цифры, открывающие парные символы [a-zA-Z\d\(\{\[] и некоторые др. символы
@@ -3712,9 +3712,9 @@ class UTF8
 			#d($m);
 			$right = isset($m[0]) ? rtrim($m[0], '.-') : '';
 			$return = $left . $right;
-			if (strlen($return) !== strlen($s)) $return .= $continue;
+			if (strlen($return) !== strlen($string)) $return .= $continue;
 		}
-		if (self::strlen($s) - self::strlen($return) < $tail_min_length) return $s;
+		if (self::class::strlen($string) - self::class::strlen($return) < $tail_min_length) return $string;
 
 		$is_cutted = true;
 		return $return;
@@ -3723,19 +3723,19 @@ class UTF8
 	/**
 	 * Implementation str_split() function for UTF-8 encoding string.
 	 *
-	 * @param   string|null      $s
+	 * @param   string|null      $string
 	 * @param   int|null   $length
 	 * @return  array|bool|null  Returns FALSE if error occurred
 	 */
-	public static function str_split($s, $length = null)
+	public static function str_split($string, $length = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		$length = ($length === null) ? 1 : intval($length);
 		if ($length < 1) return false;
 		#there are limits in regexp for {min,max}!
-		if (preg_match_all('~.~suSX', $s, $m) === false) return false;
+		if (preg_match_all('~.~suSX', $string, $m) === false) return false;
 		if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) return false;
 		if ($length === 1) $a = $m[0];
 		else
@@ -3749,31 +3749,31 @@ class UTF8
 	/**
 	 * Implementation strlen() function for UTF-8 encoding string.
 	 *
-	 * @param   string|null    $s
+	 * @param   string|null    $string
 	 * @return  int|bool|null  Returns FALSE if error occurred
 	 */
-	public static function strlen($s)
+	public static function strlen($string)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		//since PHP-5.3.x mb_strlen() faster then strlen(utf8_decode())
-		if (function_exists('mb_strlen')) return mb_strlen($s, 'utf-8');
+		if (function_exists('mb_strlen')) return mb_strlen($string, 'utf-8');
 
 		/*
           utf8_decode() converts characters that are not in ISO-8859-1 to '?', which, for the purpose of counting, is quite alright.
           It's much faster than iconv_strlen()
           Note: this function does not count bad UTF-8 bytes in the string - these are simply ignored
 		*/
-		return strlen(mb_convert_encoding( $s, 'UTF-8', 'ISO-8859-1' ));
+		return strlen(mb_convert_encoding( $string, 'UTF-8', 'ISO-8859-1' ));
 
 
 		/*
         #slowly then strlen(utf8_decode())
-        if (function_exists('iconv_strlen')) return iconv_strlen($s, 'utf-8');
+        if (function_exists('iconv_strlen')) return iconv_strlen($string, 'utf-8');
 
         #Do not count UTF-8 continuation bytes
-        #return strlen(preg_replace('/[\x80-\xBF]/sSX', '', $s));
+        #return strlen(preg_replace('/[\x80-\xBF]/sSX', '', $string));
 
         #slowly then strlen(utf8_decode())
         preg_match_all('~.~suSX', $str, $m);
@@ -3781,9 +3781,9 @@ class UTF8
 
         #slowly then preg_match_all() + count()
         $n = 0;
-        for ($i = 0, $len = strlen($s); $i < $len; $i++)
+        for ($i = 0, $len = strlen($string); $i < $len; $i++)
         {
-            $c = ord(substr($s, $i, 1));
+            $c = ord(substr($string, $i, 1));
             if ($c < 0x80) $n++;                 #single-byte (0xxxxxx)
             elseif (($c & 0xC0) == 0xC0) $n++;   #multi-byte starting byte (11xxxxxx)
         }
@@ -3794,78 +3794,78 @@ class UTF8
 	/**
 	 * Implementation strpos() function for UTF-8 encoding string
 	 *
-	 * @param   string|null    $s       The entire string
+	 * @param   string|null    $string       The entire string
 	 * @param   string|int     $needle  The searched substring
 	 * @param   int|null       $offset  The optional offset parameter specifies the position from which the search should be performed
 	 * @return  int|bool|null           Returns the numeric position of the first occurrence of needle in haystack.
 	 *                                  If needle is not found, will return FALSE.
 	 */
-	public static function strpos($s, $needle, $offset = null)
+	public static function strpos($string, $needle, $offset = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		if ($offset === null || $offset < 0) $offset = 0;
-		if (function_exists('mb_strpos')) return mb_strpos($s, $needle, $offset, 'utf-8');
-		#iconv_strpos() deprecated, because slowly than self::strlen(substr())
-		#if (function_exists('iconv_strpos')) return iconv_strpos($s, $needle, $offset, 'utf-8');
+		if (function_exists('mb_strpos')) return mb_strpos($string, $needle, $offset, 'utf-8');
+		#iconv_strpos() deprecated, because slowly than self::class::strlen(substr())
+		#if (function_exists('iconv_strpos')) return iconv_strpos($string, $needle, $offset, 'utf-8');
 		$byte_pos = $offset;
-		do if (($byte_pos = strpos($s, $needle, $byte_pos)) === false) return false;
-		while (($char_pos = self::strlen(substr($s, 0, $byte_pos++))) < $offset);
+		do if (($byte_pos = strpos($string, $needle, $byte_pos)) === false) return false;
+		while (($char_pos = self::class::strlen(substr($string, 0, $byte_pos++))) < $offset);
 		return $char_pos;
 	}
 
 	/**
 	 * Find position of first occurrence of a case-insensitive string.
 	 *
-	 * @param   string|null    $s       The entire string
+	 * @param   string|null    $string       The entire string
 	 * @param   string|int     $needle  The searched substring
 	 * @param   int|null       $offset  The optional offset parameter specifies the position from which the search should be performed
 	 * @return  int|bool|null           Returns the numeric position of the first occurrence of needle in haystack.
 	 *                                  If needle is not found, will return FALSE.
 	 */
-	public static function stripos($s, $needle, $offset = null)
+	public static function stripos($string, $needle, $offset = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		if ($offset === null || $offset < 0) $offset = 0;
-		if (function_exists('mb_stripos')) return mb_stripos($s, $needle, $offset, 'utf-8');
+		if (function_exists('mb_stripos')) return mb_stripos($string, $needle, $offset, 'utf-8');
 
 		#optimization block (speed improve)
 		#{{{
-		$ascii_int = intval(self::is_ascii($s)) + intval(self::is_ascii($needle));
+		$ascii_int = intval(self::class::is_ascii($string)) + intval(self::class::is_ascii($needle));
 		if ($ascii_int === 1) return false;
-		if ($ascii_int === 2) return stripos($s, $needle, $offset);
+		if ($ascii_int === 2) return stripos($string, $needle, $offset);
 		#}}}
 
-		$s = self::convert_case($s, CASE_LOWER, false);
-		if ($s === false) return false;
-		$needle = self::convert_case($needle, CASE_LOWER, false);
+		$string = self::class::convert_case($string, CASE_LOWER, false);
+		if ($string === false) return false;
+		$needle = self::class::convert_case($needle, CASE_LOWER, false);
 		if ($needle === false) return false;
-		return self::strpos($s, $needle, $offset);
+		return self::class::strpos($string, $needle, $offset);
 	}
 
 	/**
 	 * Implementation strrev() function for UTF-8 encoding string
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function strrev($s)
+	public static function strrev($string)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		if (0) #TODO test speed
 		{
-			$s = self::_convert($s, 'UTF-8', 'UTF-32');
-			if (! is_string($s)) return false;
-			$s = implode('', array_reverse(str_split($s, 4)));
-			return self::_convert($s, 'UTF-32', 'UTF-8');
+			$string = self::class::_convert($string, 'UTF-8', 'UTF-32');
+			if (! is_string($string)) return false;
+			$string = implode('', array_reverse(str_split($string, 4)));
+			return self::class::_convert($string, 'UTF-32', 'UTF-8');
 		}
 
-		if (! is_array($a = self::str_split($s))) return false;
+		if (! is_array($a = self::class::str_split($string))) return false;
 		return implode('', array_reverse($a));
 	}
 
@@ -3873,32 +3873,32 @@ class UTF8
 	 * Implementation substr() function for UTF-8 encoding string.
 	 *
 	 * @link     http://www.w3.org/International/questions/qa-forms-utf-8.html
-	 * @param    string|null       $s
+	 * @param    string|null       $string
 	 * @param    int         $offset
 	 * @param    int|null    $length
 	 * @return   string|bool|null             Returns FALSE if error occurred
 	 */
-	public static function substr($s, $offset, $length = null)
+	public static function substr($string, $offset, $length = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
 		#since PHP-5.3.x mb_substr() faster then iconv_substr()
 		if (function_exists('mb_substr'))
 		{
-			if ($length === null) $length = self::strlen($s);
-			return mb_substr($s, $offset, $length, 'utf-8');
+			if ($length === null) $length = self::class::strlen($string);
+			return mb_substr($string, $offset, $length, 'utf-8');
 		}
 		if (function_exists('iconv_substr'))
 		{
-			if ($length === null) $length = self::strlen($s);
-			return iconv_substr($s, $offset, $length, 'utf-8');
+			if ($length === null) $length = self::class::strlen($string);
+			return iconv_substr($string, $offset, $length, 'utf-8');
 		}
 
 		static $_s = null;
 		static $_a = null;
 
-		if ($_s !== $s) $_a = self::str_split($_s = $s);
+		if ($_s !== $string) $_a = self::class::str_split($_s = $string);
 		if (! is_array($_a)) return false;
 		if ($length !== null) $a = array_slice($_a, $offset, $length);
 		else                  $a = array_slice($_a, $offset);
@@ -3908,18 +3908,18 @@ class UTF8
 	/**
 	 * Implementation substr_replace() function for UTF-8 encoding string.
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   string|int        $replacement
 	 * @param   int         $start
 	 * @param   int|null          $length
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function substr_replace($s, $replacement, $start, $length = null)
+	public static function substr_replace($string, $replacement, $start, $length = null)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		if (! is_array($a = self::str_split($s))) return false;
+		if (! is_array($a = self::class::str_split($string))) return false;
 		array_splice($a, $start, $length, $replacement);
 		return implode('', $a);
 	}
@@ -3928,18 +3928,18 @@ class UTF8
 	 * Implementation ucfirst() function for UTF-8 encoding string.
 	 * Преобразует первый символ строки в кодировке UTF-8 в верхний регистр.
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   bool              $is_other_to_lowercase  остальные символы преобразуются в нижний регистр?
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function ucfirst($s, $is_other_to_lowercase = true)
+	public static function ucfirst($string, $is_other_to_lowercase = true)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		if ($s === '' || ! is_string($s)) return $s;
-		if (! preg_match('/^(.)(.*)$/suSX', $s, $m)) return false;
-		return self::uppercase($m[1]) . ($is_other_to_lowercase ? self::lowercase($m[2]) : $m[2]);
+		if ($string === '' || ! is_string($string)) return $string;
+		if (! preg_match('/^(.)(.*)$/suSX', $string, $m)) return false;
+		return self::class::uppercase($m[1]) . ($is_other_to_lowercase ? self::class::lowercase($m[2]) : $m[2]);
 	}
 
 	/**
@@ -3947,20 +3947,20 @@ class UTF8
 	 * Преобразует в верхний регистр первый символ каждого слова в строке в кодировке UTF-8,
 	 * остальные символы каждого слова преобразуются в нижний регистр.
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   bool              $is_other_to_lowercase  остальные символы преобразуются в нижний регистр?
 	 * @param   string            $spaces_re
 	 * @return  string|bool|null  Returns FALSE if error occurred
 	 */
-	public static function ucwords($s, $is_other_to_lowercase = true, $spaces_re = '~([\pZ\s]+)~suSX') #\pXps is POSIX space: property Z or tab, NL, VT, FF, CR
+	public static function ucwords($string, $is_other_to_lowercase = true, $spaces_re = '~([\pZ\s]+)~suSX') #\pXps is POSIX space: property Z or tab, NL, VT, FF, CR
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		$words = preg_split($spaces_re, $s, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+		$words = preg_split($spaces_re, $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 		foreach ($words as $k => $word)
 		{
-			$words[$k] = self::ucfirst($word, $is_other_to_lowercase = true);
+			$words[$k] = self::class::ucfirst($word, $is_other_to_lowercase = true);
 			if ($words[$k] === false) return false;
 		}
 		return implode('', $words);
@@ -3988,9 +3988,9 @@ class UTF8
 			$d = array();
 			foreach ($data as $k => &$v)
 			{
-				$k = self::unescape($k, $is_rawurlencode);
+				$k = self::class::unescape($k, $is_rawurlencode);
 				if ($k === false) return false;
-				$d[$k] = self::unescape($v, $is_rawurlencode);
+				$d[$k] = self::class::unescape($v, $is_rawurlencode);
 				if ($d[$k] === false && ! is_bool($v)) return false;
 			}
 			return $d;
@@ -4005,7 +4005,7 @@ class UTF8
 											function (array $m) use ($is_rawurlencode)
 											{
 												$codepoint = hexdec(trim($m[1], '{}'));
-												$char = self::chr($codepoint);
+												$char = self::class::chr($codepoint);
 												return $is_rawurlencode ? rawurlencode($char) : $char;
 											},
 											$data);
@@ -4077,7 +4077,7 @@ class UTF8
 			}
 			if (strpos($v, '%u') !== false)
 			{
-				parse_str(self::unescape($v, $is_rawurlencode = true), $GLOBALS[$k]);
+				parse_str(self::class::unescape($v, $is_rawurlencode = true), $GLOBALS[$k]);
 				$fixed = true;
 				continue;
 			}
@@ -4102,21 +4102,21 @@ class UTF8
 	 * на следующую строку, высота м.б. меньше ожидаемой.
 	 * Этот алгоритм явл. простым (и быстрым) и не отслеживает переносы слов.
 	 *
-	 * @param   string|null     $s         Текст
+	 * @param   string|null     $string         Текст
 	 * @param   int       $cols      Ширина области редактирования (колонок)
 	 * @param   int       $min_rows  Минимальное кол-во строк
 	 * @param   int       $max_rows  Максимальное кол-во строк
 	 * @return  int|bool|null              Number of rows (lines)
 	 */
-	public static function textarea_rows($s, $cols, $min_rows = 3, $max_rows = 32)
+	public static function textarea_rows($string, $cols, $min_rows = 3, $max_rows = 32)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		if (strlen($s) == 0) return $min_rows;  #speed improve
+		if (strlen($string) == 0) return $min_rows;  #speed improve
 		$rows = 0;
 		#utf8_decode() converts characters that are not in ISO-8859-1 to '?'
-		foreach (preg_split('/\r\n|[\r\n]/sSX', mb_convert_encoding( $s, 'UTF-8', 'ISO-8859-1' )) as $line)
+		foreach (preg_split('/\r\n|[\r\n]/sSX', mb_convert_encoding( $string, 'UTF-8', 'ISO-8859-1' )) as $line)
 		{
 			$rows += ceil((strlen($line) + 1) / $cols);
 			if ($rows > $max_rows) return $max_rows;
@@ -4125,44 +4125,44 @@ class UTF8
 	}
 
 	/**
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   string|null       $charlist
 	 * @return  string|bool|null
 	 */
-	public static function ltrim($s, $charlist = null)
+	public static function ltrim($string, $charlist = null)
 	{
 		
-		if (is_null($s)) return $s;
-		if ($charlist === null || self::is_ascii($charlist)) return ltrim($s);
-		return preg_replace('~^[' . self::_preg_quote_class($charlist, '~') . ']+~suSX', '', $s);
+		if (is_null($string)) return $string;
+		if ($charlist === null || self::class::is_ascii($charlist)) return ltrim($string);
+		return preg_replace('~^[' . self::class::_preg_quote_class($charlist, '~') . ']+~suSX', '', $string);
 	}
 
 	/**
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   string|null       $charlist
 	 * @return  string|bool|null
 	 */
-	public static function rtrim($s, $charlist = null)
+	public static function rtrim($string, $charlist = null)
 	{
 		
-		if (is_null($s)) return $s;
-		if ($charlist === null || self::is_ascii($charlist)) return rtrim($s);
-		return preg_replace('~[' . self::_preg_quote_class($charlist, '~') . ']+$~suSX', '', $s);
+		if (is_null($string)) return $string;
+		if ($charlist === null || self::class::is_ascii($charlist)) return rtrim($string);
+		return preg_replace('~[' . self::class::_preg_quote_class($charlist, '~') . ']+$~suSX', '', $string);
 	}
 
 	/**
-	 * @param   scalar|null  $s
+	 * @param   scalar|null  $string
 	 * @param   string|null  $charlist
 	 * @return  scalar|null
 	 */
-	public static function trim($s, $charlist = null)
+	public static function trim($string, $charlist = null)
 	{
 		
-		if (is_null($s)) return $s;
-		if ($charlist === null || self::is_ascii($charlist)) return trim($s);
-		$charlist_re = self::_preg_quote_class($charlist, '~');
-		$s = preg_replace('~^[' . $charlist_re . ']+~suSX', '', $s);
-		return preg_replace('~[' . $charlist_re . ']+$~suSX', '', $s);
+		if (is_null($string)) return $string;
+		if ($charlist === null || self::class::is_ascii($charlist)) return trim($string);
+		$charlist_re = self::class::_preg_quote_class($charlist, '~');
+		$string = preg_replace('~^[' . $charlist_re . ']+~suSX', '', $string);
+		return preg_replace('~[' . $charlist_re . ']+$~suSX', '', $string);
 	}
 
 	private static function _preg_quote_class($charlist, $delimiter = null)
@@ -4178,33 +4178,33 @@ class UTF8
 	}
 
 	/**
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   int         $length
 	 * @param   string            $pad_str
 	 * @param   int               $type     STR_PAD_LEFT, STR_PAD_RIGHT or STR_PAD_BOTH
 	 * @return  string|bool|null
 	 */
-	public static function str_pad($s, $length, $pad_str = ' ', $type = STR_PAD_RIGHT)
+	public static function str_pad($string, $length, $pad_str = ' ', $type = STR_PAD_RIGHT)
 	{
 		
-		if (is_null($s)) return $s;
+		if (is_null($string)) return $string;
 
-		$input_len = self::strlen($s);
-		if ($length <= $input_len) return $s;
+		$input_len = self::class::strlen($string);
+		if ($length <= $input_len) return $string;
 
-		$pad_str_len = self::strlen($pad_str);
+		$pad_str_len = self::class::strlen($pad_str);
 		$pad_len = $length - $input_len;
 
 		if ($type == STR_PAD_RIGHT)
 		{
 			$repeat_num = (int) ceil($pad_len / $pad_str_len);
-			return self::substr($s . str_repeat($pad_str, $repeat_num), 0, $length);
+			return self::class::substr($string . str_repeat($pad_str, $repeat_num), 0, $length);
 		}
 
 		if ($type == STR_PAD_LEFT)
 		{
 			$repeat_num = (int) ceil($pad_len / $pad_str_len);
-			return self::substr(str_repeat($pad_str, $repeat_num), 0, intval(floor($pad_len))) . $s;
+			return self::class::substr(str_repeat($pad_str, $repeat_num), 0, intval(floor($pad_len))) . $string;
 		}
 
 		if ($type == STR_PAD_BOTH)
@@ -4215,9 +4215,9 @@ class UTF8
 			$repeat_times_left  = (int) ceil($pad_amount_left  / $pad_str_len);
 			$repeat_times_right = (int) ceil($pad_amount_right / $pad_str_len);
 
-			$padding_left  = self::substr(str_repeat($pad_str, $repeat_times_left),  0, $pad_amount_left);
-			$padding_right = self::substr(str_repeat($pad_str, $repeat_times_right), 0, $pad_amount_right);
-			return $padding_left . $s . $padding_right;
+			$padding_left  = self::class::substr(str_repeat($pad_str, $repeat_times_left),  0, $pad_amount_left);
+			$padding_right = self::class::substr(str_repeat($pad_str, $repeat_times_right), 0, $pad_amount_right);
+			return $padding_left . $string . $padding_right;
 		}
 
 		trigger_error('Parameter 4 should be a constant of STR_PAD_RIGHT, STR_PAD_LEFT or STR_PAD_BOTH!', E_USER_WARNING);
@@ -4234,9 +4234,9 @@ class UTF8
 	public static function strspn($str, $mask, $start = null, $length = null)
 	{
 		
-		#if (self::is_ascii($str) && self::is_ascii($mask)) return strspn($str, $mask, $start, $length);
-		if ($start !== null || $length !== null) $str = self::substr($str, $start, $length);
-		if (preg_match('~^[' . preg_quote($mask, '~') . ']+~uSX', $str, $m)) self::strlen($m[0]);
+		#if (self::class::is_ascii($str) && self::class::is_ascii($mask)) return strspn($str, $mask, $start, $length);
+		if ($start !== null || $length !== null) $str = self::class::substr($str, $start, $length);
+		if (preg_match('~^[' . preg_quote($mask, '~') . ']+~uSX', $str, $m)) self::class::strlen($m[0]);
 		return 0;
 	}
 
@@ -4280,20 +4280,20 @@ class UTF8
 			{
 				if (is_string($files_re) && ! preg_match($files_re, $name)) continue;
 				if ($is_echo) echo $file;
-				$s = @file_get_contents($file);
-				if (! is_string($s))
+				$string = @file_get_contents($file);
+				if (! is_string($string))
 				{
 					if ($is_echo) echo '  Error to reading' . PHP_EOL;
 					return false;
 				}
-				if (self::is_utf8($s))
+				if (self::class::is_utf8($string))
 				{
 					if ($is_echo) echo '  UTF-8' . PHP_EOL;
 					continue;
 				}
-				$s = self::_convert($s, $charset, 'UTF-8');
+				$string = self::class::_convert($string, $charset, 'UTF-8');
 				#игнорируем ошибки при попытке перекодировать бинарные файлы
-				if (! is_string($s) || ! self::is_utf8($s))
+				if (! is_string($string) || ! self::class::is_utf8($string))
 				{
 					if ($is_echo) echo '  Binary' . PHP_EOL;
 					continue;
@@ -4302,22 +4302,22 @@ class UTF8
 				$ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 				if ($ext === 'htm' || $ext === 'html' || $ext === 'xhtml' || $ext === 'phtml' || $ext === 'tpl')
 				{
-					$s = preg_replace('~(<meta .+? content="text/html; [\x00-\x20]+ charset=) #1
+					$string = preg_replace('~(<meta .+? content="text/html; [\x00-\x20]+ charset=) #1
 											[-a-zA-Z\d]+
 											(" [^>]* >)  #2
-										~sixSX', '$1utf-8$2', $s);
+										~sixSX', '$1utf-8$2', $string);
 				}
 				if ($ext === 'xml' || $ext === 'xsl' || $ext === 'tpl')
 				{
-					$s = preg_replace('/~(<\?xml .+? encoding=") #1
+					$string = preg_replace('/~(<\?xml .+? encoding=") #1
 											[-a-zA-Z\d]+
 											(" .*? \?>)         #2
-										~sixSX/', '$1utf-8$2', $s);
+										~sixSX/', '$1utf-8$2', $string);
 				}
 
 				if (! $is_simulate)
 				{
-					$bytes = @file_put_contents($file, $s);
+					$bytes = @file_put_contents($file, $string);
 					if ($bytes === false)
 					{
 						if ($is_echo) echo '  Error to writing' . PHP_EOL;
@@ -4331,7 +4331,7 @@ class UTF8
 			{
 				if (! is_string($dirs_ignore_re) || ! preg_match($dirs_ignore_re, $name))
 				{
-					$c = self::convert_files_from($file, $files_re, $is_recursive, $charset, $dirs_ignore_re, $is_echo, $is_simulate);
+					$c = self::class::convert_files_from($file, $files_re, $is_recursive, $charset, $dirs_ignore_re, $is_echo, $is_simulate);
 					if ($c === false) return false;
 					$counter += $c;
 				}
@@ -4352,31 +4352,31 @@ class UTF8
 	{
 		
 		if (is_int($low) || is_int($high)) return range($low, $high, $step);  #speed improve
-		$low_cp  = self::ord($low);
-		$high_cp = self::ord($high);
+		$low_cp  = self::class::ord($low);
+		$high_cp = self::class::ord($high);
 		if ($low_cp === false || $high_cp === false) return false;
 		$a = range($low_cp, $high_cp, $step);
-		return array_map(array('self', 'chr'), $a);
+		return array_map(array('self::class', 'chr'), $a);
 	}
 
 	/**
 	 *
-	 * @param   string|null       $s
+	 * @param   string|null       $string
 	 * @param   string|array      $from
 	 * @param   string|null       $to
 	 * @return  string|bool|null         Returns FALSE if error occurred
 	 */
-	public static function strtr($s, $from, $to = null)
+	public static function strtr($string, $from, $to = null)
 	{
 		
-		if (is_null($s)) return $s;
-		if (is_array($from)) return strtr($s, $from); #speed improve
-		$keys   = self::str_split($from);
-		$values = self::str_split($to);
+		if (is_null($string)) return $string;
+		if (is_array($from)) return strtr($string, $from); #speed improve
+		$keys   = self::class::str_split($from);
+		$values = self::class::str_split($to);
 		if ($keys === false || $values === false) return false;
 		$table = array_combine($keys, $values);
 		if (! is_array($table)) return false;
-		return strtr($s, $table);
+		return strtr($string, $table);
 	}
 
 	public static function tests()
@@ -4385,70 +4385,70 @@ class UTF8
 		assert_options(ASSERT_BAIL,     true);
 		assert_options(ASSERT_WARNING,  true);
 		$a = array(
-			'self::html_entity_decode("&quot;&amp;&lt;&gt;", true) === "\"&<>"',
-			'self::html_entity_decode("&quot;&amp;&lt;&gt;", false) === "&quot;&amp;&lt;&gt;"',
-			'self::html_entity_decode("&amp;amp;", true) === "&amp;"',
-			'self::html_entity_decode("&amp;amp;", false) === "&amp;amp;"',
-			'self::html_entity_decode("&#034;", true) === "\""',
-			'self::html_entity_decode("&#034;", false) === "&quot;"',
-			'self::html_entity_decode("&#039;", true) === "\'"',
-			'self::html_entity_decode("&#039;", false) === "\'"',
-			'self::html_entity_decode("&#x22;", true) === "\""',
-			'self::html_entity_decode("&#x22;", false) === "&quot;"',
+			'self::class::html_entity_decode("&quot;&amp;&lt;&gt;", true) === "\"&<>"',
+			'self::class::html_entity_decode("&quot;&amp;&lt;&gt;", false) === "&quot;&amp;&lt;&gt;"',
+			'self::class::html_entity_decode("&amp;amp;", true) === "&amp;"',
+			'self::class::html_entity_decode("&amp;amp;", false) === "&amp;amp;"',
+			'self::class::html_entity_decode("&#034;", true) === "\""',
+			'self::class::html_entity_decode("&#034;", false) === "&quot;"',
+			'self::class::html_entity_decode("&#039;", true) === "\'"',
+			'self::class::html_entity_decode("&#039;", false) === "\'"',
+			'self::class::html_entity_decode("&#x22;", true) === "\""',
+			'self::class::html_entity_decode("&#x22;", false) === "&quot;"',
 
-			'self::array_change_key_case(array("АБВГД" => "АБВГД"), CASE_LOWER) === array("абвгд" => "АБВГД")',
-			'self::array_change_key_case(array("абвгд" => "абвгд"), CASE_UPPER) === array("АБВГД" => "абвгд")',
+			'self::class::array_change_key_case(array("АБВГД" => "АБВГД"), CASE_LOWER) === array("абвгд" => "АБВГД")',
+			'self::class::array_change_key_case(array("абвгд" => "абвгд"), CASE_UPPER) === array("АБВГД" => "абвгд")',
 
-			'self::blocks_check("Яндекс", "Cyrillic") === true',
-			'self::blocks_check("Google", "Basic Latin") === true',
-			'self::blocks_check("Google & Яндекс", array("Basic Latin", "Cyrillic")) === true',
-			'self::blocks_check("Ё-моё, Yandex!", array(array(0x20, 0x7E),    #[\x20-\x7E]
+			'self::class::blocks_check("Яндекс", "Cyrillic") === true',
+			'self::class::blocks_check("Google", "Basic Latin") === true',
+			'self::class::blocks_check("Google & Яндекс", array("Basic Latin", "Cyrillic")) === true',
+			'self::class::blocks_check("Ё-моё, Yandex!", array(array(0x20, 0x7E),    #[\x20-\x7E]
 														array(0x0410, 0x044F), #[A-Яa-я]
 														0x0401, #russian yo (Ё)
 														0x0451, #russian ye (ё)
 													)) === true',
 
-			'self::chunk_split("абвг", 2) === "аб\r\nвг"',
-			'self::chunk_split("абвг", 2, "|") === "аб|вг"',
+			'self::class::chunk_split("абвг", 2) === "аб\r\nвг"',
+			'self::class::chunk_split("абвг", 2, "|") === "аб|вг"',
 
-			'self::lowercase("1234-ABCD-АБВГ") === "1234-abcd-абвг"',
-			'self::lowercase(array("1234-ABCD-АБВГ" => "1234-ABCD-АБВГ")) === array("1234-ABCD-АБВГ" => "1234-abcd-абвг")',
-			'self::uppercase("1234-abcd-абвг") === "1234-ABCD-АБВГ"',
-			'self::uppercase(array("1234-abcd-абвг" => "1234-abcd-абвг")) === array("1234-abcd-абвг" => "1234-ABCD-АБВГ")',
+			'self::class::lowercase("1234-ABCD-АБВГ") === "1234-abcd-абвг"',
+			'self::class::lowercase(array("1234-ABCD-АБВГ" => "1234-ABCD-АБВГ")) === array("1234-ABCD-АБВГ" => "1234-abcd-абвг")',
+			'self::class::uppercase("1234-abcd-абвг") === "1234-ABCD-АБВГ"',
+			'self::class::uppercase(array("1234-abcd-абвг" => "1234-abcd-абвг")) === array("1234-abcd-абвг" => "1234-ABCD-АБВГ")',
 
-			'self::convert_from(self::convert_to("123-ABC-abc-АБВ-абв", $charset = "cp1251"), $charset = "cp1251") === "123-ABC-abc-АБВ-абв"',
+			'self::class::convert_from(self::class::convert_to("123-ABC-abc-АБВ-абв", $charset = "cp1251"), $charset = "cp1251") === "123-ABC-abc-АБВ-абв"',
 
-			'self::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние") === "вдох\xc2\xadно\xc2\xadве\xc2\xadние"',
-			'self::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние", array("\xc2\xad")) === "вдохновение"',
-			'self::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние", array("\xc2\xad"), true, $restore_table) === "вдохновение"',
-			'self::diactrical_restore("вдохновение", $restore_table) === "вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние"',
+			'self::class::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние") === "вдох\xc2\xadно\xc2\xadве\xc2\xadние"',
+			'self::class::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние", array("\xc2\xad")) === "вдохновение"',
+			'self::class::diactrical_remove("вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние", array("\xc2\xad"), true, $restore_table) === "вдохновение"',
+			'self::class::diactrical_restore("вдохновение", $restore_table) === "вдох\xc2\xadно\xc2\xadве\xcc\x81\xc2\xadние"',
 
-			'self::is_utf8(file_get_contents(' . var_export(__FILE__, true) . ', true)) === true',
-			'self::is_utf8(file_get_contents(' . var_export(__FILE__, true) . ', false)) === true',
-			'self::is_ascii(file_get_contents(' . var_export(__FILE__, true) . ')) === false',
+			'self::class::is_utf8(file_get_contents(' . var_export(__FILE__, true) . ', true)) === true',
+			'self::class::is_utf8(file_get_contents(' . var_export(__FILE__, true) . ', false)) === true',
+			'self::class::is_ascii(file_get_contents(' . var_export(__FILE__, true) . ')) === false',
 
 			#range() uses ord() and chr()
-			'self::range("A", "D") === array("A", "B", "C", "D")',
-			'self::range("а", "г") === array("а", "б", "в", "г")',
-			'self::range(1, 3) === array(1, 2, 3)',
+			'self::class::range("A", "D") === array("A", "B", "C", "D")',
+			'self::class::range("а", "г") === array("а", "б", "в", "г")',
+			'self::class::range(1, 3) === array(1, 2, 3)',
 
-			'"↔" === self::chr(self::ord("↔"))',
-			'"123-ABC-abc-АБВ-абв" === self::from_unicode(self::to_unicode("123-ABC-abc-АБВ-абв"))',
-			'self::strpos("123-ABC-abc-абв-АБВ-где", "АБВ") === 16',
-			'self::stripos("123-ABC-abc-абд-АБВ-где", "абв") === 16',
-			'self::strpos("123-ABC-abc", "АБВ") === false',
-			'self::strpos("123-АБВ-абв", "abc") === false',
+			'"↔" === self::class::chr(self::class::ord("↔"))',
+			'"123-ABC-abc-АБВ-абв" === self::class::from_unicode(self::class::to_unicode("123-ABC-abc-АБВ-абв"))',
+			'self::class::strpos("123-ABC-abc-абв-АБВ-где", "АБВ") === 16',
+			'self::class::stripos("123-ABC-abc-абд-АБВ-где", "абв") === 16',
+			'self::class::strpos("123-ABC-abc", "АБВ") === false',
+			'self::class::strpos("123-АБВ-абв", "abc") === false',
 
-			'self::preg_quote_case_insensitive("123_слово_test") === "123_(с|С)(л|Л)(о|О)(в|В)(о|О)_[tT][eE][sS][tT]"',
-			'self::preg_quote_case_insensitive("123_test") === "(?i:123_test)"',
+			'self::class::preg_quote_case_insensitive("123_слово_test") === "123_(с|С)(л|Л)(о|О)(в|В)(о|О)_[tT][eE][sS][tT]"',
+			'self::class::preg_quote_case_insensitive("123_test") === "(?i:123_test)"',
 
-			//'self::strlen(file_get_contents(' . var_export(__FILE__, true) . ', true))'
+			//'self::class::strlen(file_get_contents(' . var_export(__FILE__, true) . ', true))'
 		);
 		foreach ($a as $k => $v) if (! assert($v)) return false;
 
 		//$start_time = microtime(true);
-		//$s = file_get_contents(__FILE__);
-		//for ($i = 0; $i < 10; $i++) $r = self::html_entity_encode($s);
+		//$string = file_get_contents(__FILE__);
+		//for ($i = 0; $i < 10; $i++) $r = self::class::html_entity_encode($string);
 		//$time = microtime(true) - $start_time;
 		//d($time, $r);
 

@@ -9,7 +9,7 @@ use App\Model\OfferFacade;
 use App\Model\RatingFacade;
 use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\Ip;
-use App\UI\Accessory\ModeratingText;
+use App\UI\Accessory\Moderating\ModeratingText;
 use Nette\Application\UI\Form;
 
 /**
@@ -41,8 +41,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form_data->id = $id;
 
             $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-            $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
+            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
             $this->template->backlink = $this->storeRequest();
             $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
         } else {
@@ -168,11 +168,15 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             // moderate comment_text here or into other method
             if ($data['comment_text']) {
                 $text = htmlspecialchars(strip_tags($data['comment_text']));
-                $isBad = ModeratingText::parse(s: $text, delta: '0', continue: "\xe2\x80\xa6", is_html: false, replace: null, charset: 'UTF-8');
+                $text = trim(mb_substr($text, 0, 500));
+                $isBad = ModeratingText::isTextBad($text);
+
                 if ($isBad === false) {
                     $d->comment_text = $text;
                     $d->moderated = 1;
                 }
+                // $d->comment_text = ModeratingText::cleanText($text);
+                // $d->moderated = 1;
             }
 
             if (!empty($d->comment_text)) {

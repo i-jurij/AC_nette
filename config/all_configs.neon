@@ -3,6 +3,7 @@ includes:
     - common.neon
     - db.neon
     - own.neon
+    - php.neon
     - services.neon
     - webpack.neon
     - security.neon
