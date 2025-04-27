@@ -1,30 +1,33 @@
 {block breadcrumbMenuHome}
 
-{*if !empty($breadcrumb[2]) && \in_array($breadcrumb[2]['short'], ['Offer', 'offer'])}
-{var $breadcrumb[2]['short'] = 'Объявления'}
-{/if*}
-
-{if !empty($breadcrumb[1]) && \in_array($breadcrumb[1]['short'], ['Client'])}
-{var $breadcrumb[1]['short'] = $user->getIdentity()->username}
+{foreach $breadcrumb as $ey => $br}
+	{if \in_array($br['short'], ['Home', 'home'])}
+		{var $breadcrumb[$ey]['short'] = 'Главная'}
+	{/if}
+	{if \in_array($br['short'], ['Client', 'client'])}
+	{var $breadcrumb[$ey]['short'] = $user->getIdentity()->username}
+	{/if}
+	{if \in_array($br['short'], ['Offer', 'offer'])}
+		{var $breadcrumb[$ey]['short'] = 'Объявления'}
+		{if $ey === 1}
+			{*var $breadcrumb[2]['short'] = ''*}
+			{if !empty($offers) && count($offers) < 2 && !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
+				{var $breadcrumb[2]['short'] = 'Ищу работу'}
+			{elseif  !empty($offers) && count($offers) < 2 && !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
+				{var $breadcrumb[2]['short'] = 'Предлагаю работу'}
+			{/if}
+		{/if}
+	{/if}
+	{if \in_array($br['short'], ['Profile', 'profile'])}
+		{var $breadcrumb[$ey]['short'] = 'Профиль'}
+	{/if}
+	{if \in_array($br['short'], ['Add', 'add'])}
+		{var $breadcrumb[$ey]['short'] = 'Создать'}
+	{/if}
+	{if \in_array($br['short'], ['Edit', 'edit'])}
+	{var $breadcrumb[$ey]['short'] = 'Редактировать'}
 {/if}
-
-{if !empty($breadcrumb[1]) && \in_array($breadcrumb[1]['short'], ['Offer', 'offer'])}
-{var $breadcrumb[1]['short'] = 'Объявления'}
-
-{if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
-{var $breadcrumb[2]['short'] = 'Ищу работу'}
-{elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
-{var $breadcrumb[2]['short'] = 'Предлагаю работу'}
-{/if}
-
-{if !empty($breadcrumb[2]) && $breadcrumb[2]['short'] === 'add'}
-{var $breadcrumb[2]['short'] = 'Создать'}
-{/if}
-{/if}
-
-{if !empty($breadcrumb[0]) && \in_array($breadcrumb[0]['short'], ['Home', 'home'])}
-{var $breadcrumb[0]['short'] = 'Главная'}
-{/if}
+{/foreach}
 
 <div n:ifset="$breadcrumb" n:inner-foreach="$breadcrumb as $item" aria-label="breadcrumb"
 	n:class="!empty($breadcrumb[0]['short']) ? 'mb2'">
@@ -33,3 +36,4 @@
 	</a>
 	{if !$iterator->last}/{/if}
 </div>
+

@@ -9,13 +9,19 @@ namespace App\UI\Home\Client;
  */
 final class ClientPresenter extends \App\UI\Home\BasePresenter
 {
+    //use \App\UI\Accessory\LinkFromFileSystem;
+    //use \App\UI\Accessory\GetKeyValueRecursive;
     public function renderDefault()
     {
-        $this->template->data = 'Client presenter';
+        /*
+        $dirList = $this->linkFromFileSystem(APPDIR . DIRECTORY_SEPARATOR . 'UI');
+        $this->template->data = $this->getKeyValueRec(end($this->template->breadcrumb)['full'], $dirList);
+        */
+        $this->forward(':home:Client:Profile:');
     }
 }
 
 class ClientTemplate extends \App\UI\Home\BaseTemplate
 {
-    public string $data;
+    public array $data;
 }

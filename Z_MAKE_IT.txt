@@ -3,18 +3,14 @@
 MAKE  
 
 
-цензура сообщений комментариев в cjmment qnd foffer message   comment +-   offer -
-добавить проверку на содержание ссылок в тексте
-
-for offer and comments put to offer.request_data serialized $_SERVER
-
+цензура сообщений комментариев в cjmment qnd foffer message   comment +   offer -
+добавить проверку на содержание ссылок в тексте comment + offer -
+for offer and comments put to offer.request_data serialized $_SERVER comment + offer -
 offer add (publish after moderate), edit (publish after moderate), delete for client
 comments for offer-client (publish after moderate)
 
-
 menu for registerd client:
 profile for client (edit, delete)
-
 
 чат между клиентами 
 

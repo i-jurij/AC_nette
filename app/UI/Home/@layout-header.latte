@@ -7,7 +7,7 @@
 	<div class="right-align">
 		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink"
 			aria-label="Кнопка входа">Войти</a>
-		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка сообщения">
+		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка Сообщения" >
 			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 
@@ -18,8 +18,9 @@
 			</label>
 			<input id="profile_input" type="checkbox" style="display: none">
 			<div class="dropdown_menu round shadow left-align mt0">
-				<a href="#" aria-label="Кнопка ">Объявления</a>
-				<a href="#" aria-label="Кнопка ">Профиль</a>
+				<a n:href=":Home:Client:Offer:default" aria-label="Кнопка ">Объявления</a>
+
+				<a n:href=":Home:Client:Profile:" aria-label="Кнопка ">Профиль</a>
 				<a n:href=":Home:Sign:out" aria-label="Кнопка Выход">Выход</a>
 			</div>
 		</div>

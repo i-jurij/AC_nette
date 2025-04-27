@@ -6,5 +6,9 @@
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
-<p>{$data}</p>
+    {if (!empty($data) && is_array($data))}
+        {include menu from $shared_templates.'menu_home.latte', $data}
+    {else}
+        Client main page
+    {/if}
 {/block}

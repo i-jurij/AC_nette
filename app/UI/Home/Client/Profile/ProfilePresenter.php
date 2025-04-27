@@ -20,6 +20,7 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
     public function __construct(
         protected UserFacade $userfacade,
     ) {
+        parent::__construct();
         $this->onStartup[] = function () {
             if (IsBot::check()) {
                 $this->redirect(':Home:');

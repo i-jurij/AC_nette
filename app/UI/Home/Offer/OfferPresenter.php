@@ -41,8 +41,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form_data->id = $id;
 
             $this->template->offers = $this->offers->getOffers(form_data: $form_data);
-            $regex = '(^'.strval($id).'_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR.'/images/offers', "/$regex/");
+            $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
             $this->template->backlink = $this->storeRequest();
             $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
         } else {
@@ -188,10 +188,6 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         } else {
             $this->sendJson(false);
         }
-    }
-
-    public function renderAdd()
-    {
     }
 }
 

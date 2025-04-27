@@ -1,0 +1,17 @@
+{define menu, $items}
+<div n:if="is_array($items) && !empty($items)" class="bgcontent rounded p2 flex flex-wrap items-start justify-center">
+	{foreach $items as $key => $item}
+        {var $short = rtrim(Nette\Utils\Strings::after($key, ':', -2), ':')}
+		{if is_array($item) && !empty($item)}
+            <div class="m2 p2 border rounded">
+                <a class="button m2" n:href="$key">{$short}</a>
+                <div class="">
+			        {include menu, $item}
+                </div>
+            </div>
+		{elseif is_array($item) && empty($item) && !\mb_stristr($key, 'sign')}
+			<a class="button m2" n:href="$key">{$short}</a>
+		{/if}
+	{/foreach}
+</div>
+{/define}

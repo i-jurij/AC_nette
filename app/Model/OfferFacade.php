@@ -58,7 +58,7 @@ class OfferFacade
                 $res1[] = $row->offer_id;
             }
             if (!empty($res1)) {
-                $res = '('.\implode(',', \array_values(\array_unique($res1, SORT_REGULAR))).')';
+                $res = '(' . \implode(',', \array_values(\array_unique($res1, SORT_REGULAR))) . ')';
                 $this->sql_params[] = "`{$this->table}`.`id` IN {$res}";
             } else {
                 $this->sql_params[] = "`{$this->table}`.`id` = -1";
@@ -274,8 +274,10 @@ class OfferFacade
     {
     }
 
-    public function remove()
+    public function remove(int $id): int|null
     {
+        $sql = "DELETE FROM `{$this->table}` WHERE id = ?";
+        return $this->db->query($sql, $id)->getRowCount();
     }
 
     public function update()
