@@ -7,7 +7,7 @@
 	<div class="right-align">
 		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink"
 			aria-label="Кнопка входа">Войти</a>
-		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка Сообщения" >
+		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка Сообщения">
 			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 
@@ -27,8 +27,8 @@
 		{*<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти
 		</a> *}
-		<a class="button " n:if="$user->isLoggedIn() && !$presenter->isLinkCurrent(':Home:Offer:add')"
-			n:href=":Home:Offer:add" aria-label="Кнопка Разместить объявление">Разместить объявление</a>
+		<a class="button " n:if="$user->isLoggedIn() && !$presenter->isLinkCurrent(':Home:Client:Offer:add')"
+			n:href=":Home:Client:Offer:add" aria-label="Кнопка Разместить объявление">Разместить объявление</a>
 	</div>
 </header>
 
