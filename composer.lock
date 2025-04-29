@@ -89,12 +89,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/i-jurij/geolocation.git",
-                "reference": "d312cf51a6ce3e0420f50b44eb5db288989fd4b2"
+                "reference": "e0bceedc1cac71c320604302fee08b3bec986287"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/i-jurij/geolocation/zipball/d312cf51a6ce3e0420f50b44eb5db288989fd4b2",
-                "reference": "d312cf51a6ce3e0420f50b44eb5db288989fd4b2",
+                "url": "https://api.github.com/repos/i-jurij/geolocation/zipball/e0bceedc1cac71c320604302fee08b3bec986287",
+                "reference": "e0bceedc1cac71c320604302fee08b3bec986287",
                 "shasum": ""
             },
             "default-branch": true,
@@ -118,7 +118,7 @@
                 "source": "https://github.com/i-jurij/geolocation/tree/main",
                 "issues": "https://github.com/i-jurij/geolocation/issues"
             },
-            "time": "2025-04-17T18:38:00+00:00"
+            "time": "2025-04-28T18:55:44+00:00"
         },
         {
             "name": "i-jurij/nette_form_captcha",

@@ -7,25 +7,4 @@
 
 {block content}
 
-{control offerForm}
-<p>ADD offer</p>
-
-$offer = 'CREATE TABLE IF NOT EXISTS `offer`
-`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
-`offers_type` varchar(25) NOT NULL,
-`client_id` INTEGER UNSIGNED NOT NULL,
-`city_id` INTEGER DEFAULT NULL,
-`city_name` varchar(512) NOT NULL,
-`region_id` INTEGER DEFAULT NULL,
-`region_name` varchar(512) DEFAULT NULL,
-`district_id` INTEGER DEFAULT NULL,
-`district_name` varchar(512) DEFAULT NULL,
-`price` DECIMAL(10,2) NOT NULL,
-`message` text DEFAULT NULL,
-`moderated` TINYINT(1) DEFAULT 0,
-`request_data` TEXT DEFAULT NULL,
-`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-`end_time` TIMESTAMP NOT NULL
-
-{/block}
+{include offer_add_form from $shared_templates.'offer_add_form.latte'}

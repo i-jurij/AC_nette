@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace App\UI\Home\Client\Offer;
 
 use App\Model\OfferFacade;
+use App\Model\ServiceFacade;
 use App\UI\Accessory\IsBot;
 use Nette\Application\UI\Form;
 use Nette\Utils\Paginator;
+use App\UI\Accessory\Location\Location;
 
 /**
  * @property OfferTemplate $template
  */
 final class OfferPresenter extends \App\UI\Home\BasePresenter
 {
-    use \App\UI\Accessory\RequireLoggedUser;
-
     protected int $items_on_page_paginator = 10;
 
     public function __construct(
         protected OfferFacade $of,
+        protected ServiceFacade $sf
     ) {
         parent::__construct();
         $this->onStartup[] = function () {
@@ -53,16 +54,20 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function actionAdd()
     {
         if ($this->getUser()->isLoggedIn()) {
+            $this->template->services = $this->sf->getAllServices();
+
             $form = $this->getComponent('offerForm');
             $form->onSuccess[] = [$this, 'addingOfferFormSucceeded'];
         } else {
-            $this->error();
+            $this->redirect(":Home:");
         }
     }
 
     public function actionEdit(int $o, int $c)
     {
         if ($this->getUser()->isLoggedIn() && $this->getUser()->getId() == $c) {
+            $this->template->services = $this->sf->getAllServices();
+
             $fd = new \stdClass();
             $fd->id = $o;
             $fd->client_id = $c;
@@ -72,7 +77,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form->setDefaults($offers[0]); // установка значений по умолчанию
             $form->onSuccess[] = [$this, 'editingOfferFormSucceeded'];
         } else {
-            $this->error();
+            $this->redirect(":Home:");
         }
     }
 
@@ -84,8 +89,45 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         }
 
         $form = new Form();
+        $form->setHtmlAttribute('id', 'offer_add_form');
 
-        // ... добавляем поля формы ...
+        $form->addProtection('Csrf error');
+
+        $form->addGroup('');
+        $form->addMultiUpload('photos', 'Фото: (до 4-х штук)')
+            ->addRule($form::MaxLength, '%d фото максимум.', 4)
+            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::MaxFileSize, 'Maximum size is 1 MB.', 1024 * 1024);
+
+        $offers_type = [
+            'workoffer' => 'Предлагаю работу',
+            'serviceoffer' => 'Ищу работу',
+        ];
+        /*
+        $form->addSelect('offers_type', 'Тип:', $offers_type)
+            ->setHtmlAttribute('class', 'select')
+            ->setDefaultValue('serviceoffer')
+            ->setRequired();
+        */
+        $form->addRadioList('offers_type', 'Тип:', $offers_type)
+            ->setRequired("Выберите тип объявления");
+
+        $form->addInteger('price', "Стоимость:")
+            //->setHtmlAttribute('step', '100')
+            ->setHtmlAttribute('min', '0')
+            ->setHtmlAttribute('max', '1000000000')
+            ->setRequired("Укажите стоимость");
+
+        $form->addTextArea('message', 'Сообщение:')
+            ->setHtmlAttribute('rows', '4')
+            ->setHtmlAttribute('cols', '100')
+            ->addCondition($form::Length, [8, 500])
+            // ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[а-яА-Яa-zA-Z0-9\s?!,.\'Ёё]+$')
+            ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\":;!]+$');
+
+        $form->addHidden('client_id');
+
+        $form->addSubmit('offer_add', 'Добавить');
 
         return $form;
     }
@@ -117,6 +159,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 class OfferTemplate extends \App\UI\Home\BaseTemplate
 {
     public array $offers;
+    public array $services;
     public Paginator $paginator;
     public string $backlink;
 }

@@ -321,7 +321,7 @@ class ClientFacade
     }
 
     /**
-     * Summary of getCl.
+     * get clients by type.
      *
      * @param string $type 'customer' or 'executor'
      */

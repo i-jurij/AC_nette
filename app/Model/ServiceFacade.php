@@ -40,10 +40,16 @@ final class ServiceFacade
         return $res;
     }
 
-    public function getService(array $params)
+    public function getCategories()
     {
-        // $this->service = $this->db->table('service')->where($params);
-
-        return [];
+        return $this->db->table('category')->fetchAll();
+    }
+    public function getServices()
+    {
+        return $this->db->table('service')->select('id, category_id, name');
+    }
+    public function getService(int $category_id)
+    {
+        return $this->db->table('service')->where('category_id = ?', $category_id);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\UI\Accessory\Getcityid;
+use App\UI\Accessory\Location\Getcityid;
 use App\UI\Accessory\RequireLoggedUser;
 use Nette\Database\Connection;
 

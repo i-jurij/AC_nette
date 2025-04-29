@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\UI\Accessory;
+namespace App\UI\Accessory\Location;
 
 use Nette\Database\Connection;
 

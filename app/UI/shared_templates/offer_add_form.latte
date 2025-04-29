@@ -1,0 +1,116 @@
+{block offer_add_form}
+<style>
+    .tab {
+        position: relative
+    }
+
+    .tab-panel {
+        /* display: inline-block;
+            /* min-height: 150px; */
+    }
+
+    .tab-panel .tab-open {
+        display: none;
+    }
+
+
+    .tab-nav {
+        /* background-image: linear-gradient(to bottom, #333b33 0%, #030702 100%);
+            cursor: pointer;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem; */
+        max-width: 45%;
+    }
+
+    .tab-open,
+    .tab-nav:hover,
+    .tab-open:checked~.tab-nav,
+    .tab-label-check:hover,
+    .tab-label-check:has(> .tab-check:checked),
+    .type-rad-label:hover,
+    .type-rad:checked+.type-rad-label {
+        background-color: #666500;
+    }
+
+    .tab-inner {
+        opacity: 0;
+        position: absolute;
+        top: 1.6rem;
+        left: 50%;
+        max-width: 45%;
+        transition: opacity .1s;
+        visibility: hidden;
+        transform-origin: 50% 0%;
+    }
+
+    .tab-open:focus:checked~.tab-nav {
+        outline: thin dotted
+    }
+
+    .tab-open:checked~.tab-inner {
+        opacity: 100;
+        visibility: visible;
+        transition: opacity .6s ease
+    }
+</style>
+{var $city = (!empty($location['city'])) ? $location['city'] : 'Не выбрано...'}
+<form n:name=offerForm class="">
+    <ul class="red" n:ifcontent>
+        <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+    </ul>
+
+    <div class="bg-black rounded p1 mb2">
+        <span>Город:&nbsp;"{$city}"<span class="h6"> (кнопка выбора слева вверху)</span></span>
+    </div>
+
+    <div class="block fit bg-black rounded p1 mb2">
+        <label n:name=photos>Фото: (до 4х штук)<input n:name=photos></label>
+        <span class=error n:ifcontent>{inputError photos}</span>
+    </div>
+
+    <div class="block fit bg-black rounded p1 mb2">
+        <span class="mr2">Тип:</span>
+        <div class="inline-block">
+            {foreach $form[offers_type]->getItems() as $key => $label}
+            <input n:name="offers_type:$key" class="button type-rad">
+            <label n:name="offers_type:$key" class="button type-rad-label"> {$label}</label>
+            {/foreach}
+        </div>
+        <span class=error n:ifcontent>{inputError offers_type}</span>
+    </div>
+    <div class="block fit bg-black rounded p1 mb2">
+        <div class="tab">
+            <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
+            {foreach $services as $category_id => $category}
+            <div class="tab-panel">
+                <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}">
+                <label class="button tab-nav" for="tab-{$category_id}">{$category['category_name']}</label>
+                <div class="tab-inner">
+                    {foreach $category['services'] as $service}
+                    <label class="block button tab-label-check">
+                        <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}">
+                        <span class="checkable">{$service['name']}</span>
+                    </label>
+                    {/foreach}
+                </div>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+
+    <div class="block fit bg-black rounded p1 mb2">
+        <label n:name=price>Стоимость: <input n:name=price></label>
+        <span class=error n:ifcontent>{inputError price}</span>
+    </div>
+
+    <div class="block fit bg-black rounded p1 mb2">
+        <label n:name=message>Сообщение: <input n:name=message></label>
+        <span class=error n:ifcontent>{inputError message}</span>
+    </div>
+
+    <div class="block fit bg-black rounded p1 mb2">
+        <input n:name=client_id value="{$user->getId()}">
+        <input n:name=offer_add class="button">
+    </div>
+</form>
