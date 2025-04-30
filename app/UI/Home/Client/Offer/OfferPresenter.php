@@ -101,12 +101,29 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             ->setHtmlType('tel')
             ->setHtmlAttribute('placeholder', '☎ +7 999 333 22 22') // 📱
             ->setHtmlAttribute('id', 'user_phone_input');
-
+        /*
+                $form->addGroup('');
+                $form->addMultiUpload('photos', 'Фото: (до 4-х штук)')
+                    ->addRule($form::MaxLength, '%d фото максимум.', 4)
+                    ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+                    ->addRule($form::MaxFileSize, 'Maximum size is 1 MB.', 1024 * 1024);
+        */
         $form->addGroup('');
-        $form->addMultiUpload('photos', 'Фото: (до 4-х штук)')
-            ->addRule($form::MaxLength, '%d фото максимум.', 4)
+        $form->addUpload('photo1', 'Фото 1')
             ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
-            ->addRule($form::MaxFileSize, 'Maximum size is 1 MB.', 1024 * 1024);
+            ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
+
+        $form->addUpload('photo2', 'Фото 2')
+            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
+
+        $form->addUpload('photo3', 'Фото 3')
+            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
+
+        $form->addUpload('photo4', 'Фото 4')
+            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
 
         $offers_type = [
             'workoffer' => 'Предлагаю работу',
@@ -144,7 +161,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function addingOfferFormSucceeded(Form $form, array $data): void
     {
         $this->of->add($data); // добавление записи в базу данных
-        $this->flashMessage('Успешно добавлено', 'success');
+        $this->flashMessage('Объявление успешно добавлено', 'success');
         $this->redirect(':Home:Client:Offer:default');
     }
 
@@ -152,7 +169,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     {
         $id = (int) $this->getParameter('id');
         $this->of->update($id, $data); // обновление записи
-        $this->flashMessage('Успешно обновлено', 'success');
+        $this->flashMessage('Объявление успешно обновлено', 'success');
         $this->redirect(':Home:Client:Offer:default');
     }
 
@@ -162,6 +179,12 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $this->of->remove($o);
         }
         $this->redirect('this');
+    }
+
+    public function actionSaveToBackend()
+    {
+        $city = $this->locality['city'] ?: '';
+        $this->sendJson($city);
     }
 }
 
