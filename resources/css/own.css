@@ -89,6 +89,7 @@ textarea {
 }
 
 .flash_child .info {
+    background-color: unset;
     color: rgb(69, 125, 246);
 }
 

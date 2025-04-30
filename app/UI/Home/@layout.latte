@@ -21,7 +21,7 @@
 </head>
 
 <body style="">
-
+<script defer src="{webpack js/main.js}"></script>
 	{include flash_for_home from $shared_templates.'flash_for_home.latte'}
 
 	{*
@@ -90,7 +90,6 @@
 		{include footer from '@layout-footer.latte'}
 	</footer>
 
-	<script src="{webpack js/main.js}"></script>
 	<script src="{webpack js/geolocation.js}"></script>
 </body>
 

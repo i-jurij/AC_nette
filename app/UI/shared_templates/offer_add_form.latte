@@ -60,6 +60,15 @@
         <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
     </ul>
 
+{var $user_phone = $user->getIdentity()->getData()['phone']}
+{var $phone_value = !empty($user_phone) ? \App\UI\Accessory\PhoneNumber::fromDb($user_phone) : ''}
+<div class="bg-black rounded p1 mb2">
+    <label n:name=phone>
+        <span>Телефон:</span>
+        <span class="h6">(будет показан только зарегистрированным пользователям)</span>
+        <input n:name=phone value="{$phone_value}" required>
+    </label>
+</div>
     <div class="bg-black rounded p1 mb2">
         <span>Город:&nbsp;"{$city}"<span class="h6"> (кнопка выбора слева вверху)</span></span>
     </div>
@@ -114,3 +123,4 @@
         <input n:name=offer_add class="button">
     </div>
 </form>
+<script defer src="{webpack js/maskito.js}"></script>

@@ -18,6 +18,9 @@ profile for client (edit, delete)
 
 похожие объявления по региону (js fetch by region, type, services, price)
 
+поиск объявлений в радиусе х км от выбранного города
+
+
 -------------------
 CHAT
 table

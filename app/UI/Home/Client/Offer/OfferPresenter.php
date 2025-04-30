@@ -10,6 +10,8 @@ use App\UI\Accessory\IsBot;
 use Nette\Application\UI\Form;
 use Nette\Utils\Paginator;
 use App\UI\Accessory\Location\Location;
+use Nette\Forms\Container;
+use App\UI\Accessory\PhoneNumber;
 
 /**
  * @property OfferTemplate $template
@@ -36,7 +38,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $formdata = new \stdClass();
             $formdata->client_id = $this->getUser()->getId();
 
-            $offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
+            //$offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
+            $offersCount = $this->of->offersCount(form_data: $formdata);
             $paginator = new Paginator();
             $paginator->setItemCount($offersCount);
             $paginator->setItemsPerPage($this->items_on_page_paginator);
@@ -47,7 +50,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
         // $this->template->backlink = $this->storeRequest();
         } else {
-            $this->error();
+            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         }
     }
 
@@ -59,7 +62,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form = $this->getComponent('offerForm');
             $form->onSuccess[] = [$this, 'addingOfferFormSucceeded'];
         } else {
-            $this->redirect(":Home:");
+            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         }
     }
 
@@ -77,7 +80,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form->setDefaults($offers[0]); // установка значений по умолчанию
             $form->onSuccess[] = [$this, 'editingOfferFormSucceeded'];
         } else {
-            $this->redirect(":Home:");
+            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         }
     }
 
@@ -92,6 +95,12 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $form->setHtmlAttribute('id', 'offer_add_form');
 
         $form->addProtection('Csrf error');
+
+        $form->addText('phone', 'Номер мобильного теефона:')
+            ->addRule($form::Pattern, 'Введен неправильный номер', PhoneNumber::PHONE_REGEX)
+            ->setHtmlType('tel')
+            ->setHtmlAttribute('placeholder', '☎ +7 999 333 22 22') // 📱
+            ->setHtmlAttribute('id', 'user_phone_input');
 
         $form->addGroup('');
         $form->addMultiUpload('photos', 'Фото: (до 4-х штук)')
@@ -135,16 +144,16 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function addingOfferFormSucceeded(Form $form, array $data): void
     {
         $this->of->add($data); // добавление записи в базу данных
-        $this->flashMessage('Успешно добавлено');
-        $this->redirect('...');
+        $this->flashMessage('Успешно добавлено', 'success');
+        $this->redirect(':Home:Client:Offer:default');
     }
 
     public function editingOfferFormSucceeded(Form $form, array $data): void
     {
         $id = (int) $this->getParameter('id');
         $this->of->update($id, $data); // обновление записи
-        $this->flashMessage('Успешно обновлено');
-        $this->redirect('...');
+        $this->flashMessage('Успешно обновлено', 'success');
+        $this->redirect(':Home:Client:Offer:default');
     }
 
     public function handleRemove(int $o, int $c)

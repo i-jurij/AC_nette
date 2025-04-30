@@ -17,7 +17,7 @@ final class ClientPresenter extends \App\UI\Home\BasePresenter
         $dirList = $this->linkFromFileSystem(APPDIR . DIRECTORY_SEPARATOR . 'UI');
         $this->template->data = $this->getKeyValueRec(end($this->template->breadcrumb)['full'], $dirList);
         */
-        $this->forward(':home:Client:Profile:');
+        $this->forward(':Home:Client:Profile:');
     }
 }
 
