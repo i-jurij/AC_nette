@@ -11,7 +11,8 @@
 			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 
-		<div class="inline-block dropdown_div">
+		<div class="inline-block dropdown_div" tabindex='0'
+			onblur="document.querySelector('#profile_input').checked = false;">
 			<label class="pseudo button underline" n:if="!!$user->getIdentity()" for="profile_input"
 				aria-label="Кнопка меню профиля">
 				{$user->getIdentity()->username}
@@ -34,6 +35,6 @@
 
 <script>
 	let url_js_fetch = {link :Home:Geo:jsFetch};
-let url_location_to_server_js = {link :Home:saveToBackend};
+	let url_location_to_server_js = {link :Home:saveToBackend};
 </script>
 {/block}

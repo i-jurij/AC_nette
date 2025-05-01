@@ -164,14 +164,14 @@
     <main class="flexx one two-600">
         <div class="mt2">
             {if !empty($offers[0]['thumbnails']['thumb'])}
-            {var $src = "data:image/png;base64, base64_encode($offers[0]['thumbnails']['thumb'])"}
+            {var $src = "data:image/png;base64,". base64_encode($offers[0]['thumbnails']['thumb'])}
             {var $alt = $offers[0]['thumbnails']['caption']}
             {else}
             {if !empty($offer_images)}
-            {var $src = "$baseUrl/images/offers/$offer_images[0]"}
+            {var $src = $baseUrl."/images/offers/$offer_images[0]"}
             {var $alt = "First offers pictures"}
             {else}
-            {var $src = "$baseUrl/images/ddd.jpg"}
+            {var $src = $baseUrl."/images/ddd.jpg"}
             {var $alt = "Default offers thumbnail"}
             {/if}
             {/if}
@@ -208,6 +208,9 @@
                     </div>
                 </div>
             </div>
+            {else}
+            <img src="{$baseUrl}/images/ddd.jpg" alt="Default offers picture" loading="lazy" width="80%"
+                height="auto" />
             {/if}
             <p> ⚲ {$offers[0]['city_name']} {$offers[0]['region_name']}</p>
         </div>
