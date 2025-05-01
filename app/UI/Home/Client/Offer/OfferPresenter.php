@@ -12,6 +12,7 @@ use Nette\Utils\Paginator;
 use App\UI\Accessory\Location\Location;
 use Nette\Forms\Container;
 use App\UI\Accessory\PhoneNumber;
+use Nette\Http\FileUpload;
 use App\UI\Accessory\Moderating\ModeratingText;
 
 /**
@@ -184,13 +185,15 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
         $form_data->request_data = \serialize($_SERVER);
 
-        var_dump(['<pre>', $data, '</pre>']);
-
-        //var_dump(['<pre>', $data, '</pre>']);
-        exit;
-
 
         $this->of->add($data); // добавление записи в базу данных
+
+
+        $file = $this->getHttpRequest()->getFile('photo1');
+        if ($file instanceof FileUpload && $file?->hasFile()) {
+            $file->move("/images/offers/{$form_data->client_id} ");
+
+        }
         $this->flashMessage('Объявление успешно добавлено', 'success');
         $this->redirect(':Home:Client:Offer:default');
     }
