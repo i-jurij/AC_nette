@@ -26,23 +26,24 @@
     .tab-open,
     .tab-nav:hover,
     .tab-open:checked~.tab-nav,
-.tab-label-serv:hover,
-.tab-label-serv:has(> .tab-check:checked),
+    .tab-label-serv:hover,
+    .tab-label-serv:has(> .tab-check:checked),
     .type-rad-label:hover,
     .type-rad:checked+.type-rad-label {
         background-color: #666500;
     }
 
-.tab-nav:hover::after,
-.tab-open:checked~.tab-nav::after {
-content: " ›";
-}
+    .tab-nav:hover::after,
+    .tab-open:checked~.tab-nav::after {
+        content: " ›";
+    }
+
     .tab-inner {
         opacity: 0;
         position: absolute;
         top: 1.6rem;
         left: 50%;
-width: 50%;
+        width: 50%;
         transition: opacity .1s;
         visibility: hidden;
         transform-origin: 50% 0%;
@@ -57,13 +58,15 @@ width: 50%;
         visibility: visible;
         transition: opacity .6s ease
     }
-.form_offer_add {
-max-width: 30rem;
-margin: 0 auto;
-}
-.tab-panel .button {
-text-align: justify;
-}
+
+    .form_offer_add {
+        max-width: 30rem;
+        margin: 0 auto;
+    }
+
+    .tab-panel .button {
+        text-align: justify;
+    }
 </style>
 {var $city = (!empty($location['city'])) ? $location['city'] : 'Не выбрано...'}
 <form n:name=offerForm class="form_offer_add">
@@ -71,66 +74,68 @@ text-align: justify;
         <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
     </ul>
 
-{var $user_phone = $user->getIdentity()->getData()['phone']}
-{var $phone_value = !empty($user_phone) ? \App\UI\Accessory\PhoneNumber::fromDb($user_phone) : ''}
-<div class="bg-black rounded py1 px2 mb2">
-    <label n:name=phone>
-<span>Телефон </span>
-<span class="h6">(будет показан только зарегистрированным пользователям):</span>
-        <input n:name=phone value="{$phone_value}" required>
-    </label>
-</div>
-<div class="bg-black rounded py1 px2 mb2">
-    <span>Город<span class="h6"> (кнопка выбора слева вверху):</span></span>
-    <span class="block" id="data_by_location">"{$city}"</span>
-    </div>
-{*
-<div class="block fit bg-black rounded py1 px2 mb2">
-    <label n:name=photos>
-        Фото: (до 4х штук)
-        <input n:name=photos>
-    </label>
-    <span class=error n:ifcontent>{inputError photos}</span>
-</div>
-*}
-{*}
-<div class="block fit bg-black rounded py1 px2 mb2">
-    <label n:name=photos class="dropimage">
-        Фото: (до 4х штук)
-        <input n:name=photos title="Перетащите сюда изображения или нажмите эту кнопку">
-    </label>
-    <span class=error n:ifcontent>{inputError photos}</span>
-</div>
-*}
-<div class="block fit bg-black rounded py1 px2 mb2">
-    <span class="block">Фото:</span>
-    <div class="inline-block" style="width: 49%">
-        <label n:name=photo1 class="dropimage">
-            <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
+    {var $user_phone = $user->getIdentity()->getData()['phone']}
+    {var $phone_value = !empty($user_phone) ? \App\UI\Accessory\PhoneNumber::fromDb($user_phone) : ''}
+    <div class="bg-black rounded py1 px2 mb2">
+        <label n:name=phone>
+            <span>Телефон </span>
+            <span class="h6">(будет показан только зарегистрированным пользователям):</span>
+            <input n:name=phone value="{$phone_value}" required>
         </label>
-        <span class=error n:ifcontent>{inputError photo1}</span>
     </div>
-    <div class="inline-block" style="width: 49%">
-        <label n:name=photo2 class="dropimage">
-            <input n:name=photo2 title="Перетащите сюда изображениe или нажмите эту кнопку">
+    <div class="bg-black rounded py1 px2 mb2" id="city_input_offer_add_form">
+        <span>Город<span class="h6"> (кнопка выбора слева вверху):</span></span>
+        <span class="block" id="data_by_location">"{$city}"</span>
+    </div>
+    {*
+    <div class="block fit bg-black rounded py1 px2 mb2">
+        <label n:name=photos>
+            Фото: (до 4х штук)
+            <input n:name=photos>
         </label>
-        <span class=error n:ifcontent>{inputError photo2}</span>
+        <span class=error n:ifcontent>{inputError photos}</span>
     </div>
-    <div class="inline-block" style="width: 49%">
-        <label n:name=photo3 class="dropimage">
-            <input n:name=photo3 title="Перетащите сюда изображениe или нажмите эту кнопку">
+    *}
+    {*}
+    <div class="block fit bg-black rounded py1 px2 mb2">
+        <label n:name=photos class="dropimage">
+            Фото: (до 4х штук)
+            <input n:name=photos title="Перетащите сюда изображения или нажмите эту кнопку">
         </label>
-        <span class=error n:ifcontent>{inputError photo3}</span>
+        <span class=error n:ifcontent>{inputError photos}</span>
     </div>
-    <div class="inline-block" style="width: 49%">
-        <label n:name=photo4 class="dropimage">
-            <input n:name=photo4 title="Перетащите сюда изображение или нажмите эту кнопку">
-        </label>
-        <span class=error n:ifcontent>{inputError photo4}</span>
-    </div>
-</div>
+    *}
 
-<div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_add_form">
+        <span class="block">Фото:</span>
+        <div>
+            <label n:name=photo1 class="image_label_offer_add_form">
+                <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
+            </label>
+            <span class=error n:ifcontent>{inputError photo1}</span>
+        </div>
+        <div>
+            <label n:name=photo2 class="image_label_offer_add_form">
+                <input n:name=photo2 title="Перетащите сюда изображениe или нажмите эту кнопку">
+            </label>
+            <span class=error n:ifcontent>{inputError photo2}</span>
+        </div>
+        <div>
+            <label n:name=photo3 class="image_label_offer_add_form">
+                <input n:name=photo3 title="Перетащите сюда изображениe или нажмите эту кнопку">
+            </label>
+            <span class=error n:ifcontent>{inputError photo3}</span>
+        </div>
+        <div>
+            <label n:name=photo4 class="image_label_offer_add_form">
+                <input n:name=photo4 title="Перетащите сюда изображение или нажмите эту кнопку">
+            </label>
+            <span class=error n:ifcontent>{inputError photo4}</span>
+        </div>
+    </div>
+
+
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <span class="mr2">Тип:</span>
         <div class="inline-block">
             {foreach $form[offers_type]->getItems() as $key => $label}
@@ -140,16 +145,16 @@ text-align: justify;
         </div>
         <span class=error n:ifcontent>{inputError offers_type}</span>
     </div>
-<div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <div class="tab">
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
             {foreach $services as $category_id => $category}
             <div class="tab-panel">
                 <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}">
-<label class="block button tab-nav" for="tab-{$category_id}">{$category['category_name']}</label>
-<div class="tab-inner">
+                <label class="block button tab-nav" for="tab-{$category_id}">{$category['category_name']}</label>
+                <div class="tab-inner">
                     {foreach $category['services'] as $service}
-<label class="block button tab-label-serv">
+                    <label class="block button tab-label-serv">
                         <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}">
                         <span class="checkable">{$service['name']}</span>
                     </label>
@@ -160,33 +165,48 @@ text-align: justify;
         </div>
     </div>
 
-<div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <label n:name=price>Стоимость: <input n:name=price></label>
         <span class=error n:ifcontent>{inputError price}</span>
     </div>
 
-<div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <label n:name=message>Сообщение: <input n:name=message></label>
         <span class=error n:ifcontent>{inputError message}</span>
     </div>
 
-<div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <input n:name=client_id value="{$user->getId()}">
         <input n:name=offer_add class="button">
     </div>
 </form>
+
 <script defer src="{webpack js/maskito.js}"></script>
-<script>
-    url_location_to_server_js = {link :Home:Client:Offer:saveToBackend};
+
+<script n:syntax="double">
+    url_location_to_server_js = {{link :Home:Client:Offer:saveToBackend}};
     document.addEventListener("DOMContentLoaded", function() {
-    [].forEach.call(document.querySelectorAll('.dropimage'), function(img){
-    img.onchange = function(e){
-    var inputfile = this, reader = new FileReader();
-    reader.onloadend = function(){
-    inputfile.style['background-image'] = 'url('+reader.result+')';
-    }
-    reader.readAsDataURL(e.target.files[0]);
-    }
-    });
+        let image_labels = document.querySelectorAll('.image_label_offer_add_form');
+        if (image_labels) {
+            image_labels.forEach(
+                function (elem) {
+                     elem.classList.add('dropimage');
+                     let pd = elem.parentElement;
+                     pd.style.display = 'inline-block';
+                     pd.style.width = '49%';
+                }
+            );
+
+            [].forEach.call(document.querySelectorAll('.dropimage'), function(img) {
+                img.onchange = function(e) {
+                    var inputfile = this,
+                        reader = new FileReader();
+                    reader.onloadend = function() {
+                        inputfile.style['background-image'] = 'url(' + reader.result + ')';
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
     });
 </script>

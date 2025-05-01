@@ -58,7 +58,7 @@ class OfferFacade
                 $res1[] = $row->offer_id;
             }
             if (!empty($res1)) {
-                $res = '('.\implode(',', \array_values(\array_unique($res1, SORT_REGULAR))).')';
+                $res = '(' . \implode(',', \array_values(\array_unique($res1, SORT_REGULAR))) . ')';
                 $this->sql_params[] = "`{$this->table}`.`id` IN {$res}";
             } else {
                 $this->sql_params[] = "`{$this->table}`.`id` = -1";
@@ -272,6 +272,8 @@ class OfferFacade
 
     public function add(array $formdata)
     {
+        var_dump($formdata);
+        exit;
     }
 
     public function update(int $id, array $formdata)

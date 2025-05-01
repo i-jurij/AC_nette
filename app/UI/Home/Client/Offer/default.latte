@@ -10,7 +10,7 @@
 <div class="flexx one two-500 three-900 four-1200 five-1500 six-2000 center">
     {foreach $offers as $offer}
     <div class="flex flex-column">
-        <article class="card round flex-auto">
+        <article class="card round flex flex-column flex-auto">
             {* <a n:href=":Home:offer $offer['id']" class=""> *}
                 <a n:href=":Home:Offer:default $offer['id']" class="">
                     {if !empty($offer['thumbnails'])}
@@ -21,8 +21,9 @@
                     <img src='{$baseUrl}/images/ddd.jpg' alt="Default offers picture" loading="lazy" width="100%"
                         height="auto" />
                     {/if}
-
-                    <section>
+                </a>
+                <section class="flex-auto">
+                    <a n:href=":Home:Offer:default $offer['id']" class="">
                         <p class="bold">
                             {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
                             Ищу работу
@@ -51,12 +52,13 @@
                         {* <p> Updated_at: {$offer['updated_at']}</p> *}
                         {* <p> End_time: {$offer['end_time']}</p> *}
                         <input type="hidden" name="offer_id" value="{$offer['id']}">
-                    </section>
-                </a>
+                    </a>
+                </section>
                 <footer class="clearfix border-top">
                     {var $par = ['o' => $offer['id'], 'c' => $offer['client_id']]}
-                    <a n:href=":Home:Client:Offer:edit, ...$par" class="button tooltip-right left" data-tooltip="Редактировать">✎</a>        
-                    <a n:href="remove!, ...$par" class="button tooltip-left right"  data-tooltip="Удалить">✖</a>
+                    <a n:href=":Home:Client:Offer:edit, ...$par" class="button tooltip-right left"
+                        data-tooltip="Редактировать">✎</a>
+                    <a n:href="remove!, ...$par" class="button tooltip-left right" data-tooltip="Удалить">✖</a>
                 </footer>
         </article>
     </div>

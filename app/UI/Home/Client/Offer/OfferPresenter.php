@@ -12,6 +12,7 @@ use Nette\Utils\Paginator;
 use App\UI\Accessory\Location\Location;
 use Nette\Forms\Container;
 use App\UI\Accessory\PhoneNumber;
+use App\UI\Accessory\Moderating\ModeratingText;
 
 /**
  * @property OfferTemplate $template
@@ -48,7 +49,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
             $this->template->offers = $this->of->getOffers(form_data: $formdata);
 
-        // $this->template->backlink = $this->storeRequest();
+            // $this->template->backlink = $this->storeRequest();
         } else {
             $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         }
@@ -160,6 +161,35 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function addingOfferFormSucceeded(Form $form, array $data): void
     {
+        $form_data = new \stdClass;
+        $form_data->phone = PhoneNumber::toDb($data['phone']);
+        $form_data->city = $this->locality['city'] ?: false;
+        $form_data->category = (int) $form->getHttpData($form::DataText, 'category');
+        $service_array = $form->getHttpData($form::DataText, 'service[]');
+        foreach ($service_array as $key => $service_id) {
+            $service_array[$key] = (int) $service_id;
+        }
+        $form_data->service = $service_array;
+        $form_data->offers_type = (in_array($data['offers_type'], ['workoffer', 'serviceoffer'])) ? $data['offers_type'] : false;
+        $form_data->price = (int) $data['price'];
+        $form_data->client_id = (int) $data['client_id'];
+
+        $text = htmlspecialchars(strip_tags($data['message']));
+        $text = trim(mb_substr($text, 0, 500));
+        $isBad = ModeratingText::isTextBad($text);
+        if ($isBad === false) {
+            $form_data->message = $text;
+            $form_data->moderated = 1;
+        }
+
+        $form_data->request_data = \serialize($_SERVER);
+
+        var_dump(['<pre>', $data, '</pre>']);
+
+        //var_dump(['<pre>', $data, '</pre>']);
+        exit;
+
+
         $this->of->add($data); // добавление записи в базу данных
         $this->flashMessage('Объявление успешно добавлено', 'success');
         $this->redirect(':Home:Client:Offer:default');
