@@ -155,31 +155,27 @@
 
     .details_div {
         width: 100%;
-        max-width: 50em;
+        max-width: 60rem;
         text-align: justify;
+        background-color: black;
+        margin: 0 0 1rem 0;
+        padding: 1rem;
     }
 </style>
 
 <article class="bgcontent px2 pb1 rounded">
     <main class="flexx one two-600">
         <div class="mt2">
-            {if !empty($offers[0]['thumbnails']['thumb'])}
-            {var $src = "data:image/png;base64,". base64_encode($offers[0]['thumbnails']['thumb'])}
-            {var $alt = $offers[0]['thumbnails']['caption']}
-            {else}
-            {if !empty($offer_images)}
-            {var $src = $baseUrl."/images/offers/$offer_images[0]"}
-            {var $alt = "First offers pictures"}
-            {else}
-            {var $src = $baseUrl."/images/ddd.jpg"}
-            {var $alt = "Default offers thumbnail"}
-            {/if}
-            {/if}
-
             {if !empty($offer_images)}
             {var $count = \count($offer_images)}
             <figure class="offer_figure">
-                <img src="{$src}" onclick="openModal();currentSlide(1)" alt="{$alt}" />
+                {if !empty($offers[0]['thumbnails']['thumb'])}
+                <img src="data:image/png;base64, {base64_encode($offers[0]['thumbnails']['thumb'])}"
+                    onclick="openModal();currentSlide(1)" alt="Фото {$offers[0]['thumbnails']['caption']}" />
+                {else}
+                <img src="{$baseUrl}/images/offers/{current($offer_images)}" onclick="openModal();currentSlide(1)"
+                    alt="Первое фото" />
+                {/if}
                 <figcaption class="">Фото&nbsp;1&nbsp;из&nbsp;{$count}</figcaption>
             </figure>
 
@@ -209,8 +205,13 @@
                 </div>
             </div>
             {else}
+            {if !empty($offers[0]['thumbnails']['thumb'])}
+            <img src="data:image/png;base64, {base64_encode($offers[0]['thumbnails']['thumb'])}"
+                alt="Фото {$offers[0]['thumbnails']['caption']}" width="80%" />
+            {else}
             <img src="{$baseUrl}/images/ddd.jpg" alt="Default offers picture" loading="lazy" width="80%"
                 height="auto" />
+            {/if}
             {/if}
             <p> ⚲ {$offers[0]['city_name']} {$offers[0]['region_name']}</p>
         </div>
@@ -241,7 +242,7 @@
                 </dd>
             </dl>
 
-            <p>{$offers[0]['price']}</p>
+            <p>{number_format($offers[0]['price'], 0, ",", " ")} руб.</p>
 
             {include rating from $shared_templates.'rating.latte'}
 
@@ -254,7 +255,7 @@
     </main>
     <div class="mt0 pt0">
         <h4 class="mt0 pt0"> Подробности:</h4>
-        <p class="mt0 pt0 details_div">{$offers[0]['message']}</p>
+        <p class="details_div rounded">{$offers[0]['message']}</p>
     </div>
 
     {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}

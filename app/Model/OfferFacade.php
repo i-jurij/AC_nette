@@ -221,7 +221,7 @@ class OfferFacade
             FROM `offer_service` 
                 INNER JOIN `service` ON `offer_service`.`service_id` = `service`.`id`
                 INNER JOIN `category` ON `service`.`category_id` = `category`.`id`  WHERE';
-            $offer_services = $this->db->query($sql_services, ['offer_service.offer_id' => $offers_ids]);
+            $offer_services = $this->db->query($sql_services, ['offer_service.offer_id' => $offers_ids])->fetchAll();
 
             $categories = [];
             foreach ($offer_services as $vos) {
@@ -230,7 +230,10 @@ class OfferFacade
                     'category_image' => $vos->category_image,
                     'category_name' => $vos->category_name,
                     'category_description' => $vos->category_description,
+                    'services' => []
                 ];
+            }
+            foreach ($offer_services as $vos) {
                 $categories[$vos->offer_id][$vos->category_id]['services'][$vos->id] = [
                     'id' => $vos->id,
                     'image' => $vos->image,
@@ -238,12 +241,13 @@ class OfferFacade
                     'description' => $vos->description,
                 ];
             }
-            $fmt = new \NumberFormatter('ru_RU', \NumberFormatter::CURRENCY);
-            $fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
+
+            //$fmt = new \NumberFormatter('ru_RU', \NumberFormatter::CURRENCY);
+            //$fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, 0);
             $res_array = [];
             foreach ($offers as $k => $offer) {
                 $res_array[$k] = [];
-                $offer->price = $fmt->formatCurrency((float) $offer->price, 'RUR');
+                //$offer->price = $fmt->formatCurrency((float) $offer->price, 'RUR');
                 foreach ($offer as $m => $valu) {
                     $res_array[$k] += [$m => $valu];
                 }
@@ -270,10 +274,10 @@ class OfferFacade
         return !empty($res_array) ? $res_array : [];
     }
 
-    public function add(array $formdata)
+    public function add(object $formdata): string
     {
-        var_dump($formdata);
-        exit;
+        $this->db->query("INSERT INTO `{$this->table}` ?", $formdata);
+        return $this->db->getInsertId();
     }
 
     public function update(int $id, array $formdata)

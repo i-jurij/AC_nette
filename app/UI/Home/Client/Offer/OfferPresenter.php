@@ -14,6 +14,14 @@ use Nette\Forms\Container;
 use App\UI\Accessory\PhoneNumber;
 use Nette\Http\FileUpload;
 use App\UI\Accessory\Moderating\ModeratingText;
+use \Nette\Utils\ArrayHash;
+use Nette\Utils\Image;
+use Nette\Utils\ImageColor;
+use Nette\Utils\ImageType;
+use Nette\Utils\FileSystem;
+use Nette\Utils\Finder;
+
+
 
 /**
  * @property OfferTemplate $template
@@ -78,6 +86,10 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $fd->client_id = $c;
             $offers = $this->of->getOffers(form_data: $fd);
 
+
+
+
+
             $form = $this->getComponent('offerForm');
             $form->setDefaults($offers[0]); // установка значений по умолчанию
             $form->onSuccess[] = [$this, 'editingOfferFormSucceeded'];
@@ -112,19 +124,19 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         */
         $form->addGroup('');
         $form->addUpload('photo1', 'Фото 1')
-            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::Image, 'Тип фото JPEG, PNG, WebP.')
             ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
 
         $form->addUpload('photo2', 'Фото 2')
-            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::Image, 'Тип фото JPEG, PNG, WebP.')
             ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
 
         $form->addUpload('photo3', 'Фото 3')
-            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::Image, 'Тип фото JPEG, PNG, WebP.')
             ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
 
         $form->addUpload('photo4', 'Фото 4')
-            ->addRule($form::Image, 'Avatar must be JPEG, PNG, WebP.')
+            ->addRule($form::Image, 'Тип фото JPEG, PNG, WebP.')
             ->addRule($form::MaxFileSize, 'Maximum size is 10 MB.', 1024 * 1024 * 10);
 
         $offers_type = [
@@ -155,26 +167,23 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
         $form->addHidden('client_id');
 
-        $form->addSubmit('offer_add', 'Добавить');
+        $form->addSubmit('offer_add', 'Сохранить');
 
         return $form;
     }
 
-    public function addingOfferFormSucceeded(Form $form, array $data): void
+    protected function prepareOfferFormData(Form $form, array $data): ArrayHash
     {
-        $form_data = new \stdClass;
-        $form_data->phone = PhoneNumber::toDb($data['phone']);
-        $form_data->city = $this->locality['city'] ?: false;
-        $form_data->category = (int) $form->getHttpData($form::DataText, 'category');
-        $service_array = $form->getHttpData($form::DataText, 'service[]');
-        foreach ($service_array as $key => $service_id) {
-            $service_array[$key] = (int) $service_id;
-        }
-        $form_data->service = $service_array;
-        $form_data->offers_type = (in_array($data['offers_type'], ['workoffer', 'serviceoffer'])) ? $data['offers_type'] : false;
-        $form_data->price = (int) $data['price'];
+        $form_data = new ArrayHash;
+
         $form_data->client_id = (int) $data['client_id'];
 
+        $form_data->city_name = $this->locality['city'] ?: false;
+        $form_data->region_name = $this->locality['region'] ?: false;
+
+        $form_data->offers_type = (in_array($data['offers_type'], ['workoffer', 'serviceoffer'])) ? $data['offers_type'] : false;
+        $form_data->price = (int) $data['price'];
+        $form_data->moderated = 0;
         $text = htmlspecialchars(strip_tags($data['message']));
         $text = trim(mb_substr($text, 0, 500));
         $isBad = ModeratingText::isTextBad($text);
@@ -185,16 +194,114 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
         $form_data->request_data = \serialize($_SERVER);
 
+        return $form_data;
+    }
 
-        $this->of->add($data); // добавление записи в базу данных
+    protected function addNewOffer($form, $data)
+    {
+        $form_data = $this->prepareOfferFormData($form, $data);
 
+        if (!empty($form_data) && $form_data->moderated === 1) {
+            $new_offer_id = $this->of->add($form_data);
 
-        $file = $this->getHttpRequest()->getFile('photo1');
-        if ($file instanceof FileUpload && $file?->hasFile()) {
-            $file->move("/images/offers/{$form_data->client_id} ");
+            if (!empty($new_offer_id)) {
+                $this->flashMessage('Объявление успешно добавлено', 'success');
+                // update clients phone 
+                $phone = PhoneNumber::toDb($data['phone']);
+                $client_phone = $this->sf->db->table('client')
+                    ->where('id', $form_data->client_id)
+                    ->update([
+                        'phone' => $phone
+                    ]);
+                if ($client_phone > 0) {
+                    $this->flashMessage('Номер телефона обновлен', 'success');
+                }
 
+                // add offers services 
+                // $category_id = (int) $form->getHttpData($form::DataText, 'category');
+                $service_array = $form->getHttpData($form::DataText, 'service[]');
+                foreach ($service_array as $service_id) {
+                    $services[] = [
+                        'offer_id' => $new_offer_id,
+                        'service_id' => (int) $service_id
+                    ];
+                }
+                /* $offer_service = $this->sf->db->table('offer_service')->insert($services);
+                if (!empty($offer_service)) {
+                    $this->flashMessage('Услуги успешно добавлены', 'success');
+                }
+                */
+                $this->of->db->query("INSERT INTO `offer_service` ?", $services);
+                $offer_service_res = $this->of->db->getInsertId();
+
+                if (!empty($offer_service_res)) {
+                    $this->flashMessage('Услуги успешно добавлены', 'success');
+                }
+
+                $this->imagesAdd($new_offer_id);
+            } else {
+                $this->flashMessage('Объявление не добавлено. Попробуйте позже.', 'error');
+            }
+        } else {
+            $this->flashMessage('Объявление не добавлено. В сообщении не должно быть ссылок или ругательств', 'success');
         }
-        $this->flashMessage('Объявление успешно добавлено', 'success');
+    }
+
+    protected function imagesAdd($new_offer_id)
+    {
+        //add offers images
+        $files_array = [
+            '1' => $this->getHttpRequest()->getFile('photo1'),
+            '2' => $this->getHttpRequest()->getFile('photo2'),
+            '3' => $this->getHttpRequest()->getFile('photo3'),
+            '4' => $this->getHttpRequest()->getFile('photo4'),
+        ];
+        foreach ($files_array as $key => $file) {
+            if (
+                $file instanceof FileUpload
+                && $file?->hasFile()
+                && $file?->isOk()
+                && $file?->isImage()
+                && $file?->getSize() < 10 * 1024 * 1024
+                && in_array($file?->getSuggestedExtension(), ['jpg', 'jpeg', 'png', 'webp'])
+            ) {
+                // $file?->getImageSize() = [0 => width, 1 => height]
+                $size = $file?->getImageSize();
+                $width = (!empty($size[0])) ? $size[0] : null;
+                $height = (!empty($size[1])) ? $size[1] : null;
+                if ($width > 2048 || $height > 2048) {
+                    $image = $file->toImage();
+                    $image->resize(2048, 2048);
+                    // $image->sharpen();
+                    $image->save(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.png', null, ImageType::PNG);
+
+                } else {
+                    $file->move(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.' . $file->getSuggestedExtension());
+                }
+
+                $this->flashMessage("Фото $key успешно добавлено", "success");
+            }
+        }
+
+        if (!empty($files_array[1])) {
+            $thumb = $files_array[1]->toImage()->resize(1024, 960, Image::Cover)->sharpen();
+
+            $offer_thumb = $this->sf->db
+                ->table('offer_image_thumb')
+                ->insert([
+                    'offer_id' => $new_offer_id,
+                    'caption' => '',
+                    'thumb' => $thumb
+                ]);
+            if (!empty($offer_thumb)) {
+                $this->flashMessage('Изабражение для объявления успешно добавлено в базу данных', 'success');
+            }
+        }
+    }
+
+    public function addingOfferFormSucceeded(Form $form, array $data): void
+    {
+        $this->addNewOffer($form, $data);
         $this->redirect(':Home:Client:Offer:default');
     }
 
@@ -209,8 +316,18 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function handleRemove(int $o, int $c)
     {
         if ($this->getUser()->isLoggedIn() && $this->getUser()->getId() == $c) {
-            $this->of->remove($o);
+            if ($this->of->remove($o) > 0) {
+                $this->flashMessage('Объявление удалено из базы данных', 'success');
+            }
+
+            $images = Finder::findFiles([(string) $o . '_*.jpg', (string) $o . '_*.jpeg', (string) $o . '_*.png', (string) $o . '_*.webp'])
+                ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers");
+            foreach ($images as $name => $file) {
+                FileSystem::delete($name);
+            }
+            $this->flashMessage('Фото для объявления удалены', 'success');
         }
+
         $this->redirect('this');
     }
 

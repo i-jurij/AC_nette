@@ -2,12 +2,17 @@
         
 MAKE  
 
+переделать выбор города в форме добавления и редактироавния
+сделать проверку наличия необходимых полей (город, номер телефона, тип, услуга, цена)
 
-цензура сообщений комментариев в cjmment qnd foffer message   comment +   offer -
-добавить проверку на содержание ссылок в тексте comment + offer -
-for offer and comments put to offer.request_data serialized $_SERVER comment + offer -
-offer add (publish after moderate), edit (publish after moderate), delete for client
-comments for offer-client (publish after moderate)
+в комментарии добавить кнопку пожаловаться (на объявление или комментарий) создать таблицу в бд comment_grievance
+
+добавить в объялении пункт "Ссылки на сайт, мессенджер"
+сделать размещение ссылок на сайты или мессенджеры и прочее платными 
+
+сделать платные объявления, которые всегда в топе?
+
+сделать среди объявлений вставку рекламы?
 
 menu for registerd client:
 profile for client (edit, delete)

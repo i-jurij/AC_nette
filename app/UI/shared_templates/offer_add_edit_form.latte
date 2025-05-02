@@ -1,4 +1,4 @@
-{block offer_add_form}
+{block offer_add_edit_form}
 <style>
     .tab {
         position: relative
@@ -107,7 +107,7 @@
     *}
 
     <div class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_add_form">
-        <span class="block">Фото:</span>
+        <span class="block">Фото<span class="h6"> (до 10МБ каждое):</span></span>
         <div>
             <label n:name=photo1 class="image_label_offer_add_form">
                 <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
@@ -145,6 +145,7 @@
         </div>
         <span class=error n:ifcontent>{inputError offers_type}</span>
     </div>
+
     <div class="block fit bg-black rounded py1 px2 mb2">
         <div class="tab">
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
@@ -171,7 +172,8 @@
     </div>
 
     <div class="block fit bg-black rounded py1 px2 mb2">
-        <label n:name=message>Сообщение: <textarea n:name=message type=""></textarea></label>
+        <label n:name=message>Сообщение<span class="h6"> (ссылки в тексте запрещены)</span>: <textarea n:name=message
+                type=""></textarea></label>
         <span class=error n:ifcontent>{inputError message}</span>
     </div>
 
