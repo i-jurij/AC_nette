@@ -86,9 +86,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $fd->client_id = $c;
             $offers = $this->of->getOffers(form_data: $fd);
 
-
-
-
+            $this->template->offers = $offers[0];
 
             $form = $this->getComponent('offerForm');
             $form->setDefaults($offers[0]); // установка значений по умолчанию
@@ -109,6 +107,11 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $form->setHtmlAttribute('id', 'offer_add_form');
 
         $form->addProtection('Csrf error');
+
+        /*
+        $form->addHidden('city_name')->setOmitted();
+        $form->addHidden('region_name')->setOmitted();
+        */
 
         $form->addText('phone', 'Номер мобильного теефона:')
             ->addRule($form::Pattern, 'Введен неправильный номер', PhoneNumber::PHONE_REGEX)
@@ -283,18 +286,21 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             }
         }
 
-        if (!empty($files_array[1])) {
-            $thumb = $files_array[1]->toImage()->resize(1024, 960, Image::Cover)->sharpen();
+        foreach ($files_array as $value) {
+            if ($value) {
+                $thumb = $value->toImage()->resize(1024, 960, Image::Cover)->sharpen();
 
-            $offer_thumb = $this->sf->db
-                ->table('offer_image_thumb')
-                ->insert([
-                    'offer_id' => $new_offer_id,
-                    'caption' => '',
-                    'thumb' => $thumb
-                ]);
-            if (!empty($offer_thumb)) {
-                $this->flashMessage('Изабражение для объявления успешно добавлено в базу данных', 'success');
+                $offer_thumb = $this->sf->db
+                    ->table('offer_image_thumb')
+                    ->insert([
+                        'offer_id' => $new_offer_id,
+                        'caption' => '',
+                        'thumb' => $thumb
+                    ]);
+                if (!empty($offer_thumb)) {
+                    $this->flashMessage('Изабражение для объявления успешно добавлено в базу данных', 'success');
+                }
+                return;
             }
         }
     }
