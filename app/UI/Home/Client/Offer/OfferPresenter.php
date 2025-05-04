@@ -88,6 +88,13 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
             $this->template->offers = $offers[0];
 
+
+            //$this->template->images = Finder::findFiles([(string) $o . '_*.jpg', (string) $o . '_*.jpeg', (string) $o . '_*.png', (string) $o . '_*.webp'])
+            //  ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers");
+
+            $this->template->images = Finder::findFiles([(string) $o . '_*.jpg', (string) $o . '_*.jpeg', (string) $o . '_*.png', (string) $o . '_*.webp'])
+                ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers")->collect();
+
             $form = $this->getComponent('offerForm');
             $form->setDefaults($offers[0]); // установка значений по умолчанию
             $form->onSuccess[] = [$this, 'editingOfferFormSucceeded'];
@@ -169,6 +176,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\":;!]+$');
 
         $form->addHidden('client_id');
+        $form->addHidden('id');
 
         $form->addSubmit('offer_add', 'Сохранить');
 
@@ -178,6 +186,10 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     protected function prepareOfferFormData(Form $form, array $data): ArrayHash
     {
         $form_data = new ArrayHash;
+
+        if (!empty($data['id'])) {
+            $form_data->id = (int) $data['id'];
+        }
 
         $form_data->client_id = (int) $data['client_id'];
 
@@ -250,7 +262,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         }
     }
 
-    protected function imagesAdd($new_offer_id)
+    protected function imagesAdd(string $new_offer_id)
     {
         //add offers images
         $files_array = [
@@ -259,6 +271,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             '3' => $this->getHttpRequest()->getFile('photo3'),
             '4' => $this->getHttpRequest()->getFile('photo4'),
         ];
+        $path = WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR;
+        // $logo = Image::fromFile(file: $path . 'logo.png');
         foreach ($files_array as $key => $file) {
             if (
                 $file instanceof FileUpload
@@ -268,27 +282,46 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
                 && $file?->getSize() < 10 * 1024 * 1024
                 && in_array($file?->getSuggestedExtension(), ['jpg', 'jpeg', 'png', 'webp'])
             ) {
+
                 // $file?->getImageSize() = [0 => width, 1 => height]
                 $size = $file?->getImageSize();
                 $width = (!empty($size[0])) ? $size[0] : null;
                 $height = (!empty($size[1])) ? $size[1] : null;
+
                 if ($width > 2048 || $height > 2048) {
                     $image = $file->toImage();
-                    $image->resize(2048, 2048);
+                    //$image->resize(width: 2048, height: 2048, mode: Image::ShrinkOnly);
+                    $image->resize(width: 2048, height: 2048);
                     // $image->sharpen();
-                    $image->save(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.png', null, ImageType::PNG);
-
+                    //$image->place(image: $logo, left: '80%', top: '80%', opacity: 25); //watermark
+                    $image->save(file: $path . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.png', quality: null, type: ImageType::PNG);
                 } else {
-                    $file->move(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.' . $file->getSuggestedExtension());
+                    $file->move(dest: $path . "offers" . DIRECTORY_SEPARATOR . $new_offer_id . '_' . $key . '.' . $file->getSuggestedExtension());
                 }
 
                 $this->flashMessage("Фото $key успешно добавлено", "success");
+
+                if ($key == '1') {
+                    $thumb = $file->toImage()->resize(1024, 960, Image::Cover)->sharpen();
+                    // $thumb->place(image: $logo, left: '80%', top: '80%', opacity: 25); //watermark
+                    $offer_thumb = $this->sf->db
+                        ->table('offer_image_thumb')
+                        ->insert([
+                            'offer_id' => $new_offer_id,
+                            'caption' => '',
+                            'thumb' => $thumb
+                        ]);
+                    if (!empty($offer_thumb)) {
+                        $this->flashMessage('Изабражение для объявления успешно добавлено в базу данных', 'success');
+                    }
+                }
             }
         }
-
+        /*
         foreach ($files_array as $value) {
             if ($value) {
                 $thumb = $value->toImage()->resize(1024, 960, Image::Cover)->sharpen();
+                // $thumb->place(image: $logo, left: '80%', top: '80%', opacity: 25); //watermark
 
                 $offer_thumb = $this->sf->db
                     ->table('offer_image_thumb')
@@ -303,8 +336,17 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
                 return;
             }
         }
+        */
     }
 
+    public function handleImageDel(string $image_name)
+    {
+        $filename = WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . \basename($image_name);
+        if (\file_exists($filename)) {
+            FileSystem::delete($filename);
+        }
+        $this->redirect('this');
+    }
     public function addingOfferFormSucceeded(Form $form, array $data): void
     {
         $this->addNewOffer($form, $data);
@@ -313,9 +355,47 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function editingOfferFormSucceeded(Form $form, array $data): void
     {
-        $id = (int) $this->getParameter('id');
-        $this->of->update($id, $data); // обновление записи
-        $this->flashMessage('Объявление успешно обновлено', 'success');
+        $id = (int) $this->getParameter('o');
+        $form_data = $this->prepareOfferFormData($form, $data);
+
+        if ($id == $form_data->id) {
+            // update clients phone 
+            $phone = PhoneNumber::toDb($data['phone']);
+            $client_phone = $this->sf->db->table('client')
+                ->where('id', $form_data->client_id)
+                ->update([
+                    'phone' => $phone
+                ]);
+            if ($client_phone > 0) {
+                $this->flashMessage('Номер телефона обновлен', 'success');
+            }
+
+            // add offers services 
+            // $category_id = (int) $form->getHttpData($form::DataText, 'category');
+            $service_array = $form->getHttpData($form::DataText, 'service[]');
+            foreach ($service_array as $service_id) {
+                $services[] = [
+                    'offer_id' => $form_data->id,
+                    'service_id' => (int) $service_id
+                ];
+            }
+            $this->of->db->query("DELETE FROM `offer_service` WHERE offer_id = ?", $form_data->id);
+            $this->of->db->query("INSERT IGNORE INTO `offer_service` ?", $services);
+            $offer_service_res = $this->of->db->getInsertId();
+
+            if (!empty($offer_service_res)) {
+                $this->flashMessage('Услуги успешно обновлены', 'success');
+            }
+
+            $this->imagesAdd((string) $form_data->id);
+
+            $this->of->update($id, $form_data);
+
+            $this->flashMessage('Объявление успешно обновлено', 'success');
+        } else {
+            $this->flashMessage('Объявление не обновлено', 'warning');
+        }
+
         $this->redirect(':Home:Client:Offer:default');
     }
 
@@ -348,6 +428,8 @@ class OfferTemplate extends \App\UI\Home\BaseTemplate
 {
     public array $offers;
     public array $services;
+    // public Finder $images;
+    public array $images;
     public Paginator $paginator;
     public string $backlink;
 }

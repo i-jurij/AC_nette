@@ -168,7 +168,7 @@
         <div class="mt2">
             {if !empty($offer_images)}
             {var $count = \count($offer_images)}
-            <figure class="offer_figure">
+            <figure class="offer_figure wmk">
                 {if !empty($offers[0]['thumbnails']['thumb'])}
                 <img src="data:image/png;base64, {base64_encode($offers[0]['thumbnails']['thumb'])}"
                     onclick="openModal();currentSlide(1)" alt="Фото {$offers[0]['thumbnails']['caption']}" />
@@ -183,7 +183,7 @@
                 <span class="close cursor" onclick="closeModal()">&times;</span>
                 <div class="offer_pictures_gallery_modal-content">
 
-                    <div class="mySlides" n:foreach="$offer_images as $key => $image">
+                    <div class="mySlides wmk" n:foreach="$offer_images as $key => $image">
                         <div class="numbertext">{$key+1} / {$count}</div>
                         <img src="{$baseUrl.'/images/offers/'.$image}" loading="lazy">
                     </div>
@@ -213,7 +213,12 @@
                 height="auto" />
             {/if}
             {/if}
+            {if $offers[0]['city_name'] != $offers[0]['region_name']}
             <p> ⚲ {$offers[0]['city_name']} {$offers[0]['region_name']}</p>
+            {else}
+            <p> ⚲ {$offers[0]['city_name']}</p>
+            {/if}
+
         </div>
 
         <div class="">

@@ -87,10 +87,18 @@
     {var $city = (!empty($location['city'])) ? $location['city'] : 'Не выбрано...'}
     <div class="bg-black rounded py1 px2 mb2" id="city_input_offer_add_form">
         <span class="block mb1">Город:</span>
-        {if !empty($offers['city_name'])}
-        <span class="h6">Был </span><span class="inline-block bgcolor rounded p1">{$offers['city_name']}</span>
-        <span class="h6">Станет </span><span class="inline-block bgcolor rounded p1 red"
-            id="data_by_location">{$city}</span>
+        {if (!empty($offers['city_name']) && $offers['city_name'] != $city)}
+        <table>
+            <tr class="bg-black">
+                <td class="h6">Был</td>
+                <td><span class="inline-block bgcolor rounded p1">{$offers['city_name']}</span></td>
+            </tr>
+            <tr class="bg-black">
+                <td class="h3 orange">⚠ <span class="h6 orange">Станет</span></td>
+                <td><span class="h6"> </span><span class="inline-block bgcolor orange rounded p1"
+                        id="data_by_location">{$city}</span></td>
+            </tr>
+        </table>
         {else}
         <span class="block" id="data_by_location">{$city}</span>
         {/if}
@@ -103,9 +111,35 @@
     </div>
     *}
 
-    <div class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_add_form">
+    {if !empty($images)}
+    <div class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_edit_form">
+        <span class="block">Фото:</span>
+        {foreach $images as $name => $file}
+        {var $image_name = $file->getBasename()}
+        <div class="border mb1 clearfix ">
+            <div class="inline-block left" style="width: 80%">
+                <img src="{$baseUrl}/images/offers/{$image_name}?{time()}" alt="{$image_name}" width="100%">
+            </div>
+            <a n:href="imageDel! $image_name" class="button bg-red tooltip-left right" data-tooltip="Удалить">✖</a>
+        </div>
+        {/foreach}
+
+        {var $oefiic = 4 - count($images)}
+        {for $i = 1; $i <= $oefiic; $i++} {var $fff=count($images) + $i} {var $name="photo" .$fff} <div class="mt2">
+            <label n:name=$name class="image_label_offer_add_form">
+                <input n:name=$name title="Перетащите сюда изображениe или нажмите эту кнопку">
+            </label>
+            <span class=error n:ifcontent>{inputError $name}</span>
+    </div>
+    {/for}
+    </div>
+    {/if}
+
+
+    <div n:if="empty($images)" class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_add_form">
         <span class="block">Фото<span class="h6"> (до 10МБ каждое):</span></span>
-        <div>
+        &#9432; <span class="h6">Первое фото будет основным.</span>
+        <div class="mt1">
             <label n:name=photo1 class="image_label_offer_add_form">
                 <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
             </label>
@@ -189,6 +223,7 @@
 
     <div class="block fit bg-black rounded py1 px2 mb2">
         <input n:name=client_id value="{$user->getId()}">
+        <input n:name=id value="{(!empty($offers[id])) ? $offers[id] : ''}">
         <input n:name=offer_add class="button">
     </div>
 </form>
@@ -198,28 +233,48 @@
 <script n:syntax="double">
     url_location_to_server_js = {{link :Home:Client:Offer:saveToBackend}};
 
-    document.addEventListener("DOMContentLoaded", function() {
+    function imageLabels(){
         let image_labels = document.querySelectorAll('.image_label_offer_add_form');
         if (image_labels) {
             image_labels.forEach(
                 function (elem) {
-                     elem.classList.add('dropimage');
-                     let pd = elem.parentElement;
-                     pd.style.display = 'inline-block';
-                     pd.style.width = '49%';
+                    elem.classList.add('dropimage');
+                    let pd = elem.parentElement;
+                    if (pd.nodeName.toLowerCase()=='div') {
+                        pd.style.display = 'inline-block';
+                        pd.style.width = '49%';
+                    }
                 }
             );
 
             [].forEach.call(document.querySelectorAll('.dropimage'), function(img) {
                 img.onchange = function(e) {
-                    var inputfile = this,
-                        reader = new FileReader();
+                    let inputfile = this,
+                    reader = new FileReader();
                     reader.onloadend = function() {
                         inputfile.style['background-image'] = 'url(' + reader.result + ')';
                     }
                     reader.readAsDataURL(e.target.files[0]);
                 }
             });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        imageLabels();
+
+        let categories = document.querySelectorAll('input[name="category"]');
+        let services = document.querySelectorAll('input[name="service[]"]');
+        if (categories) {
+            categories.forEach(
+                elem => { 
+                    elem.addEventListener('change', function () {
+                        services.forEach(function (el) {
+                            el.checked = false;
+                        })
+                    });
+                }
+            );
         }
     });
 </script>

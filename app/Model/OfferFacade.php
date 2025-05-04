@@ -280,8 +280,10 @@ class OfferFacade
         return $this->db->getInsertId();
     }
 
-    public function update(int $id, array $formdata)
+    public function update(int $id, object $formdata)
     {
+        $this->db->query("UPDATE `{$this->table}` SET ?  WHERE id = ?", $formdata, $id);
+        return $this->db->getInsertId();
     }
 
     public function remove(int $id): ?int
