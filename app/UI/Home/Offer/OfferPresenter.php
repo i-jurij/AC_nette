@@ -11,6 +11,9 @@ use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\Ip;
 use App\UI\Accessory\Moderating\ModeratingText;
 use Nette\Application\UI\Form;
+use \Ijurij\Geolocation\Lib\Csrf;
+use Nette\Utils\Validators;
+
 
 /**
  * @property OfferTemplate $template
@@ -187,6 +190,65 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             } else {
                 $this->sendJson(false);
             }
+        } else {
+            $this->sendJson(false);
+        }
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionSimilar()
+    {
+        if (Csrf::isValid() && Csrf::isRecent()) {
+            $httpRequest = $this->getHttpRequest();
+            $not_id = htmlspecialchars(strip_tags($httpRequest->getPost('not_id')));
+            $type = $httpRequest->getPost('type');
+            $services = unserialize($httpRequest->getPost('services'));
+            $price = (float) htmlspecialchars(strip_tags($httpRequest->getPost('price')));
+
+            $form_data = new \stdClass;
+            $form_data->not_id = (!empty($not_id)) ? $not_id : null;
+            $form_data->offertype = (!empty($type) && in_array($type, ['serviceoffer', 'workoffer'])) ? $type : '';
+
+            $service = [];
+            if (Validators::is($services, 'array')) {
+                foreach ($services as $category) {
+                    if (
+                        Validators::is($category['category_id'], 'int') && Validators::is($category['services'], 'array')
+                    ) {
+                        foreach ($category['services'] as $serv) {
+                            if (Validators::is($serv['id'], 'int')) {
+                                $service[] = $serv['id'];
+                            }
+                        }
+                    }
+                }
+            }
+            $form_data->service = \serialize($service);
+
+            $form_data->price_min = (($price - $price / 2) > 0) ? ($price - $price / 2) : $price;
+            $form_data->price_max = $price + $price / 2;
+
+            $limit = 20;
+            $page = (!empty($httpRequest->getPost('page'))) ? (int) htmlspecialchars(strip_tags($httpRequest->getPost('page'))) : false;
+            $page = (empty($page)) ? 1 : $page;
+            $offset = ($page != 1) ? $page * $limit - $limit : 0;
+
+            $similar = $this->offers->getSimilar(location: $this->locality, limit: $limit, offset: $offset, form_data: $form_data);
+            $countSimilar = $this->offers->offersCount(location: $this->locality, form_data: $form_data);
+
+            $latte = $this->template->getLatte();
+            $params = [
+                'offers' => $similar,
+                'user' => $this->user,
+                'baseUrl' => $this->template->baseUrl,
+                'page' => $page,
+                'maxPage' => ceil($countSimilar / $limit)
+            ];
+
+            $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'offers_list.latte';
+            $output = $latte->renderToString($template, $params);
+
+            $this->sendJson($output);
         } else {
             $this->sendJson(false);
         }

@@ -51,7 +51,7 @@
 
 
 <!-- Paginator -->
-<div class="pagination center">
+<div n:if="isset($paginator)" class="pagination center">
     {if !$paginator->isFirst()}
     <a class="pseudo button" n:href="default, 1">1</a>
     <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
@@ -64,3 +64,8 @@
     <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
     {/if}
 </div>
+
+<button n:if="(!empty($page) && !empty($maxPage) && $page < $maxPage)" id="buttonLoadNextPageSimilar" class="bgcontent"
+    data-page={$page} data-max="{$maxPage}">
+    Загрузить еще
+</button>

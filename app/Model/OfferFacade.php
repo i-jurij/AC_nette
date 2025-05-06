@@ -55,7 +55,12 @@ class OfferFacade
                 }
             }
             foreach ($offer_ids as $row) {
-                $res1[] = $row->offer_id;
+                // for similar search 
+                if (empty($form_data->not_id)) {
+                    $res1[] = $row->offer_id;
+                } elseif (!empty($form_data->not_id) && $row->offer_id != $form_data->not_id) {
+                    $res1[] = $row->offer_id;
+                }
             }
             if (!empty($res1)) {
                 $res = '(' . \implode(',', \array_values(\array_unique($res1, SORT_REGULAR))) . ')';
@@ -291,6 +296,11 @@ class OfferFacade
         $sql = "DELETE FROM `{$this->table}` WHERE id = ?";
 
         return $this->db->query($sql, $id)->getRowCount();
+    }
+
+    public function getSimilar(array $location, int $limit, int $offset, object $form_data): array
+    {
+        return $this->getOffers(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
     }
 
     public function priceMinMax()

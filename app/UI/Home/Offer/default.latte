@@ -239,8 +239,7 @@
                     {$ca['category_name']}:
                     {/if}
                     {foreach $ca['services'] as $se}
-                    {$se['name']}
-                    {if !$iterator->last}, {/if}
+                    {$se['name']}{if !$iterator->last}, {/if}
                     {/foreach}
                     {if !$iterator->last}и {/if}
                     {/foreach}
@@ -277,12 +276,11 @@
             +
         </button>
         &emsp;
-        <button id="similar_offer_button" onclick="getSimilar(json_encode({$offers[0]}))" class="tooltip-top"
-            data-tooltip="Показать / скрыть похожие">
+        <button id="similar_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть похожие">
             Похожие объявления
         </button>
 
-        <ul id="comment_or_similar" class="bgcolor round p1 display-none"></ul>
+        <ul id="comment_or_similar" class="bgcolor round p1 center display-none"></ul>
 
         <div n:if="$user->isLoggedIn()" class="modal">
             <input id="offer_comment_form_input" type="checkbox" />
@@ -303,8 +301,14 @@
 
 <script n:syntax="double">
     // js fetch url to change the rating
-    let url_rating = {{link :Home:Offer:jsFetchRatingForm}};   
-
+    let url_rating = {{link :Home:Offer:jsFetchRatingForm}};  
+    let url_comment = {{link :Home:Offer:getComment}};
+    let url_comment_add = {{link :Home:Offer:offerCommentAdd}}; 
+    let url_similar = {{link :Home:Offer:similar}};
+    const comment_or_similar = document.querySelector("#comment_or_similar");
+    const comment_button = document.getElementById('comment_offer_button');
+    const similar_offer_button = document.getElementById('similar_offer_button');
+    
     //// gallery //////////////
     function openModal() {
         document.getElementById("offer_pictures_gallery_modal").style.display = "block";
@@ -354,9 +358,6 @@
     //// end gallery //////////////
 
     //// comment ////////////////
-    let url_comment = {{link :Home:Offer:getComment}};
-    let url_comment_add = {{link :Home:Offer:offerCommentAdd}};
-
     function offer_comment_form_show(){
         document.querySelector('input[type="hidden"][name="parent_id"]').value = '';
         document.querySelector('textarea[name="comment_text"]').value = '';
@@ -516,32 +517,96 @@
             .catch(error => console.error('Error:', error));
         }
     }
-    //// end comment ////////////////
+    function outComment (){
+        if ({{$user->isLoggedIn()}}) {
+            getComment({{$offers[0]['id']}});
+        } else {
+            comment_or_similar.innerHTML = "Комментарии доступны после входа";
+        }
+        comment_or_similar.style.cssText = 'list-style: none outside none;';
+        comment_button.classList.add('bg-olive');
+    }
 
-    const comment_button = document.getElementById('comment_offer_button');
-    const comment_or_similar = document.querySelector("#comment_or_similar");
     if (comment_button) {
         comment_button.addEventListener('pointerup', function (event) {
-            if (comment_or_similar.classList.contains('display-none') ) {
-
-                if ({{$user->isLoggedIn()}}) {
-                    getComment({{$offers[0]['id']}});
-                } else {
-                    comment_or_similar.innerHTML = "Комментарии доступны после входа";
-                }
-                
-                comment_or_similar.classList.remove('display-none');
-                comment_or_similar.style.cssText = 'list-style: none outside none;';
-                if (comment_button) {
-                comment_button.classList.add('bg-olive');
-                }
+        if (comment_or_similar.classList.contains('display-none') ) {
+            outComment ();
+            comment_or_similar.classList.remove('display-none');
+        } else {
+            if (similar_offer_button.classList.contains('bg-olive')) {
+                outComment ();
+                similar_offer_button.classList.remove('bg-olive')
             } else {
                 comment_or_similar.classList.add('display-none');
-                if (comment_button) {
-                    comment_button.classList.remove('bg-olive');
+                comment_button.classList.remove('bg-olive');
+            }
+        }
+        });
+        }
+    //// end comment ////////////////
+
+//// similar ////
+    function getSimilar(){
+        const formData = new FormData();
+        formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+        formData.set('not_id', {{$offers[0]['id']}});
+        formData.set('type', {{$offers[0]['offers_type']}});
+        formData.set('services', {{serialize($offers[0]['services'])}});
+        formData.set('price', {{$offers[0]['price']}});
+
+        if (document.querySelector('#buttonLoadNextPageSimilar')) {
+            let page = document.querySelector('#buttonLoadNextPageSimilar').dataset.page;
+            page++;
+            formData.set('page', page);
+        }
+
+        fetch(url_similar, {
+                responseType: 'json',
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'},
+                body: formData
+        }).then(response => response.json())
+        .then(json => {
+            if (document.querySelector('#buttonLoadNextPageSimilar')) {
+                document.querySelector('#buttonLoadNextPageSimilar').remove();
+            }
+
+            comment_or_similar.insertAdjacentHTML('beforeend', json);
+            if (document.querySelector('#buttonLoadNextPageSimilar') && document.querySelector('#buttonLoadNextPageSimilar').getAttribute('listener') !== 'true') {
+                document.querySelector('#buttonLoadNextPageSimilar').addEventListener('pointerdown', function (e) {
+                    const elementClicked = e.target;
+                    elementClicked.setAttribute('listener', 'true');
+                    getSimilar();
+                });
+            }
+
+        })
+        .catch(error => console.error('Error:', error));
+
+    }
+
+    if (similar_offer_button) {
+        similar_offer_button.addEventListener('pointerup', async function (event) {
+            if (comment_or_similar.classList.contains('display-none') ) {
+                getSimilar();
+                
+                comment_or_similar.classList.remove('display-none');
+                similar_offer_button.classList.add('bg-olive');
+            } else {
+                if (comment_button.classList.contains('bg-olive')) {
+                    comment_or_similar.replaceChildren();
+                    getSimilar();
+                    
+                    comment_button.classList.remove('bg-olive')
+                } else {
+                    comment_or_similar.classList.add('display-none');
+                    similar_offer_button.classList.remove('bg-olive');
+                    comment_or_similar.replaceChildren();
+                    //comment_or_similar.textContent = '';
                 }
             }
         });
     }
-
+//// end similar ////
 </script>
