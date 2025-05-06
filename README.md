@@ -174,3 +174,12 @@ List, show, clear logs
 SEO --- MAKE IT!!!
 Create, update, delete clients (customers, executors)  
 Create, update, delete offers, comments, rating
+
+## Front (home)
+
+### Offers
+
+#### Comments
+
+The number of comments in one offer is limited to 100.  
+This can be change into `\App\UI\Model\CommentFacade.php`

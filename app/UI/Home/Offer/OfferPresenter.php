@@ -185,8 +185,12 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             }
 
             if (!empty($d->comment_text)) {
-                $this->cf->create($d);
-                $this->sendJson(true);
+                $res = $this->cf->create($d);
+                if (!empty($res)) {
+                    $this->sendJson(true);
+                } else {
+                    $this->sendJson(false);
+                }
             } else {
                 $this->sendJson(false);
             }
