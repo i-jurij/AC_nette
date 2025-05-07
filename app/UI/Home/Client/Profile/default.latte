@@ -6,5 +6,190 @@
 {var $robots = "NOINDEX,NOFOLLOW"}
 
 {block content}
-<p>{$data}</p>
-{/block}
+<div class="center bgcontent round p1 m1">
+    <h1 class="h3">Профиль </h1>
+</div>
+<div class="center bgcontent round p1 m1">
+    <p class="">После изменения данных потребуется снова войти на сайт. Запомните ваши изменения.</p>
+</div>
+
+<div class="max-width-1 mx-auto">
+    <div class="card ">
+        <header class="">
+            {if !empty($user_data['image'])}
+            <img src="{$baseUrl}/{$user_data['image']}" alt="Photo {$user_data['username']}" width="100%">
+            {else}
+            <img src="{$baseUrl}/images/ddd.jpg" alt="Photo {$user_data['username']}" width="100%">
+            {/if}
+        </header>
+        <form n:name=clientUpdateForm onsubmit="return validatePassword(event)">
+            <section class="">
+                <p class="clearfix">
+                    <span class="clearfix left">
+                        Имя:
+                        <br>
+                        {$user_data['username']}
+                        <br>
+                        <span class=error n:ifcontent>{inputError username}</span>
+                    </span>
+                    <label for="client_name_edit" class="button right">✎</label>
+                </p>
+                <div class="modal">
+                    <input id="client_name_edit" type="checkbox" />
+                    <label for="client_name_edit" class="overlay"></label>
+                    <article class="">
+                        <header><label n:name=username>Введите новое имя:</label></header>
+                        <section>
+                            <input n:name=username>
+                        </section>
+                        <footer>
+                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                        </footer>
+                    </article>
+                </div>
+
+                <p class="clearfix">
+                    <span class="clearfix left">
+                        Телефон:
+                        <br>
+                        {\App\UI\Accessory\PhoneNumber::fromDb($user_data['phone'])}
+                        <br>
+                        <span class=error n:ifcontent>{inputError phone}</span>
+                    </span>
+                    <label for="client_phone_edit" class="button right">✎</label>
+                </p>
+                <div class="modal">
+                    <input id="client_phone_edit" type="checkbox" />
+                    <label for="client_phone_edit" class="overlay"></label>
+                    <article class="">
+                        <header><label n:name=phone>Введите новый номер телефона:</label></header>
+                        <section>
+                            <input n:name=phone>
+                        </section>
+                        <footer>
+                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                        </footer>
+                    </article>
+                </div>
+
+                <p class="clearfix">
+                    <span class="left">
+                        Почта:
+                        <br>
+                        {$user_data['email']}
+                        <br>
+                        <span class=error n:ifcontent>{inputError email}</span>
+                    </span>
+                    <label for="client_email_edit" class="button right">✎</label>
+                </p>
+                <div class="modal">
+                    <input id="client_email_edit" type="checkbox" />
+                    <label for="client_email_edit" class="overlay"></label>
+                    <article class="">
+                        <header><label n:name=email>Введите новый адрес почты:</label></header>
+                        <section>
+                            <input n:name=email>
+                        </section>
+                        <footer>
+                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                        </footer>
+                    </article>
+                </div>
+
+                <p class="clearfix">
+                    <span class="left">
+                        Пароль
+                        <br>
+                        ********
+                        <br>
+                        <span class=error n:ifcontent>{inputError password}</span>
+                    </span>
+                    <label for="client_password_edit" class="button right">✎</label>
+                </p>
+                <div class="modal">
+                    <input id="client_password_edit" type="checkbox" />
+                    <label for="client_password_edit" class="overlay"></label>
+                    <article class="">
+                        <header>Введите новый пароль</header>
+                        <section>
+                            <input n:name=password>
+                            <label for="">
+                                Повторите пароль
+                                <input n:name=passwordVerify>
+                            </label>
+                        </section>
+                        <footer>
+                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                        </footer>
+                    </article>
+                </div>
+            </section>
+            <footer class="mt3">
+                <a n:href=":Home:Client:Profile:delete $user_data['id']" type="button" class="button dangerous">Удалить
+                    аккаунт</a>
+            </footer>
+        </form>
+    </div>
+</div>
+
+<script n:syntax="double">
+    function validatePassword(event) {
+        event.preventDefault();
+        const clientUpdateForm = document.getElementById('clientUpdateForm');
+
+        if (updateClientPhone() == true) {
+            clientUpdateForm.submit();
+        } 
+
+        let password = document.getElementById("clientUpdateFormPassword");
+        let confirmPassword = document.getElementById("clientUpdateFormPasswordVerify");
+        if (password && confirmPassword && password.value == confirmPassword.value) {
+            clientUpdateForm.submit(); 
+        } else {
+            alert("Пароли не совпадают");
+        }
+    }
+
+    let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
+    
+    function fetchRequest(phone) {
+    const formData = new FormData();
+    formData.set("phone", phone);
+    
+    return {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+    'Accept': 'application/json'
+    },
+    body: formData,
+    };
+    }
+    
+    function updateClientPhone() {
+        const phone_elem = document.querySelector('#frm-clientUpdateForm-phone');
+        if (phone_elem){
+            phone_elem.addEventListener('change',
+                () => {
+                    const reg = /(\+?7)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+                    let user_phone_pre = phone_elem.value;
+                    if (reg.test(user_phone_pre)){
+                        let user_phone_in_db = user_phone_pre.replace(/[^0-9]/g, '');
+                        
+                        fetch(url_for_check_phone_in_db, fetchRequest(user_phone_in_db))
+                        .then((response) => response.ok === true ? response.json() : false)
+                        .then(check => {
+                            if (check > 0){
+                                let error_text = '<p>Пользователь с таким номером уже зарегистрирован.</p>';
+                                window.Main.jsModaFlash(error_text, window.Main.elements);
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
+                    }
+                }
+            );
+        }
+    };
+</script>

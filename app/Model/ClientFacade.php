@@ -53,6 +53,7 @@ class ClientFacade
         try {
             $this->db->table($this->table)->where('id', $id)->delete();
             $this->db->table($this->table_role_user)->where('user_id', $id)->delete();
+            $this->db->table('offer')->where('client_id', $id)->delete();
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -159,7 +160,7 @@ class ClientFacade
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function update($id, $data): void
+    public function update(int $id, array $data): void
     {
         if (!empty($data['email'])) {
             Validators::assert($data['email'], 'email');
@@ -183,7 +184,7 @@ class ClientFacade
             }
 
             if (!empty($data['roles']) && is_array($data['roles'])) {
-                if ($user->get($id)->related($this->table_role_user.'.user_id')->delete() > 0) {
+                if ($user->get($id)->related($this->table_role_user . '.user_id')->delete() > 0) {
                     unset($user);
                 }
                 $roles = [];
@@ -286,7 +287,7 @@ class ClientFacade
                     'updated_at' => $user->updated_at,
                 ];
 
-                foreach ($user->related($this->table_role_user.'.user_id') as $row) {
+                foreach ($user->related($this->table_role_user . '.user_id') as $row) {
                     $users_data[$user->id]['roles'][] = $row->ref('role', 'role_id');
                 }
             }
@@ -317,7 +318,7 @@ class ClientFacade
         }
         $query = $this->db->table($this->table);
 
-        return $query->where($field.$like, $pro.$data.$pro)->fetch();
+        return $query->where($field . $like, $pro . $data . $pro)->fetch();
     }
 
     /**

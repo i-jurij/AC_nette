@@ -589,15 +589,14 @@
     if (similar_offer_button) {
         similar_offer_button.addEventListener('pointerup', async function (event) {
             if (comment_or_similar.classList.contains('display-none') ) {
+                comment_or_similar.replaceChildren();
                 getSimilar();
-                
                 comment_or_similar.classList.remove('display-none');
                 similar_offer_button.classList.add('bg-olive');
             } else {
                 if (comment_button.classList.contains('bg-olive')) {
                     comment_or_similar.replaceChildren();
                     getSimilar();
-                    
                     comment_button.classList.remove('bg-olive')
                 } else {
                     comment_or_similar.classList.add('display-none');

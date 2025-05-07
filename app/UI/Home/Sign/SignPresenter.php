@@ -2,7 +2,6 @@
 
 namespace App\UI\Home\Sign;
 
-// use App\Model\UserFacade;
 use App\Model\ClientFacade;
 use App\UI\Accessory\Email;
 use App\UI\Accessory\FormFactory;
@@ -28,8 +27,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     // Dependency injection of form factory and user management facade
     public function __construct(
         private FormFactory $formFactory,
-        // protected UserFacade $userfacade,
-        protected ClientFacade $userfacade,
+        protected ClientFacade $cf,
     ) {
         $this->onStartup[] = function () {
             if (IsBot::check()) {
@@ -65,7 +63,8 @@ final class SignPresenter extends \App\UI\BasePresenter
                 $user->login($data->username, $data->password);
             }
             if (!empty($data->phone)) {
-                $user->login(PhoneNumber::toDb($data->phone), $data->password);
+                $username = $this->cf->searchBy('phone', PhoneNumber::toDb($data->phone), true)->username;
+                $user->login($username, $data->password);
             }
 
             $this->restoreRequest($this->backlink);
@@ -139,7 +138,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     private function processSignUpForm(Form $form, \stdClass $data): void
     {
         $data->roles = 'client';
-        $res = $this->userfacade->add($data);
+        $res = $this->cf->add($data);
         if ($res === 'ok') {
             $this->flashMessage('Вы зарегистрированы', 'success');
             $this->redirect(':Home:Sign:in');
@@ -160,7 +159,7 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         $httpRequest = $this->getHttpRequest();
         $phone = $httpRequest->getPost('phone');
-        $res = $this->userfacade->searchBy('phone', $phone);
+        $res = $this->cf->searchBy('phone', $phone);
         if (!empty($res->id)) {
             $this->sendJson(1);
         }
@@ -195,14 +194,14 @@ final class SignPresenter extends \App\UI\BasePresenter
     {
         $email = filter_var($data->email, FILTER_SANITIZE_EMAIL);
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $res = $this->userfacade->searchBy('email', $email);
+            $res = $this->cf->searchBy('email', $email);
             if (!empty($res->auth_token)) {
                 // create or get and receive passsword or url with token to email;
                 $this->absoluteUrls = true;
-                $redirect_url = $this->link(':Home:Sign:restorelink').'?token='.$res->auth_token.'&'.Csrf::$token_name.'='.Csrf::getToken();
+                $redirect_url = $this->link(':Home:Sign:restorelink') . '?token=' . $res->auth_token . '&' . Csrf::$token_name . '=' . Csrf::getToken();
 
                 $mail = new Email();
-                $mail->from = 'admin@'.SITE_NAME;
+                $mail->from = 'admin@' . SITE_NAME;
                 $mail->to = $email;
                 $mail->subject = 'Restore password';
                 $mail->body = $redirect_url;
