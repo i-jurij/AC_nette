@@ -22,8 +22,8 @@
             <img src="{$baseUrl}/images/ddd.jpg" alt="Photo {$user_data['username']}" width="100%">
             {/if}
         </header>
-        <form n:name=clientUpdateForm onsubmit="return validatePassword(event)">
-            <section class="">
+        <section class="">
+            <form n:name=clientUpdateUsernameForm>
                 <p class="clearfix">
                     <span class="clearfix left">
                         Имя:
@@ -38,16 +38,20 @@
                     <input id="client_name_edit" type="checkbox" />
                     <label for="client_name_edit" class="overlay"></label>
                     <article class="">
-                        <header><label n:name=username>Введите новое имя:</label></header>
                         <section>
-                            <input n:name=username>
+                            <label n:name=username>Введите новое имя:</label>
+                            <input n:name=username minlength="3">
                         </section>
                         <footer>
-                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                            <input n:name=clientUpdateUsernameFormSubmit type="submit" class="button" value="Сохранить"
+                                onclick="">
                         </footer>
                     </article>
                 </div>
+            </form>
 
+
+            <form n:name=clientUpdatePhoneForm onsubmit="checkPhone(event)">
                 <p class="clearfix">
                     <span class="clearfix left">
                         Телефон:
@@ -56,22 +60,25 @@
                         <br>
                         <span class=error n:ifcontent>{inputError phone}</span>
                     </span>
-                    <label for="client_phone_edit" class="button right">✎</label>
+                    <label for="client_phone_edit" class="button right" onclick="phoneMask()">✎</label>
                 </p>
                 <div class="modal">
                     <input id="client_phone_edit" type="checkbox" />
                     <label for="client_phone_edit" class="overlay"></label>
                     <article class="">
-                        <header><label n:name=phone>Введите новый номер телефона:</label></header>
                         <section>
+                            <label n:name=phone>Введите новый номер телефона:</label>
                             <input n:name=phone>
                         </section>
                         <footer>
-                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                            <input n:name=clientUpdatePhoneFormSubmit type="submit" class="button" value="Сохранить">
                         </footer>
                     </article>
                 </div>
+            </form>
 
+
+            <form n:name=clientUpdateEmailForm>
                 <p class="clearfix">
                     <span class="left">
                         Почта:
@@ -86,16 +93,19 @@
                     <input id="client_email_edit" type="checkbox" />
                     <label for="client_email_edit" class="overlay"></label>
                     <article class="">
-                        <header><label n:name=email>Введите новый адрес почты:</label></header>
                         <section>
+                            <label n:name=email>Введите новый адрес почты:</label>
                             <input n:name=email>
                         </section>
                         <footer>
-                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                            <input n:name=clientUpdateEmailFormSubmit type="submit" class="button" value="Сохранить">
                         </footer>
                     </article>
                 </div>
+            </form>
 
+
+            <form n:name=clientUpdatePasswordForm>
                 <p class="clearfix">
                     <span class="left">
                         Пароль
@@ -110,86 +120,72 @@
                     <input id="client_password_edit" type="checkbox" />
                     <label for="client_password_edit" class="overlay"></label>
                     <article class="">
-                        <header>Введите новый пароль</header>
                         <section>
+                            <label n:name=password>Введите новый пароль:</label>
                             <input n:name=password>
-                            <label for="">
+                            <label n:name=passwordVerify>
                                 Повторите пароль
                                 <input n:name=passwordVerify>
                             </label>
                         </section>
                         <footer>
-                            <input n:name=clientUpdateFormSubmit type="submit" class="button" value="Сохранить">
+                            <input n:name=clientUpdatePasswordFormSubmit type="submit" class="button" value="Сохранить">
                         </footer>
                     </article>
                 </div>
-            </section>
-            <footer class="mt3">
-                <a n:href=":Home:Client:Profile:delete $user_data['id']" type="button" class="button dangerous">Удалить
-                    аккаунт</a>
-            </footer>
-        </form>
+            </form>
+        </section>
+
+        <footer class="mt3">
+            <a n:href=":Home:Client:Profile:delete $user_data['id']" type="button" class="button dangerous">Удалить
+                аккаунт</a>
+        </footer>
     </div>
 </div>
 
-<script n:syntax="double">
-    function validatePassword(event) {
-        event.preventDefault();
-        const clientUpdateForm = document.getElementById('clientUpdateForm');
-
-        if (updateClientPhone() == true) {
-            clientUpdateForm.submit();
-        } 
-
-        let password = document.getElementById("clientUpdateFormPassword");
-        let confirmPassword = document.getElementById("clientUpdateFormPasswordVerify");
-        if (password && confirmPassword && password.value == confirmPassword.value) {
-            clientUpdateForm.submit(); 
-        } else {
-            alert("Пароли не совпадают");
-        }
+<script src="{webpack js/netteForms.js}"></script>
+<script defer src="{webpack js/phoneMask.js}"></script>
+<script defer n:syntax="double">
+    function phoneMask(){
+        window.Main.phone_elem = document.getElementById("user_phone_input");
     }
 
     let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
-    
+        
     function fetchRequest(phone) {
-    const formData = new FormData();
-    formData.set("phone", phone);
-    
-    return {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: {
-    'Accept': 'application/json'
-    },
-    body: formData,
-    };
+        const formData = new FormData();
+        formData.set("phone", phone);
+        
+        return {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+        'Accept': 'application/json'
+        },
+        body: formData,
+        };
     }
-    
-    function updateClientPhone() {
-        const phone_elem = document.querySelector('#frm-clientUpdateForm-phone');
-        if (phone_elem){
-            phone_elem.addEventListener('change',
-                () => {
-                    const reg = /(\+?7)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
-                    let user_phone_pre = phone_elem.value;
-                    if (reg.test(user_phone_pre)){
-                        let user_phone_in_db = user_phone_pre.replace(/[^0-9]/g, '');
-                        
-                        fetch(url_for_check_phone_in_db, fetchRequest(user_phone_in_db))
-                        .then((response) => response.ok === true ? response.json() : false)
-                        .then(check => {
-                            if (check > 0){
-                                let error_text = '<p>Пользователь с таким номером уже зарегистрирован.</p>';
-                                window.Main.jsModaFlash(error_text, window.Main.elements);
-                                return false;
-                            } else {
-                                return true;
-                            }
-                        });
-                    }
+        
+    function checkPhone(event) {
+        event.preventDefault();
+            let phone_elem = window.Main.phone_elem;
+            if (phone_elem && phone_elem.value){
+                const reg = /(\+?7)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+                let user_phone_pre = phone_elem.value;
+                if (reg.test(user_phone_pre)){
+                    let user_phone_in_db = user_phone_pre.replace(/[^0-9]/g, '');
+                
+                    fetch(url_for_check_phone_in_db, fetchRequest(user_phone_in_db))
+                    .then((response) => response.ok === true ? response.json() : false)
+                    .then(check => {
+                        if (check > 0){
+                            let error_text = '<p>Пользователь с таким номером уже зарегистрирован.</p>';
+                            window.Main.jsModaFlash(error_text, window.Main.elements);
+                        } else {
+                            event.target.submit();
+                        }
+                    });
                 }
-            );
-        }
-    };
+            }
+    }
 </script>

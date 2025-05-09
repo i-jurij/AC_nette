@@ -22,10 +22,11 @@ trait RequireLoggedClient
             if ($user->isLoggedIn()) {
                 return;
             } elseif ($user->getLogoutReason() === $user::LogoutInactivity) {
-                $this->flashMessage('You have been signed out due to inactivity. Please sign in again.');
+                $this->flashMessage('Войдите на сайт');
                 $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
             } else {
-                $this->redirect(':Home:Sign:in');
+                //$this->redirect(':Home:Sign:in');
+                $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
             }
         };
     }

@@ -32,53 +32,108 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
 
     public function renderDefault()
     {
-        if ($this->getUser()->isLoggedIn()) {
-            $identity = $this->getUser()->getIdentity();
+        $user = $this->getUser();
+        if ($user->isLoggedIn()) {
+            $identity = $user->getIdentity();
             $this->template->user_data = $identity->getData();
+        } elseif ($user->getLogoutReason() === $user::LogoutInactivity) {
+            $this->flashMessage('You have been signed out due to inactivity. Please sign in again.');
+            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         } else {
-            $this->error();
+            $this->redirect(':Home:Sign:in');
         }
     }
 
-    public function createComponentClientUpdateForm()
+    public function createComponentClientUpdateUsernameForm()
     {
         $form = new Form();
         $form->addProtection();
-        $form->setHtmlAttribute('id', 'clientUpdateForm');
+        $form->setHtmlAttribute('id', 'clientUpdateUsernameForm');
 
         $form->addText('username', 'Введите новое имя:')
-            ->setHtmlAttribute('placeholder', 'Буквы, цифры, дефис, подчеркивание')
+            ->setHtmlAttribute('id', 'clientUpdateUsernameInput')
+            ->setHtmlAttribute('placeholder', 'Буквы, цифры, дефис')
             ->addRule($form::MinLength, 'Имя длиной не менее %d символов', 3)
             ->addRule($form::MaxLength, 'Имя длиной до 250 символов', 250)
             ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9_\-]+$')
-            ->setMaxLength(250);
+            ->setMaxLength(250)
+            ->setRequired();
+
+        $form->addHidden('client_id', $this->getUser()->getId());
+
+        $form->addSubmit('clientUpdateUsernameFormSubmit', 'Update');
+
+        $form->onSuccess[] = [$this, 'edit'];
+
+        return $form;
+    }
+
+    public function createComponentClientUpdatePhoneForm()
+    {
+        $form = new Form();
+        $form->addProtection();
+        $form->setHtmlAttribute('id', 'clientUpdatePhoneForm');
 
         $form->addText('phone', 'Phone:')
             ->setHtmlType('tel')
             ->setHtmlAttribute('placeholder', '+7 000 111 22 33')
-            ->addRule($form::Pattern, 'Формат номера: +7 000 111 22 33', PhoneNumber::PHONE_REGEX);
+            ->setHtmlAttribute('id', 'user_phone_input')
+            ->addRule($form::Pattern, 'Формат номера: +7 000 111 22 33', PhoneNumber::PHONE_REGEX)
+            ->setRequired();
         // ->setEmptyValue('+7');
 
+        $form->addHidden('client_id', $this->getUser()->getId());
+
+        $form->addSubmit('clientUpdatePhoneFormSubmit', 'Update');
+
+        $form->onSuccess[] = [$this, 'edit'];
+
+        return $form;
+    }
+
+    public function createComponentClientUpdateEmailForm()
+    {
+        $form = new Form();
+        $form->addProtection();
+        $form->setHtmlAttribute('id', 'clientUpdateEmailForm');
+
         $form->addEmail('email', 'Email:')
+            ->setHtmlAttribute('id', 'clientUpdateEmailInput')
             ->setHtmlAttribute('placeholder', 'name@mail.com')
             ->addRule($form::Email, 'Введите правильный адрес электронной почты.')
-            ->addFilter(fn($value) => filter_var($value, FILTER_SANITIZE_EMAIL));
+            ->addFilter(fn($value) => filter_var($value, FILTER_SANITIZE_EMAIL))
+            ->setRequired();
+
+        $form->addHidden('client_id', $this->getUser()->getId());
+
+        $form->addSubmit('clientUpdateEmailFormSubmit', 'Update');
+
+        $form->onSuccess[] = [$this, 'edit'];
+
+        return $form;
+    }
+
+    public function createComponentClientUpdatePasswordForm()
+    {
+        $form = new Form();
+        $form->addProtection();
+        $form->setHtmlAttribute('id', 'clientUpdatePasswordForm');
 
         $form->addPassword('password', 'Password:')
+            ->setHtmlAttribute('id', 'clientUpdatePasswordInput')
             ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
-            ->setHtmlAttribute('id', 'clientUpdateFormPassword')
             ->setMaxLength(120);
 
         $form->addPassword('passwordVerify', 'PasswordVerify')
-            ->addRule($form::Equal, 'Несоответствие пароля', $form['password'])
+            ->setHtmlAttribute('id', 'clientUpdatePasswordVerifyInput')
+            ->addRule($form::Equal, "Пароли не совпадают", $form['password'])
             ->addRule($form::MinLength, 'Пароль длиной не менее %d символов', PASSWORD_MIN_LENGTH)
             ->setMaxLength(120)
-            ->setHtmlAttribute('id', 'clientUpdateFormPasswordVerify')
             ->setOmitted();
 
         $form->addHidden('client_id', $this->getUser()->getId());
 
-        $form->addSubmit('clientUpdateFormSubmit', 'Update');
+        $form->addSubmit('clientUpdatePasswordFormSubmit', 'Update');
 
         $form->onSuccess[] = [$this, 'edit'];
 
@@ -109,12 +164,14 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
 
         $current_client_id = $this->getUser()->getId();
         if ($this->getUser()->isLoggedIn() && $id === $current_client_id) {
-            $this->cf->update($id, $d);
-
-            $this->getUser()->logout(clearIdentity: true);
-
-            // $this->flashMessage('Изменения сохранены.', 'success');
-            $this->redirect(':Home:Sign:in');
+            if (!empty($d)) {
+                $this->cf->update($id, $d);
+                $this->getUser()->logout(clearIdentity: true);
+                // $this->flashMessage('Изменения сохранены.', 'success');
+                $this->redirect(':Home:Sign:in');
+            }
+            $this->flashMessage('Отправлена пустая форма.', 'info');
+            $this->redirect('this');
         } else {
             $this->error();
         }

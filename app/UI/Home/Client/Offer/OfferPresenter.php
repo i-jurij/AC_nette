@@ -20,7 +20,7 @@ use Nette\Utils\ImageColor;
 use Nette\Utils\ImageType;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
-
+use App\UI\Accessory\RequireLoggedClient;
 
 
 /**
@@ -28,6 +28,7 @@ use Nette\Utils\Finder;
  */
 final class OfferPresenter extends \App\UI\Home\BasePresenter
 {
+    use RequireLoggedClient;
     protected int $items_on_page_paginator = 10;
 
     public function __construct(
@@ -44,36 +45,26 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function renderDefault(int $page = 1)
     {
-        if ($this->getUser()->isLoggedIn()) {
-            $formdata = new \stdClass();
-            $formdata->client_id = $this->getUser()->getId();
+        $formdata = new \stdClass();
+        $formdata->client_id = $this->getUser()->getId();
 
-            //$offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
-            $offersCount = $this->of->offersCount(form_data: $formdata);
-            $paginator = new Paginator();
-            $paginator->setItemCount($offersCount);
-            $paginator->setItemsPerPage($this->items_on_page_paginator);
-            $paginator->setPage($page);
-            $this->template->paginator = $paginator;
+        //$offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
+        $offersCount = $this->of->offersCount(form_data: $formdata);
+        $paginator = new Paginator();
+        $paginator->setItemCount($offersCount);
+        $paginator->setItemsPerPage($this->items_on_page_paginator);
+        $paginator->setPage($page);
+        $this->template->paginator = $paginator;
 
-            $this->template->offers = $this->of->getOffers(form_data: $formdata);
-
-            // $this->template->backlink = $this->storeRequest();
-        } else {
-            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
-        }
+        $this->template->offers = $this->of->getOffers(form_data: $formdata);
     }
 
     public function actionAdd()
     {
-        if ($this->getUser()->isLoggedIn()) {
-            $this->template->services = $this->sf->getAllServices();
+        $this->template->services = $this->sf->getAllServices();
 
-            $form = $this->getComponent('offerForm');
-            $form->onSuccess[] = [$this, 'addingOfferFormSucceeded'];
-        } else {
-            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
-        }
+        $form = $this->getComponent('offerForm');
+        $form->onSuccess[] = [$this, 'addingOfferFormSucceeded'];
     }
 
     public function actionEdit(int $o, int $c)
@@ -98,8 +89,6 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form = $this->getComponent('offerForm');
             $form->setDefaults($offers[0]); // установка значений по умолчанию
             $form->onSuccess[] = [$this, 'editingOfferFormSucceeded'];
-        } else {
-            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
         }
     }
 

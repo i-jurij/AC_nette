@@ -29,14 +29,15 @@
 	{block scripts}
 	<script src="{webpack js/netteForms.js}"></script>
 	<script defer src="{webpack js/main.js}"></script>
-	<script defer src="{webpack js/maskito.js}"></script>
+	{*<script defer src="{webpack js/maskitoPhone.js}"></script>*}
+	<script defer src="{webpack js/phoneMask.js}"></script>
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {  
-				let captcha = document.querySelector('input[name="captcha[question]"]');     
-				if (captcha){
-					captcha.placeholder = 'Введите ответ здесь:';
-				}
-			});
+		document.addEventListener('DOMContentLoaded', function() { 
+			let captcha = document.querySelector('input[name="captcha[question]"]');     
+			if (captcha){
+				captcha.placeholder = 'Введите ответ здесь:';
+			}
+		});
 	</script>
 	{/block}
 </body>

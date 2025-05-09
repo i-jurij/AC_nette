@@ -173,20 +173,30 @@ $offer_service = 'CREATE TABLE IF NOT EXISTS `offer_service`
 		FOREIGN KEY (`service_id`) REFERENCES `service`(`id`) ON DELETE CASCADE
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
+$grievance = 'CREATE TABLE IF NOT EXISTS `grievance` (
+	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`offer_id` INTEGER UNSIGNED NOT NULL,
+	`comment_id` INTEGER UNSIGNED DEFAULT NULL,
+	`client_id_who` INTEGER UNSIGNED NOT NULL,
+	`message` varchar(500) NOT NULL,
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
+
 $create_sqls = [
-    'role' => $role,
-    'permission' => $permission,
-    'role_permission' => $role_permission,
-    'user' => $user,
-    'role_user' => $role_user,
-    'client' => $client,
-    'role_client' => $role_client,
-    'userappliedforregistration' => $userappliedforregistration,
-    'offer' => $offer,
-    'offer_image' => $offer_image,
-    'comment' => $comment,
-    'rating' => $rating,
-    'category' => $category,
-    'service' => $service,
-    'offer_service' => $offer_service,
+	'role' => $role,
+	'permission' => $permission,
+	'role_permission' => $role_permission,
+	'user' => $user,
+	'role_user' => $role_user,
+	'client' => $client,
+	'role_client' => $role_client,
+	'userappliedforregistration' => $userappliedforregistration,
+	'offer' => $offer,
+	'offer_image' => $offer_image,
+	'comment' => $comment,
+	'rating' => $rating,
+	'category' => $category,
+	'service' => $service,
+	'offer_service' => $offer_service,
+	'grievance' => $grievance
 ];

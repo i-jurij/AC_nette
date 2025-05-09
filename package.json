@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@maskito/phone": "^3.2.1",
+    "@pivsemdmi/phone-mask-js": "^1.2.7",
     "all": "^0.0.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
