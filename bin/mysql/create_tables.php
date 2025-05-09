@@ -179,7 +179,8 @@ $grievance = 'CREATE TABLE IF NOT EXISTS `grievance` (
 	`comment_id` INTEGER UNSIGNED DEFAULT NULL,
 	`client_id_who` INTEGER UNSIGNED NOT NULL,
 	`message` varchar(500) NOT NULL,
-	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`resolve_time` TIMESTAMP
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
 $create_sqls = [

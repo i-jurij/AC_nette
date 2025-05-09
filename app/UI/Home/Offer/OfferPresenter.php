@@ -7,6 +7,7 @@ namespace App\UI\Home\Offer;
 use App\Model\CommentFacade;
 use App\Model\OfferFacade;
 use App\Model\RatingFacade;
+use App\Model\GrievanceFacade;
 use App\UI\Accessory\FormFactory;
 use App\UI\Accessory\Ip;
 use App\UI\Accessory\Moderating\ModeratingText;
@@ -24,7 +25,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         private OfferFacade $offers,
         private FormFactory $formFactory,
         private RatingFacade $rf,
-        private CommentFacade $cf
+        private CommentFacade $cf,
+        private GrievanceFacade $gr,
     ) {
         parent::__construct();
     }
@@ -257,6 +259,68 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $this->sendJson(false);
         }
     }
+
+    public function createComponentOfferGrievanceForm()
+    {
+        $form = new Form();
+        $form->addProtection('Csrf error');
+        // $form->setTranslator($this->translator);
+        $renderer = $form->getRenderer();
+        $form->setHtmlAttribute('id', 'offer_grievance_form');
+
+        $form->addTextArea('message')
+            ->setHtmlAttribute('rows', '4')
+            ->setHtmlAttribute('cols', '100')
+            ->addCondition($form::Length, [8, 500])
+            ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\":;!]+$')
+            ->setRequired();
+
+        $form->addHidden('offer_id')->setRequired();
+        $form->addHidden('client_id_who')->setRequired();
+        $form->addHidden('comment_id')->setHtmlAttribute('id', 'offer_grievance_form_comment_id_input');
+        $form->addSubmit('sendGrievance', 'Отправить');
+        $form->onSuccess[] = [$this, 'actionGrievance'];
+
+        return $form;
+    }
+
+
+    private function preGrivanceFormData($data): array
+    {
+        $d = [];
+        if ($data->message) {
+            $text = htmlspecialchars(strip_tags($data->message));
+            $text = trim(mb_substr($text, 0, 500));
+            $isBad = ModeratingText::isTextBad($text);
+
+            if ($isBad === false) {
+                $d['message'] = $text;
+            }
+        }
+        if ($data->comment_id) {
+            $d['comment_id'] = (int) $data->comment_id;
+        }
+
+        if (!empty($d['message'])) {
+            $d['offer_id'] = (int) $data->offer_id;
+            $d['client_id_who'] = (int) $data->client_id_who;
+        }
+        return $d;
+    }
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionGrievance(Form $form, $data)
+    {
+        $d = $this->preGrivanceFormData($data);
+        if (!empty($d['message'])) {
+            if ($this->gr->create($d) > 0) {
+                $this->flashMessage('Отправлено', 'success');
+            }
+
+            $this->redirect('this');
+        }
+    }
+
 }
 
 class OfferTemplate extends \App\UI\Home\BaseTemplate

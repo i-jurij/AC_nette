@@ -265,20 +265,53 @@
     {* <p> Updated_at: {$offers[0]['updated_at']}</p> *}
     {* <p> End_time: {$offers[0]['end_time']}</p> *}
     <div>
-        {* <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top" *} <button
-            id="comment_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть комментарии">
-            Комментарии
-            &ensp;
-            <span class="" id="comments_count_span">{$comments_count}</span>
-        </button>
-        <button n:if="$user->isLoggedIn()" class="tooltip-top" data-tooltip="Добавить комментарий"
-            aria-label="Добавить комментарий" onclick="offer_comment_form_show();">
-            +
-        </button>
-        &emsp;
-        <button id="similar_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть похожие">
-            Похожие объявления
-        </button>
+        <div class="clearfix">
+            <div class="left">
+                {* <button id="comment_offer_button" onclick="getComment({$offers[0]['id']});" class="tooltip-top" *}
+                    <button id="comment_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть комментарии">
+                    Комментарии
+                    &ensp;
+                    <span class="" id="comments_count_span">{$comments_count}</span>
+                </button>
+                <button n:if="$user->isLoggedIn()" class="tooltip-top" data-tooltip="Добавить комментарий"
+                    aria-label="Добавить комментарий" onclick="offer_comment_form_show();">
+                    +
+                </button>
+                &emsp;
+                <button id="similar_offer_button" class="tooltip-top" data-tooltip="Показать / скрыть похожие">
+                    Похожие объявления
+                </button>
+            </div>
+
+            <div class="right pt1">
+                <label for="offer_grievance" class="h2 red" title="Сообщить о нарушении">⚠</label>
+                <div class="modal">
+                    <input id="offer_grievance" type="checkbox" />
+                    <label for="offer_grievance" class="overlay"></label>
+                    <article>
+                        <header>
+                            <h3>Опишите суть нарушения:</h3>
+                            <label for="offer_grievance" class="close">&times;</label>
+                        </header>
+                        <form n:name=offerGrievanceForm>
+                            <section class="content">
+                                <textarea n:name=message></textarea>
+                                <input n:name=offer_id value="{$offers[0]['id']}">
+                                <input n:name=client_id_who value="{$user->getId()}">
+                                <input n:name=comment_id>
+                            </section>
+                            <footer>
+                                <input n:name=sendGrievance>
+                                <label for="offer_grievance" class="button dangerous">
+                                    Закрыть
+                                </label>
+                            </footer>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </div>
+
 
         <ul id="comment_or_similar" class="bgcolor round p1 center display-none"></ul>
 
@@ -358,6 +391,12 @@
     //// end gallery //////////////
 
     //// comment ////////////////
+    function commentIdGrivance(id){
+        let inp = document.querySelector('#offer_grievance_form_comment_id_input');
+        if (inp) {
+            inp.value = id;
+        }
+    }
     function offer_comment_form_show(){
         document.querySelector('input[type="hidden"][name="parent_id"]').value = '';
         document.querySelector('textarea[name="comment_text"]').value = '';
@@ -428,7 +467,11 @@
                 <section class="flex">\
                     <p class="flex-auto">' + el.comment_text + '</p>\
                     <p class="flex items-center justify-center">\
-                        <button class="tooltip-left self-center" data-tooltip="Ответить" onclick="replyForm('+el.id+');">↶</button>\
+                        <label for="offer_grievance" class="comment_grievance self-center" id="'+el.id+'" title="Сообщить о нарушении"\
+                            onclick="commentIdGrivance('+el.id+')">\
+                            <span class="h2 red">⚠</span>\
+                        </label>\
+                        <button class="tooltip-left self-center ml2" data-tooltip="Ответить" onclick="replyForm('+el.id+');">↶</button>\
                     </p>\
                 </section>\
             </article>';
