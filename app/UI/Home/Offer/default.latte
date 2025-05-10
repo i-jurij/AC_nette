@@ -293,7 +293,7 @@
                             <h3>Опишите суть нарушения:</h3>
                             <label for="offer_grievance" class="close">&times;</label>
                         </header>
-                        <form n:name=offerGrievanceForm>
+                        <form n:name=offerGrievanceForm onsubmit="grievanceFetch(event)">
                             <section class="content">
                                 <textarea n:name=message></textarea>
                                 <input n:name=offer_id value="{$offers[0]['id']}">
@@ -338,6 +338,7 @@
     let url_comment = {{link :Home:Offer:getComment}};
     let url_comment_add = {{link :Home:Offer:offerCommentAdd}}; 
     let url_similar = {{link :Home:Offer:similar}};
+    let url_grievance = {{link :Home:Offer:grievanceJs}};
     const comment_or_similar = document.querySelector("#comment_or_similar");
     const comment_button = document.getElementById('comment_offer_button');
     const similar_offer_button = document.getElementById('similar_offer_button');
@@ -397,6 +398,30 @@
             inp.value = id;
         }
     }
+
+    function grievanceFetch(event){
+        event.preventDefault();
+
+        let formData = new FormData(event.target);
+        formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+
+        document.querySelector('textarea[name="message"]').value = '';
+        document.querySelector('#offer_grievance').checked = false;
+
+        fetch(url_grievance, {
+                    responseType: 'json',
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    body: formData 
+                }
+            ).then(response => response.json())
+            .then(json => {
+                window.Main.jsModaFlash(json, window.Main.elements);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function offer_comment_form_show(){
         document.querySelector('input[type="hidden"][name="parent_id"]').value = '';
         document.querySelector('textarea[name="comment_text"]').value = '';

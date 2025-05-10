@@ -316,11 +316,23 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             if ($this->gr->create($d) > 0) {
                 $this->flashMessage('Отправлено', 'success');
             }
-
-            $this->redirect('this');
         }
+        $this->redirect('this');
     }
-
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function actionGrievanceJs($data)
+    {
+        if (Csrf::isValid() && Csrf::isRecent()) {
+            $data = (object) $this->getHttpRequest()->getPost();
+            $d = $this->preGrivanceFormData($data);
+            if (!empty($d['message'])) {
+                if ($this->gr->create($d) > 0) {
+                    $this->sendJson('Отправлено');
+                }
+            }
+        }
+        $this->sendJson('Не отправлено');
+    }
 }
 
 class OfferTemplate extends \App\UI\Home\BaseTemplate
