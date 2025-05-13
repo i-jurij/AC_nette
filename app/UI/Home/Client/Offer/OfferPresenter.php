@@ -6,6 +6,7 @@ namespace App\UI\Home\Client\Offer;
 
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
+use \App\Model\ChatFacade;
 use App\UI\Accessory\IsBot;
 use Nette\Application\UI\Form;
 use Nette\Utils\Paginator;
@@ -33,9 +34,10 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function __construct(
         protected OfferFacade $of,
-        protected ServiceFacade $sf
+        protected ServiceFacade $sf,
+        protected ChatFacade $chat
     ) {
-        parent::__construct();
+        parent::__construct($this->chat);
         $this->onStartup[] = function () {
             if (IsBot::check()) {
                 $this->redirect(':Home:');

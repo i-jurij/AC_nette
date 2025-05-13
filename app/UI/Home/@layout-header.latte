@@ -7,8 +7,12 @@
 	<div class="right-align">
 		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink"
 			aria-label="Кнопка входа">Войти</a>
-		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="" aria-label="Кнопка Сообщения">
-			<span class="label">1</span><span class="align-middle">&nbsp;&#128276;</span>
+		<button class="pseudo px0" n:if="$user->isLoggedIn()" onclick="Chat.getMessage({$user->getId()}, false)"
+			aria-label="Кнопка Сообщения">
+			<span class="label" id="countChatMessagesClient" data-count="{$count_client_chat}">
+				{$count_client_chat}
+			</span>
+			<span class="align-middle">&nbsp;&#128276;</span>
 		</button>
 
 		<div class="inline-block dropdown_div" tabindex='0'
@@ -33,8 +37,83 @@
 	</div>
 </header>
 
-<script>
-	let url_js_fetch = {link :Home:Geo:jsFetch};
-	let url_location_to_server_js = {link :Home:saveToBackend};
+<script n:syntax="double">
+	let url_js_fetch = {{link :Home:Geo:jsFetch}};
+	let url_location_to_server_js = {{link :Home:saveToBackend}};
+
+	let url_chat = {{link :Home:Client:Chat:default}}
+
+	Chat = {
+		message: document.querySelector('#chat_message'),
+		count_client_chat: document.querySelector('#countChatMessagesClient'),
+		countUp: 0,
+		firstGetChat: function (client_id, offer_id) {
+			let formData = new FormData();
+			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+			formData.set('getMessage', 'true');
+			formData.set('client_id', client_id);
+			formData.set('offer_id', offer_id);
+			
+			fetch(url_chat, {
+				responseType: 'json',
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {'X-Requested-With': 'XMLHttpRequest'},
+				body: formData
+			})
+			.then(response => response.json())
+			.then(json => {
+				if (json && (typeof json === 'string' || json instanceof String)) {
+					document.body.insertAdjacentHTML('beforeend', json);
+					document.querySelector('#chat_modal_window').checked = true;
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		},
+		updNoReadCount: function(client_id, offer_id){
+			// exec every 5 min eg
+			return 'number of no read ';
+		},
+		updateChat: function(client_id, offer_id){
+			let formData = new FormData();
+			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+			formData.set('update_chat', 'true');
+			formData.set('client_id', client_id);
+			formData.set('offer_id', offer_id);
+			
+			fetch(url_chat, {
+			responseType: 'json',
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'},
+			body: formData
+			})
+			.then(response => response.json())
+			.then(json => {
+				if (json && (typeof json === 'string' || json instanceof String)) {
+					if (document.querySelector('#chat_modal_window').checked != true) {
+						document.querySelector('#chat_modal_window').checked = true;
+					}
+					document.querySelector('#chat_content_section').insertAdjacentHTML('beforeend', json);
+				}
+			})
+			.catch(error => console.error('Error:', error));
+		},
+		getMessage: async function(client_id, offer_id){		
+			if (Chat.countUp === 0) {
+				Chat.firstGetChat(client_id, offer_id);
+			} else {
+				Chat.updateChat(client_id, offer_id);
+			}
+			Chat.countUp++;
+		},
+		createMessage: function(){
+
+		}
+	}
+	
+	window.addEventListener("load", (event) => {
+
+	});
 </script>
 {/block}

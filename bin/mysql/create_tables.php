@@ -183,6 +183,22 @@ $grievance = 'CREATE TABLE IF NOT EXISTS `grievance` (
 	`resolve_time` TIMESTAMP
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
+$chat = 'CREATE TABLE IF NOT EXISTS `chat` (
+	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`parent_id` INTEGER UNSIGNED DEFAULT NULL,
+	`offer_id` INTEGER UNSIGNED NOT NULL,
+	`client_id` INTEGER UNSIGNED NOT NULL,
+	`message` text NOT NULL,
+	`moderated` TINYINT(1) DEFAULT 0,
+	`read`  TINYINT(1) DEFAULT 0,
+	`request_data` TEXT DEFAULT NULL,
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (`parent_id`) REFERENCES `chat`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
+
 $create_sqls = [
 	'role' => $role,
 	'permission' => $permission,
@@ -199,5 +215,6 @@ $create_sqls = [
 	'category' => $category,
 	'service' => $service,
 	'offer_service' => $offer_service,
-	'grievance' => $grievance
+	'grievance' => $grievance,
+	'chat' => $chat
 ];

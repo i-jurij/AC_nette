@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\UI\Home\Offer;
 
+use \App\Model\ChatFacade;
 use App\Model\CommentFacade;
 use App\Model\OfferFacade;
 use App\Model\RatingFacade;
@@ -27,8 +28,9 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         private RatingFacade $rf,
         private CommentFacade $cf,
         private GrievanceFacade $gr,
+        protected ChatFacade $chat,
     ) {
-        parent::__construct();
+        parent::__construct($this->chat);
     }
 
     public function createComponentClientRatingForm()
@@ -52,6 +54,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
             $this->template->backlink = $this->storeRequest();
             $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
+            $this->template->count_offer_chat = $this->chat->countChat(client_id: $this->getUser()->getId(), offer_id: $id);
         } else {
             $this->redirectPermanent(':Home:default');
         }
@@ -284,7 +287,6 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         return $form;
     }
 
-
     private function preGrivanceFormData($data): array
     {
         $d = [];
@@ -341,4 +343,6 @@ class OfferTemplate extends \App\UI\Home\BaseTemplate
     public string $backlink;
     public array $offer_images;
     public int $comments_count;
+    public int $count_offer_chat;
+
 }

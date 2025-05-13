@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\UI\Home\Client\Profile;
 
 use App\Model\ClientFacade;
+use \App\Model\ChatFacade;
 use App\UI\Accessory\IsBot;
 use Ijurij\Geolocation\Lib\Csrf;
 use Nette\Application\UI\Form;
@@ -21,8 +22,9 @@ final class ProfilePresenter extends \App\UI\Home\BasePresenter
     // Dependency injection of form factory and user management facade
     public function __construct(
         protected ClientFacade $cf,
+        protected ChatFacade $chat
     ) {
-        parent::__construct();
+        parent::__construct($this->chat);
         $this->onStartup[] = function () {
             if (IsBot::check()) {
                 $this->redirect(':Home:');

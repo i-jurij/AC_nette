@@ -1,0 +1,126 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\UI\Home\Client\Chat;
+
+use \App\Model\ChatFacade;
+use \Ijurij\Geolocation\Lib\Csrf;
+use App\UI\Accessory\Moderating\ModeratingText;
+use \Nette\Utils\ArrayHash;
+
+class ChatPresenter extends \Nette\Application\UI\Presenter
+{
+    private array $post_data;
+
+    public function __construct(
+        private ChatFacade $chatFacade
+    ) {
+    }
+
+    public function actionDefault($data)
+    {
+        if ($this->user->isLoggedIn()) {
+            $httpRequest = $this->getHttpRequest();
+            $this->post_data = $httpRequest->getPost();
+
+            if (Csrf::isValid() && Csrf::isRecent()) {
+                $d = $this->preparePostData($this->post_data);
+                if (!empty($this->post_data['getMessage']) && $this->post_data['getMessage'] === 'true') {
+                    $message = $this->get();
+                    $latte = $this->template->getLatte();
+                    $params = [
+                        'message' => $message,
+                    ];
+                    $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
+                    $output = $latte->renderToString($template, $params);
+                }
+
+                if (!empty($this->post_data['update_chat']) && $this->post_data['update_chat'] === 'true') {
+                    //update chats messages
+                    //$output = $this->chatFacade->countChat(client_id: $this->getUser()->getId());
+
+                    //// TEST
+                    $output = 'message list';
+                    //// END TEST
+                }
+
+                $this->sendJson($output);
+            } else {
+                $this->sendJson(false);
+            }
+        } else {
+            $this->sendJson(false);
+        }
+    }
+    public function get()
+    {
+        $message = [];
+        $d = $this->preparePostData($this->post_data);
+
+        //// TEST
+        $message = [
+            (object) ['id' => 1],
+            (object) ['id' => 2]
+        ];
+        //// END TEST
+
+
+        // checkkk csrf, get httprec then post then client id offer id
+        if (!empty($d->client_id) && !empty($d->offer_id) && empty($d->message)) {
+            # code...
+        } else {
+            # code...
+        }
+        return $message;
+    }
+
+    public function save()
+    {
+        $d = $this->preparePostData($this->post_data);
+
+        if (!empty($d->message)) {
+            $res = $this->chatFacade->create($d);
+            if (!empty($res)) {
+                $this->sendJson(true);
+            } else {
+                $this->sendJson(false);
+            }
+        } else {
+            $this->sendJson(false);
+        }
+    }
+
+    public function delete()
+    {
+
+    }
+
+    private function preparePostData(array $data): ArrayHash
+    {
+        $d = new ArrayHash();
+        if (!empty($data['offer_id'])) {
+            $d->offer_id = (int) htmlspecialchars(strip_tags($data['offer_id']));
+        }
+        if (!empty($data['offer_owner_id'])) {
+            $d->offer_owner_id = (int) htmlspecialchars(strip_tags($data['offer_owner_id']));
+        }
+        $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
+        if (!empty($data['parent_id'])) {
+            $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
+        }
+        $d->request_data = \serialize($_SERVER);
+        // moderate comment_text here or into other method
+        if (!empty($data['message'])) {
+            $text = htmlspecialchars(strip_tags($data['message']));
+            $text = trim(mb_substr($text, 0, 500));
+            $isBad = ModeratingText::isTextBad($text);
+
+            if ($isBad === false) {
+                $d->message = $text;
+                $d->moderated = 1;
+            }
+        }
+        return $d;
+    }
+}

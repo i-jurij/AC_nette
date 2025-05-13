@@ -253,7 +253,11 @@
             {include client_phone from $shared_templates.'client_phone.latte'}
 
             <p class="">
-                <button>Написать в чат на сайте</button>
+                <button onclick="Chat.getMessage({$user->getId()}, {$offers[0]['id']})">
+                    Написать в чат на сайте
+                    <span class="label bg-olive" id="countChatMessagesClientOffer"
+                        n:if="!empty($count_offer_chat)">{$count_offer_chat}</span>
+                </button>
             </p>
         </div>
     </main>

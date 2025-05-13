@@ -7,6 +7,7 @@ namespace App\UI\Home;
 // use App\Model\PageFacade;
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
+use \App\Model\ChatFacade;
 use App\UI\Accessory\FormFactory;
 use Ijurij\Geolocation\Lib\Csrf;
 use Ijurij\Geolocation\Lib\Session;
@@ -25,8 +26,9 @@ final class HomePresenter extends BasePresenter
         private OfferFacade $offers,
         private ServiceFacade $services,
         private FormFactory $formFactory,
+        protected ChatFacade $chat
     ) {
-        parent::__construct();
+        parent::__construct($this->chat);
         $this->form_data = new \stdClass();
         $this->form_data->offertype = 'all';
         $this->form_data->order_by = 'end_time';
@@ -51,7 +53,7 @@ final class HomePresenter extends BasePresenter
             'paginator' => $this->template->paginator,
             'user' => $this->user,
         ];
-        $template = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR.'offers_list.latte';
+        $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'offers_list.latte';
         $output = $latte->renderToString($template, $params);
 
         $this->sendJson($output);
