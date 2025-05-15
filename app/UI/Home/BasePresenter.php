@@ -25,7 +25,9 @@ abstract class BasePresenter extends \App\UI\BasePresenter
 
         $this->template->geo = $this->geo->run();
         $this->template->location = $this->locality;
-        $this->template->count_client_chat = $this->chat->countChat(client_id: $this->getUser()->getId());
+        if ($this->getUser()->isLoggedIn()) {
+            $this->template->count_client_chat = $this->chat->countChat(client_id: $this->getUser()->getId());
+        }
     }
 }
 

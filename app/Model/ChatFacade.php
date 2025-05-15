@@ -20,14 +20,17 @@ class ChatFacade
         //$this->chat = $this->db->table('chat');
     }
 
-    public function getByOffer(ArrayHash $data)
+    public function getByOffer(ArrayHash $data): array
     {
-        $sql = 'SELECT * FROM `chat` WHERE ';
-        $res = $this->db->query(sql: $sql, params: $data);
+        $sql = 'SELECT * FROM `chat` 
+                WHERE 
+                `offer_id` = ? 
+                AND (client_id_who = ? OR client_id_to_whom = ?)';
+        return $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
     }
-    public function getByClient(ArrayHash $data)
+    public function getByClient(ArrayHash $data): array
     {
-
+        return [];
     }
     public function create(ArrayHash $data): int
     {
@@ -41,17 +44,17 @@ class ChatFacade
     public function countChat(int $client_id, int $offer_id = null): int
     {
         if (!empty($offer_id)) {
-            $sql = "SELECT COUNT(*) FROM `chat` WHERE `chat`.`parent_id` IN 
-                            (SELECT `chat`.`id` FROM `chat` WHERE `chat`.`offer_id` = ? AND `chat`.`client_id` = ?)
-                            AND `chat`.`client_id` = (
-                                SELECT `offer`.`client_id` FROM `offer` WHERE `offer`.`id` = ?
-                            )
-                            AND `chat`.`read` = FALSE";
-            $res = $this->db->query($sql, $offer_id, $client_id, $offer_id)->fetchField();
+            $sql = "SELECT COUNT(*) 
+                        FROM `chat` 
+                        WHERE `chat`.`offer_id` = ?
+                        AND `chat`.`client_id_to_whom` = ?
+                        AND `chat`.`read` = FALSE";
+            $res = $this->db->query($sql, $offer_id, $client_id)->fetchField();
         } else {
-            $sql = "SELECT COUNT(*) FROM `chat` WHERE `chat`.`offer_id` IN
-                (SELECT `offer`.`id` FROM `offer` WHERE `offer`.`client_id` = ?)
-                AND `chat`.`read` = FALSE";
+            $sql = "SELECT COUNT(*) 
+                        FROM `chat` 
+                        WHERE `chat`.`client_id_to_whom` = ?
+                        AND `chat`.`read` = FALSE";
             $res = $this->db->query($sql, $client_id)->fetchField();
         }
 

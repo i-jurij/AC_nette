@@ -47,11 +47,11 @@
 		message: document.querySelector('#chat_message'),
 		count_client_chat: document.querySelector('#countChatMessagesClient'),
 		countUp: 0,
-		firstGetChat: function (client_id, offer_id) {
+		firstGetChat: function (client_id_who, offer_id) {
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 			formData.set('getMessage', 'true');
-			formData.set('client_id', client_id);
+			formData.set('client_id_who', client_id_who);
 			formData.set('offer_id', offer_id);
 			
 			fetch(url_chat, {
@@ -70,15 +70,15 @@
 			})
 			.catch(error => console.error('Error:', error));
 		},
-		updNoReadCount: function(client_id, offer_id){
+		updNoReadCount: function(client_id_who, offer_id){
 			// exec every 5 min eg
 			return 'number of no read ';
 		},
-		updateChat: function(client_id, offer_id){
+		updateChat: function(client_id_who, offer_id){
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 			formData.set('update_chat', 'true');
-			formData.set('client_id', client_id);
+			formData.set('client_id', client_id_who);
 			formData.set('offer_id', offer_id);
 			
 			fetch(url_chat, {
@@ -99,11 +99,16 @@
 			})
 			.catch(error => console.error('Error:', error));
 		},
-		getMessage: async function(client_id, offer_id){		
+		getMessage: async function(client_id_who, offer_id){	
+			
+			
+			console.log(client_id_who + ' ' + offer_id)
+
+
 			if (Chat.countUp === 0) {
-				Chat.firstGetChat(client_id, offer_id);
+				Chat.firstGetChat(client_id_who, offer_id);
 			} else {
-				Chat.updateChat(client_id, offer_id);
+				Chat.updateChat(client_id_who, offer_id);
 			}
 			Chat.countUp++;
 		},
@@ -116,6 +121,14 @@
 					formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 					formData.set('createMessage_chat', 'true');
 					formData.set('client_id_who', {{$user->getId()}});
+					let client_id_to_whom = {{(!empty($offers[0]['client_id'])) ? $offers[0]['client_id'] : null}};
+					if (client_id_to_whom == null || client_id_to_whom == 'undefined' || client_id_to_whom == '' ) {
+						let client_id_to_whom_input = document.querySelector('input[name="client_id_to_whom"]');
+						if (client_id_to_whom_input) {
+							client_id_to_whom = client_id_to_whom_input.value;
+						}
+					}
+					formData.set('client_id_to_whom', client_id_to_whom);
 					formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
 					formData.set('message', mes);
 					

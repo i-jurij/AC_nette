@@ -57,17 +57,10 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         $message = [];
         $d = $this->preparePostData($this->post_data);
 
-        //// TEST
-        $message = [
-            (object) ['id' => 1],
-            (object) ['id' => 2]
-        ];
-        //// END TEST
-
-        if (!empty($d->client_id) && !empty($d->offer_id) && empty($d->message)) {
-            # code...
+        if (!empty($d->offer_id)) {
+            $message = $this->chatFacade->getByOffer(data: $d);
         } else {
-            # code...
+            $message = $this->chatFacade->getByClient(data: $d);
         }
         return $message;
     }
@@ -76,7 +69,11 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
     {
         $d = $this->preparePostData($this->post_data);
 
-        if (!empty($d->message) && !empty($d->client_id) && !empty($d->offer_id)) {
+        if (
+            !empty($d->message) && !empty($d->client_id_who)
+            && !empty($d->client_id_to_whom) && $d->client_id_who !== $d->client_id_to_whom
+            && !empty($d->offer_id)
+        ) {
             $res = $this->chatFacade->create($d);
             if ($res > 0) {
                 return true;
@@ -96,10 +93,17 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         if (!empty($data['offer_id'])) {
             $d->offer_id = (int) htmlspecialchars(strip_tags($data['offer_id']));
         }
+        /*
         if (!empty($data['offer_owner_id'])) {
             $d->offer_owner_id = (int) htmlspecialchars(strip_tags($data['offer_owner_id']));
         }
-        $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
+        */
+        if (!empty($data['client_id_who'])) {
+            $d->client_id_who = (int) htmlspecialchars(strip_tags($data['client_id_who']));
+        }
+        if (!empty($data['client_id_to_whom'])) {
+            $d->client_id_to_whom = (int) htmlspecialchars(strip_tags($data['client_id_to_whom']));
+        }
         /*
         if (!empty($data['parent_id'])) {
             $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));

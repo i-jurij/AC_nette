@@ -6,20 +6,18 @@
             <h3>Chat</h3>
             <label for="chat_modal_window" class="close">&times;</label>
         </header>
-        <section class="content" id="chat_content_section">
-            <p n:if="!empty($message) && is_array($message)" n:foreach="$message as $m">
-            <p>
-            <p>{$m->client_id_who}</p>
-            <p>{$m->message}</p>
-            </p>
-            </p>
-        </section>
-        <footer>
-            <textarea name="message" id="chat_message"></textarea>
+        <div class="bgcolor p2" id="chat_content_section">
+            <div class="bgcontent rounded p1" n:if="!empty($message) && is_array($message)" n:foreach="$message as $m">
+                <span class="h4">client_photo client_name or phone created_at</span>
+                <p class="">message</p>
+            </div>
+        </div>
+        <div class="p2">
+            <textarea name="message" id="chat_message" placeholder="Напишите новое сообщение здесь"></textarea>
             <button type="submit" class="button" onclick="Chat.createMessage()">Отправить</button>
             <label for="chat_modal_window" class="button dangerous">
                 Закрыть
             </label>
-        </footer>
+        </div>
     </article>
 </div>

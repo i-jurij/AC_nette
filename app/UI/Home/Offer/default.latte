@@ -253,7 +253,10 @@
             {include client_phone from $shared_templates.'client_phone.latte'}
 
             <p n:if="$user->getId() != $offers[0]['client_id']" class="">
-                <button onclick="Chat.getMessage({$user->getId()}, {$offers[0]['id']})">
+                <button n:if="!$user->isLoggedIn()" class="tooltip-top" data-tooltip="Авторизуйтесь">
+                    Написать в чат на сайте
+                </button>
+                <button n:if="$user->isLoggedIn()" onclick="Chat.getMessage({$user->getId()}, {$offers[0]['id']})">
                     Написать в чат на сайте
                     <span class="label bg-olive" id="countChatMessagesClientOffer"
                         n:if="!empty($count_offer_chat)">{$count_offer_chat}</span>
@@ -288,8 +291,10 @@
             </div>
 
             <div class="right pt1">
-                <label for="offer_grievance" class="h2 red" title="Сообщить о нарушении">⚠</label>
-                <div class="modal">
+                <span n:if="!$user->isLoggedIn()" class="h2 red" title="Авторизуйтесь">⚠</span>
+                <label n:if="$user->isLoggedIn()" for="offer_grievance" class="h2 red"
+                    title="Сообщить о нарушении">⚠</label>
+                <div n:if="$user->isLoggedIn()" class="modal">
                     <input id="offer_grievance" type="checkbox" />
                     <label for="offer_grievance" class="overlay"></label>
                     <article>
