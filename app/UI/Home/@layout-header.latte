@@ -108,7 +108,34 @@
 			Chat.countUp++;
 		},
 		createMessage: function(){
-
+			let chat_message = document.querySelector('#chat_message');
+			if (chat_message) {
+				let mes = chat_message.value;
+				if (mes) {
+				let formData = new FormData();
+					formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+					formData.set('createMessage_chat', 'true');
+					formData.set('client_id_who', {{$user->getId()}});
+					formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
+					formData.set('message', mes);
+					
+					fetch(url_chat, {
+						responseType: 'json',
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: {'X-Requested-With': 'XMLHttpRequest'},
+						body: formData
+					})
+					.then(response => response.json())
+					.then(json => {
+						if (json) {
+							document.querySelector('#chat_content_section').insertAdjacentHTML('beforeend', '<p>'+mes+'</p>');
+							chat_message.value = '';
+						}
+					})
+					.catch(error => console.error('Error:', error));
+				}
+			}
 		}
 	}
 	

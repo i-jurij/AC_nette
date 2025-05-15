@@ -20,15 +20,19 @@ class ChatFacade
         //$this->chat = $this->db->table('chat');
     }
 
-    public function search(ArrayHash $data)
+    public function getByOffer(ArrayHash $data)
     {
-        // get chats message from this client to offers owner 
-        // (search by offer_id client_id and parent_id = chat.id where offer_id and client_id)
-        // get chats message to this client (search by offer_id with him client_id)
+        $sql = 'SELECT * FROM `chat` WHERE ';
+        $res = $this->db->query(sql: $sql, params: $data);
     }
-    public function create(ArrayHash $data)
+    public function getByClient(ArrayHash $data)
     {
-        return 1;
+
+    }
+    public function create(ArrayHash $data): int
+    {
+        $this->db->query('INSERT INTO `chat` ?', $data);
+        return (int) $this->db->getInsertId();
     }
 
     /**

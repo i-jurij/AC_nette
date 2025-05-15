@@ -11,15 +11,35 @@ MAKE
 
 offer chat part
 js 
-getMessage() - первое получение всех сообщений чата  
-потом работает только скрипт получения количества непроочитаннвх (написать)
 
-при закрытом окне при клике на кнопку вызовется getMessage(), там проверить
-счетчик (или существование модального окна чата, значит вызов не первый) 
-и вызвать функцию updateChat(), которая получает только непрочитанные и дописывает их в модал окно,
-затем присвоить checked to input for modal window
+save
+открыто объявление не его автором:
+пишет user->id === client_id_who для offer->client_id == client_id_to_whom
 
-при открытом окне рисовать мигающий знак новых сообщений и кнопку Получить новые или Обновить,
+get
+открыто объявление не его автором:
+where offer_id == $post->offer_id, client_id_who and client_id_to_whom == user->id
+открыто объявление автором:
+не показывать кнопку Написать в чат
+
+get
+for client 
+chat from headers button:
+list of count of messages split by offers
+after users click on offer then show window with count of the offer messages split by clients
+after users click on client show messages to user from selected client
+WHERE offer_id == selected offer->id 
+    AND (
+            (client_id_who = selected client->id AND client_id_to_whom == user->id) 
+            OR 
+            (client_id_who = user->id AND client_id_to_whom == selected client->id)
+        )
+then
+save
+INSERT  user->id === client_id_who AND client_id_to_whom == message->client_id_who
+
+
+при открытом окне чата рисовать мигающий знак новых сообщений и кнопку Получить новые или Обновить,
 при нажатии вызвать функцию updateChat()
 
 

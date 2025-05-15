@@ -28,12 +28,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                 $d = $this->preparePostData($this->post_data);
                 if (!empty($this->post_data['getMessage']) && $this->post_data['getMessage'] === 'true') {
                     $message = $this->get();
-                    $latte = $this->template->getLatte();
-                    $params = [
-                        'message' => $message,
-                    ];
-                    $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
-                    $output = $latte->renderToString($template, $params);
+                    $output = $this->getHtml($message);
                 }
 
                 if (!empty($this->post_data['update_chat']) && $this->post_data['update_chat'] === 'true') {
@@ -43,6 +38,10 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                     //// TEST
                     $output = 'message list';
                     //// END TEST
+                }
+
+                if (!empty($this->post_data['createMessage_chat']) && $this->post_data['createMessage_chat'] === 'true') {
+                    $output = $this->save();
                 }
 
                 $this->sendJson($output);
@@ -65,8 +64,6 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         ];
         //// END TEST
 
-
-        // checkkk csrf, get httprec then post then client id offer id
         if (!empty($d->client_id) && !empty($d->offer_id) && empty($d->message)) {
             # code...
         } else {
@@ -75,20 +72,17 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         return $message;
     }
 
-    public function save()
+    public function save(): bool
     {
         $d = $this->preparePostData($this->post_data);
 
-        if (!empty($d->message)) {
+        if (!empty($d->message) && !empty($d->client_id) && !empty($d->offer_id)) {
             $res = $this->chatFacade->create($d);
-            if (!empty($res)) {
-                $this->sendJson(true);
-            } else {
-                $this->sendJson(false);
+            if ($res > 0) {
+                return true;
             }
-        } else {
-            $this->sendJson(false);
         }
+        return false;
     }
 
     public function delete()
@@ -106,9 +100,11 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             $d->offer_owner_id = (int) htmlspecialchars(strip_tags($data['offer_owner_id']));
         }
         $d->client_id = (int) htmlspecialchars(strip_tags($data['client_id']));
+        /*
         if (!empty($data['parent_id'])) {
             $d->parent_id = (int) htmlspecialchars(strip_tags($data['parent_id']));
         }
+        */
         $d->request_data = \serialize($_SERVER);
         // moderate comment_text here or into other method
         if (!empty($data['message'])) {
@@ -122,5 +118,16 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             }
         }
         return $d;
+    }
+
+    private function getHtml(array $message): string
+    {
+        $latte = $this->template->getLatte();
+        $params = [
+            'message' => $message,
+        ];
+        $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
+        $output = $latte->renderToString($template, $params);
+        return $output;
     }
 }

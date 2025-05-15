@@ -8,12 +8,15 @@
         </header>
         <section class="content" id="chat_content_section">
             <p n:if="!empty($message) && is_array($message)" n:foreach="$message as $m">
-                {$m->id}
+            <p>
+            <p>{$m->client_id_who}</p>
+            <p>{$m->message}</p>
+            </p>
             </p>
         </section>
         <footer>
             <textarea name="message" id="chat_message"></textarea>
-            <button type="submit" class="button" href="#">Ответить</button>
+            <button type="submit" class="button" onclick="Chat.createMessage()">Отправить</button>
             <label for="chat_modal_window" class="button dangerous">
                 Закрыть
             </label>
