@@ -124,11 +124,39 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         return $d;
     }
 
-    private function getHtml(array $message): string
+    private function getHtml(array $messages): string
     {
+        $m = [];
+        foreach ($messages as $message) {
+            $m[$message['client_id_who']][] = $message;
+        }
+
+        $current_user_id = $this->user->getId();
+
+        if (!empty($m[$current_user_id])) {
+            foreach ($m[$current_user_id] as $k => $mes) {
+                if (!empty($m[$mes['client_id_to_whom']])) {
+                    $m[$mes['client_id_to_whom']][] = $mes;
+                    unset($m[$current_user_id][$k]);
+                }
+            }
+            unset($m[$current_user_id]);
+        }
+
+        if (!empty($m)) {
+            foreach ($m as $km => $value) {
+                uasort($m[$km], function ($a, $b) {
+                    if (strtotime($a['created_at']->format('Y-m-d H:i:s')) == \strtotime($b['created_at']->format('Y-m-d H:i:s'))) {
+                        return 0;
+                    }
+                    return \strtotime($a['created_at']->format('Y-m-d H:i:s')) < \strtotime($b['created_at']->format('Y-m-d H:i:s')) ? -1 : 1;
+                });
+            }
+        }
+
         $latte = $this->template->getLatte();
         $params = [
-            'message' => $message,
+            'message' => $m,
             'user' => $this->template->user
         ];
         $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';

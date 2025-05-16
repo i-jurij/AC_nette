@@ -94,7 +94,9 @@
 					if (document.querySelector('#chat_modal_window').checked != true) {
 						document.querySelector('#chat_modal_window').checked = true;
 					}
-					document.querySelector('#chat_content_section').insertAdjacentHTML('beforeend', json);
+					if (document.querySelector('#chat_content_section')) {
+						document.querySelector('#chat_content_section').insertAdjacentHTML('beforeend', json);
+					}
 				}
 			})
 			.catch(error => console.error('Error:', error));

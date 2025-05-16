@@ -22,13 +22,28 @@ class ChatFacade
 
     public function getByOffer(ArrayHash $data): array
     {
-        $sql = 'SELECT * FROM `chat` 
+        $sql = 'SELECT `chat`.`id`,
+                        `chat`.`parent_id`,
+                        `chat`.`offer_id`,
+                        `chat`.`client_id_who`,
+                        `chat`.`client_id_to_whom`,
+                        `chat`.`message`,
+                        `chat`.`created_at`
+                        FROM `chat` 
                 WHERE 
-                `offer_id` = ? 
-                AND (client_id_who = ? OR client_id_to_whom = ?)';
-        $message = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
+                `chat`.`offer_id` = ? 
+                AND (`chat`.`client_id_who` = ? OR `chat`.`client_id_to_whom` = ?)
+                AND `chat`.`moderated` = true';
+        //$message = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
+        $m = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who);
+        foreach ($m as $row_message) {
+            $message[] = get_object_vars($row_message);
+        }
+
         $ids = \array_column(array: $message, column_key: 'id');
-        $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+        if (!empty($ids)) {
+            $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+        }
 
         return $message;
     }

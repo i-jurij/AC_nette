@@ -1,0 +1,20 @@
+<div id="chat_client_room_link" n:inner-foreach="$message as $cid => $mess">
+    <a href="#room_{$cid}" class="button pseudo">{$cid}</a>
+</div>
+<div id="chat_content_section" n:inner-foreach="$message as $client_id => $mes">
+    <div class="bgcolor p2 mb2" id="room_{$client_id}">
+        {$client_id}
+        <div n:inner-foreach="$mes as $m">
+            <div n:class="$m->client_id_who != $user->getId() ? 'bg-black ml2', 'bgcontent rounded p1 mb1'"
+                n:if="!empty($message) && is_array($message)">
+                <span class="h4" data-id="{$m->id}" data-offer_id="{$m->offer_id}"
+                    data-client_id_who="{$m->client_id_who}" data-client_id_to_whom="{$m->client_id_to_whom}"
+                    data-created_at="{$m->created_at}">
+                    {* ****{substr($str, strlen($m->client_name) - 4)} *}
+                    {$m->created_at->format('d.m.Y H:i:s')}
+                </span>
+                <p class="">{$m->message}</p>
+            </div>
+        </div>
+    </div>
+</div>

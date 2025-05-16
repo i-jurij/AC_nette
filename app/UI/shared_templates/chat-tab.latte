@@ -1,0 +1,36 @@
+{var $c = \count($message)}
+{switch $c}
+{case $c=1}{var $n=one}
+{case $c=2}{var $n=tho}
+{case $c=3}{var $n=three}
+{case $c=4}{var $n=four}
+{case $c=5}{var $n=five}
+{case $c=6}{var $n=six}
+{/switch}
+<div id="chat_content_section" class="tabs {$n}">
+    {foreach $message as $client_id => $mes}
+    {if $iterator->first}
+    <input id='tab-{$client_id}' type='radio' name='tabgroupB' checked />
+    {else}
+    <input id='tab-{$client_id}' type='radio' name='tabgroupB' />
+    {/if}
+    <label class="pseudo button toggle" for="tab-{$client_id}">{$client_id}</label>
+    {/foreach}
+
+    <div class="row">
+        {foreach $message as $client_id => $mes}
+        <div n:inner-foreach="$mes as $m" class="bgcolor p2">
+            <div n:class="$m['client_id_who'] != $user->getId() ? 'bg-black ml2' : 'bgcontent', 'rounded p1 mb1'"
+                n:if="!empty($m) && is_array($m)">
+                <span class="h4" data-id="{$m['id']}" data-offer_id="{$m['offer_id']}"
+                    data-client_id_who="{$m['client_id_who']}" data-client_id_to_whom="{$m['client_id_to_whom']}"
+                    data-created_at="{$m['created_at']}">
+                    {* ****{substr($str, strlen($m['client_name']) - 4)} *}
+                    {$m['created_at']->format('d.m.Y H:i:s')}
+                </span>
+                <p class="">{$m['message']}</p>
+            </div>
+        </div>
+        {/foreach}
+    </div>
+</div>
