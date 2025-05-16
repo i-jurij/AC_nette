@@ -26,7 +26,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
 
             if (Csrf::isValid() && Csrf::isRecent()) {
                 $d = $this->preparePostData($this->post_data);
-                if (!empty($this->post_data['getMessage']) && $this->post_data['getMessage'] === 'true') {
+                if (!empty($this->post_data['firstGetChat']) && $this->post_data['firstGetChat'] === 'true') {
                     $message = $this->get();
                     $output = $this->getHtml($message);
                 }
@@ -129,6 +129,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         $latte = $this->template->getLatte();
         $params = [
             'message' => $message,
+            'user' => $this->template->user
         ];
         $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
         $output = $latte->renderToString($template, $params);

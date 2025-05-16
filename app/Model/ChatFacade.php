@@ -26,7 +26,11 @@ class ChatFacade
                 WHERE 
                 `offer_id` = ? 
                 AND (client_id_who = ? OR client_id_to_whom = ?)';
-        return $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
+        $message = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
+        $ids = \array_column(array: $message, column_key: 'id');
+        $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+
+        return $message;
     }
     public function getByClient(ArrayHash $data): array
     {

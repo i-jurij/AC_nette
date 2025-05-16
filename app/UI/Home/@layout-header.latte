@@ -50,7 +50,7 @@
 		firstGetChat: function (client_id_who, offer_id) {
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
-			formData.set('getMessage', 'true');
+			formData.set('firstGetChat', 'true');
 			formData.set('client_id_who', client_id_who);
 			formData.set('offer_id', offer_id);
 			
@@ -100,11 +100,6 @@
 			.catch(error => console.error('Error:', error));
 		},
 		getMessage: async function(client_id_who, offer_id){	
-			
-			
-			console.log(client_id_who + ' ' + offer_id)
-
-
 			if (Chat.countUp === 0) {
 				Chat.firstGetChat(client_id_who, offer_id);
 			} else {

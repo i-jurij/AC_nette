@@ -252,7 +252,7 @@
 
             {include client_phone from $shared_templates.'client_phone.latte'}
 
-            <p n:if="$user->getId() != $offers[0]['client_id']" class="">
+            <p class="">
                 <button n:if="!$user->isLoggedIn()" class="tooltip-top" data-tooltip="Авторизуйтесь">
                     Написать в чат на сайте
                 </button>
