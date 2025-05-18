@@ -6,12 +6,12 @@
             <h3>Chat</h3>
             <label for="chat_modal_window" class="close">&times;</label>
         </header>
-        {if \count($message) < 7} {include chat-tab.latte} {else} {include chat-ankor.latte} {/if} <div class="p2">
-            <textarea name="message" id="chat_message" placeholder="Напишите новое сообщение здесь"></textarea>
-            <button type="submit" class="button" onclick="Chat.createMessage()">Отправить</button>
-            <label for="chat_modal_window" class="button dangerous">
-                Закрыть
-            </label>
-</div>
-</article>
+        {var $count_mes = \count($message)}
+        {if $count_mes > 0 && $count_mes < 7} {include chat-tab.latte} {elseif $count_mes> 6}
+            {include chat-ankor.latte}
+            {/if}
+            <footer>
+                <label for="chat_modal_window" class="button dangerous mb2">Закрыть</label>
+            </footer>
+    </article>
 </div>

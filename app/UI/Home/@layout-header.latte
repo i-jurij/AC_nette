@@ -44,9 +44,14 @@
 	let url_chat = {{link :Home:Client:Chat:default}}
 
 	Chat = {
-		message: document.querySelector('#chat_message'),
 		count_client_chat: document.querySelector('#countChatMessagesClient'),
 		countUp: 0,
+		toTop: function(id){
+			let element = document.querySelector('#'+id);
+			if (element) {
+				element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+			}
+		},
 		firstGetChat: function (client_id_who, offer_id) {
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
@@ -66,6 +71,11 @@
 				if (json && (typeof json === 'string' || json instanceof String)) {
 					document.body.insertAdjacentHTML('beforeend', json);
 					document.querySelector('#chat_modal_window').checked = true;
+
+					let cs = document.querySelector('#countChatMessagesClientOffer');
+					if (cs) {
+						cs.innerText = '';
+					}
 				}
 			})
 			.catch(error => console.error('Error:', error));
@@ -109,8 +119,8 @@
 			}
 			Chat.countUp++;
 		},
-		createMessage: function(){
-			let chat_message = document.querySelector('#chat_message');
+		createMessage: function(client_id_to_whom){
+			let chat_message = document.querySelector('#chat_message_'+client_id_to_whom);
 			if (chat_message) {
 				let mes = chat_message.value;
 				if (mes) {
@@ -118,13 +128,6 @@
 					formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 					formData.set('createMessage_chat', 'true');
 					formData.set('client_id_who', {{$user->getId()}});
-					let client_id_to_whom = {{(!empty($offers[0]['client_id'])) ? $offers[0]['client_id'] : null}};
-					if (client_id_to_whom == null || client_id_to_whom == 'undefined' || client_id_to_whom == '' ) {
-						let client_id_to_whom_input = document.querySelector('input[name="client_id_to_whom"]');
-						if (client_id_to_whom_input) {
-							client_id_to_whom = client_id_to_whom_input.value;
-						}
-					}
 					formData.set('client_id_to_whom', client_id_to_whom);
 					formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
 					formData.set('message', mes);
@@ -139,7 +142,16 @@
 					.then(response => response.json())
 					.then(json => {
 						if (json) {
-							document.querySelector('#chat_content_section').insertAdjacentHTML('beforeend', '<p>'+mes+'</p>');
+							let html = '<div class="bgcontent rounded p1 mb1 mr1">'+
+								'<span class="h4" data-id="'+json.id+'" data-offer_id="'+json.offer_id+'"'+
+									'data-client_id_who="'+json.client_id_who+'"'+
+									'data-client_id_to_whom="'+json.client_id_who+'" data-created_at="'+json.created_at+'">'+
+									'Вы, '+ new Date(json.created_at).toLocaleString() +
+								'</span>'+
+								'<p class="">'+json.message+'</p>'+
+							'</div>';
+							
+							document.querySelector('#chat_message_wrapper_'+json.client_id_to_whom).insertAdjacentHTML('beforebegin', html);
 							chat_message.value = '';
 						}
 					})

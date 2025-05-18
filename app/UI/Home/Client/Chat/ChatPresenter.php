@@ -62,10 +62,23 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         } else {
             $message = $this->chatFacade->getByClient(data: $d);
         }
+
+        if (!empty($message)) {
+            $client_id = $this->user->getId();
+            foreach ($message as $row) {
+                if ($row['client_id_to_whom'] == $client_id) {
+                    $ids[] = $row['id'];
+                }
+            }
+            if (!empty($ids)) {
+                $this->chatFacade->markRead($ids);
+            }
+        }
+
         return $message;
     }
 
-    public function save(): bool
+    public function save(): array
     {
         $d = $this->preparePostData($this->post_data);
 
@@ -74,12 +87,9 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             && !empty($d->client_id_to_whom) && $d->client_id_who !== $d->client_id_to_whom
             && !empty($d->offer_id)
         ) {
-            $res = $this->chatFacade->create($d);
-            if ($res > 0) {
-                return true;
-            }
+            return $this->chatFacade->create($d);
         }
-        return false;
+        return [];
     }
 
     public function delete()
@@ -128,16 +138,17 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
     {
         $m = [];
         foreach ($messages as $message) {
-            $m[$message['client_id_who']][] = $message;
+            $m[$message['client_id_who']]['name'] = $message['username'];
+            $m[$message['client_id_who']]['message'][] = $message;
         }
 
         $current_user_id = $this->user->getId();
 
-        if (!empty($m[$current_user_id])) {
-            foreach ($m[$current_user_id] as $k => $mes) {
+        if (!empty($m[$current_user_id]) && !empty($m[$current_user_id]['message'])) {
+            foreach ($m[$current_user_id]['message'] as $k => $mes) {
                 if (!empty($m[$mes['client_id_to_whom']])) {
-                    $m[$mes['client_id_to_whom']][] = $mes;
-                    unset($m[$current_user_id][$k]);
+                    $m[$mes['client_id_to_whom']]['message'][] = $mes;
+                    unset($m[$current_user_id]['message'][$k]);
                 }
             }
             unset($m[$current_user_id]);
@@ -145,7 +156,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
 
         if (!empty($m)) {
             foreach ($m as $km => $value) {
-                uasort($m[$km], function ($a, $b) {
+                uasort($m[$km]['message'], function ($a, $b) {
                     if (strtotime($a['created_at']->format('Y-m-d H:i:s')) == \strtotime($b['created_at']->format('Y-m-d H:i:s'))) {
                         return 0;
                     }

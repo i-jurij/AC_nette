@@ -28,21 +28,19 @@ class ChatFacade
                         `chat`.`client_id_who`,
                         `chat`.`client_id_to_whom`,
                         `chat`.`message`,
-                        `chat`.`created_at`
+                        `chat`.`created_at`,
+                        `client`.`username` 
                         FROM `chat` 
+                INNER JOIN `client` ON `chat`.`client_id_who` = `client`.`id`
                 WHERE 
                 `chat`.`offer_id` = ? 
                 AND (`chat`.`client_id_who` = ? OR `chat`.`client_id_to_whom` = ?)
                 AND `chat`.`moderated` = true';
         //$message = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who)->fetchAll();
         $m = $this->db->query($sql, $data->offer_id, $data->client_id_who, $data->client_id_who);
+        $message = [];
         foreach ($m as $row_message) {
-            $message[] = get_object_vars($row_message);
-        }
-
-        $ids = \array_column(array: $message, column_key: 'id');
-        if (!empty($ids)) {
-            $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+            $message[] = \get_object_vars($row_message);
         }
 
         return $message;
@@ -51,10 +49,24 @@ class ChatFacade
     {
         return [];
     }
-    public function create(ArrayHash $data): int
+
+    public function markRead(array $ids)
+    {
+        $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+    }
+    public function create(ArrayHash $data)
     {
         $this->db->query('INSERT INTO `chat` ?', $data);
-        return (int) $this->db->getInsertId();
+        $resp = $this->db->query('SELECT    `chat`.`id`,
+                                        `chat`.`parent_id`,
+                                        `chat`.`offer_id`,
+                                        `chat`.`client_id_who`,
+                                        `chat`.`client_id_to_whom`,
+                                        `chat`.`message`,
+                                        `chat`.`created_at`
+                                FROM `chat` 
+                                WHERE `chat`.`id` = ?', $this->db->getInsertId())->fetch();
+        return \get_object_vars($resp);
     }
 
     /**
