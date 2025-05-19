@@ -14,7 +14,7 @@
     {else}
     <input id='tab-{$client_id}' type='radio' name='tabgroupB' />
     {/if}
-    <label class="pseudo button toggle" for="tab-{$client_id}">
+    <label class="button toggle" for="tab-{$client_id}">
         ****{substr($mes['name'], strlen($mes['name']) - 4)}
     </label>
     {/foreach}
@@ -37,12 +37,12 @@
                 <p class="">{$m['message']}</p>
             </div>
             {/foreach}
-            <div class="p2 clearfix bgcontent rounded mt2 mr1" id="chat_message_wrapper_{$client_id}">
-                <textarea name="message" id="chat_message_{$client_id}"
-                    placeholder="Напишите новое сообщение здесь"></textarea>
-                <button type="submit" class="button right" onclick="Chat.createMessage({$client_id})">Отправить</button>
+            <div class="p2 flex bgcontent rounded mt2 mr1" id="chat_message_wrapper_{$client_id}">
+                <textarea name="message" id="chat_message_{$client_id}" placeholder="Напишите новое сообщение здесь"
+                    class="flex-auto mb0 mr1"></textarea>
+                <button type="submit" title="Отправить" class="button h2"
+                    onclick="Chat.createMessage({$client_id})">&#128232;</button>
             </div>
-
         </div>
     </div>
 </div>

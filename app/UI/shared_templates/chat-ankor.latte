@@ -1,10 +1,13 @@
 <div id="chat_client_room_link" n:inner-foreach="$message as $cid => $mess">
+    {if $cid != $offer_owner_id}
     <button class="pseudo" onclick='Chat.toTop("room_{$cid}")'>
         ****{substr($mess['name'], strlen($mess['name']) - 4)}
     </button>
+    {/if}
 </div>
 <div id="chat_content_section" n:inner-foreach="$message as $client_id => $mes">
     <div n:class="!$iterator->last ? mb3, 'bgcolor p2'" id="room_{$client_id}">
+        {if $client_id != $offer_owner_id}
         <span class="bgcontent rounded mb1 p1 inline-block">****{substr($mes['name'], strlen($mes['name']) - 4)}</span>
         <div n:inner-foreach="$mes['message'] as $m" id="room_messages_{$client_id}">
             <div n:class="$m['client_id_who'] != $user->getId() ? 'bg-black ml2' : 'bgcontent', 'rounded p1 mb1'"
@@ -23,10 +26,12 @@
                 <p class="p1">{$m['message']}</p>
             </div>
         </div>
-        <div class="p2 clearfix bgcontent rounded" id="chat_message_wrapper_{$client_id}">
-            <textarea name="message" id="chat_message_{$client_id}"
-                placeholder="Напишите новое сообщение здесь"></textarea>
-            <button type="submit" class="button right" onclick="Chat.createMessage({$client_id})">Отправить</button>
+        {/if}
+        <div class="p2 flex bgcontent rounded mt2 mr1" id="chat_message_wrapper_{$client_id}">
+            <textarea name="message" id="chat_message_{$client_id}" placeholder="Напишите новое сообщение здесь"
+                class="flex-auto mb0 mr1"></textarea>
+            <button type="submit" title="Отправить" class="button h2"
+                onclick="Chat.createMessage({$client_id})">&#128232;</button>
         </div>
     </div>
 </div>

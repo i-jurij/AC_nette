@@ -25,19 +25,16 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             $this->post_data = $httpRequest->getPost();
 
             if (Csrf::isValid() && Csrf::isRecent()) {
-                $d = $this->preparePostData($this->post_data);
                 if (!empty($this->post_data['firstGetChat']) && $this->post_data['firstGetChat'] === 'true') {
                     $message = $this->get();
-                    $output = $this->getHtml($message);
+                    $offer_owner_id = (int) $this->post_data['offer_owner_id'];
+                    $output = $this->getHtml($message, $offer_owner_id);
                 }
 
                 if (!empty($this->post_data['update_chat']) && $this->post_data['update_chat'] === 'true') {
-                    //update chats messages
-                    //$output = $this->chatFacade->countChat(client_id: $this->getUser()->getId());
-
-                    //// TEST
-                    $output = 'message list';
-                    //// END TEST
+                    $d = $this->preparePostData($this->post_data);
+                    $messages = $this->chatFacade->getByOfferNoRead(data: $d);
+                    $output = json_encode($messages);
                 }
 
                 if (!empty($this->post_data['createMessage_chat']) && $this->post_data['createMessage_chat'] === 'true') {
@@ -134,7 +131,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         return $d;
     }
 
-    private function getHtml(array $messages): string
+    private function getHtml(array $messages, int $offer_owner_id): string
     {
         $m = [];
         foreach ($messages as $message) {
@@ -144,14 +141,20 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
 
         $current_user_id = $this->user->getId();
 
-        if (!empty($m[$current_user_id]) && !empty($m[$current_user_id]['message'])) {
-            foreach ($m[$current_user_id]['message'] as $k => $mes) {
+        if ($current_user_id == $offer_owner_id) {
+            $cid = $current_user_id;
+        } else {
+            $cid = $offer_owner_id;
+        }
+
+        if (!empty($m[$cid]) && !empty($m[$cid]['message'])) {
+            foreach ($m[$cid]['message'] as $k => $mes) {
                 if (!empty($m[$mes['client_id_to_whom']])) {
                     $m[$mes['client_id_to_whom']]['message'][] = $mes;
-                    unset($m[$current_user_id]['message'][$k]);
+                    unset($m[$cid]['message'][$k]);
                 }
             }
-            unset($m[$current_user_id]);
+            unset($m[$cid]);
         }
 
         if (!empty($m)) {
@@ -168,7 +171,8 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         $latte = $this->template->getLatte();
         $params = [
             'message' => $m,
-            'user' => $this->template->user
+            'user' => $this->template->user,
+            'offer_owner_id' => $offer_owner_id
         ];
         $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
         $output = $latte->renderToString($template, $params);

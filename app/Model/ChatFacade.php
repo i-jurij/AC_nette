@@ -45,6 +45,33 @@ class ChatFacade
 
         return $message;
     }
+
+    public function getByOfferNoRead(ArrayHash $data): array
+    {
+        $sql = 'SELECT `chat`.`id`,
+                        `chat`.`parent_id`,
+                        `chat`.`offer_id`,
+                        `chat`.`client_id_who`,
+                        `chat`.`client_id_to_whom`,
+                        `chat`.`message`,
+                        `chat`.`created_at`,
+                        `client`.`username` 
+                        FROM `chat` 
+                INNER JOIN `client` ON `chat`.`client_id_who` = `client`.`id`
+                WHERE 
+                `chat`.`offer_id` = ? 
+                AND `chat`.`client_id_to_whom` = ?
+                AND `chat`.`moderated` = true
+                AND `chat`.`read` = false';
+        $m = $this->db->query($sql, $data->offer_id, $data->client_id_who);
+        $message = [];
+        foreach ($m as $row_message) {
+            $message[] = \get_object_vars($row_message);
+        }
+
+        return $message;
+    }
+
     public function getByClient(ArrayHash $data): array
     {
         return [];
