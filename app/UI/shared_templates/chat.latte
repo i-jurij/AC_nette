@@ -1,14 +1,15 @@
+{var $client_id = $user->getId()}
+{var $count_mes = \count($message)}
 <div class="modal">
     <input id="chat_modal_window" type="checkbox" />
     <label for="chat_modal_window" class="overlay"></label>
     <article>
         <header>
-            <h3>Chat</h3>
+            {* <button onclick="Chat.updateChat({$client_id}, {$offer_id})">Получить новые сообщения</button> *}
+            &nbsp;
             <label for="chat_modal_window" class="close">&times;</label>
         </header>
         <section>
-            {var $count_mes = \count($message)}
-            {var $client_id = $user->getId()}
             {if $client_id != $offer_owner_id}
             <div id="chat_content_section">
                 <div class="bgcolor p2 mb1" id="room_{$offer_owner_id}">

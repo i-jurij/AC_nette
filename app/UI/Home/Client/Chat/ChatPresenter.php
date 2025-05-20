@@ -24,17 +24,22 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             $httpRequest = $this->getHttpRequest();
             $this->post_data = $httpRequest->getPost();
 
-            if (Csrf::isValid() && Csrf::isRecent()) {
+            if (Csrf::isValid()) {
                 if (!empty($this->post_data['firstGetChat']) && $this->post_data['firstGetChat'] === 'true') {
                     $message = $this->get();
                     $offer_owner_id = (int) $this->post_data['offer_owner_id'];
-                    $output = $this->getHtml($message, $offer_owner_id);
+                    $offer_id = (int) $this->post_data['offer_id'];
+                    $output = $this->getHtml($message, $offer_owner_id, $offer_id);
                 }
 
                 if (!empty($this->post_data['update_chat']) && $this->post_data['update_chat'] === 'true') {
                     $d = $this->preparePostData($this->post_data);
                     $messages = $this->chatFacade->getByOfferNoRead(data: $d);
-                    $output = json_encode($messages);
+                    $output = [];
+                    foreach ($messages as $message) {
+                        $output[$message['client_id_who']]['name'] = $message['username'];
+                        $output[$message['client_id_who']]['message'][] = $message;
+                    }
                 }
 
                 if (!empty($this->post_data['createMessage_chat']) && $this->post_data['createMessage_chat'] === 'true') {
@@ -131,7 +136,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         return $d;
     }
 
-    private function getHtml(array $messages, int $offer_owner_id): string
+    private function getHtml(array $messages, int $offer_owner_id, int $offer_id): string
     {
         $m = [];
         foreach ($messages as $message) {
@@ -172,7 +177,8 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
         $params = [
             'message' => $m,
             'user' => $this->template->user,
-            'offer_owner_id' => $offer_owner_id
+            'offer_owner_id' => $offer_owner_id,
+            'offer_id' => $offer_id
         ];
         $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat.latte';
         $output = $latte->renderToString($template, $params);

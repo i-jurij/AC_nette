@@ -1,6 +1,6 @@
 <div id="chat_client_room_link" n:inner-foreach="$message as $cid => $mess">
     {if $cid != $offer_owner_id}
-    <button class="pseudo" onclick='Chat.toTop("room_{$cid}")'>
+    <button class="" onclick='Chat.toTop("room_{$cid}")'>
         ****{substr($mess['name'], strlen($mess['name']) - 4)}
     </button>
     {/if}

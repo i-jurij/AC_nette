@@ -63,12 +63,14 @@ class ChatFacade
                 AND `chat`.`client_id_to_whom` = ?
                 AND `chat`.`moderated` = true
                 AND `chat`.`read` = false';
-        $m = $this->db->query($sql, $data->offer_id, $data->client_id_who);
+        $m = $this->db->query($sql, $data->offer_id, $data->client_id_who)->fetchAll();
         $message = [];
-        foreach ($m as $row_message) {
-            $message[] = \get_object_vars($row_message);
+        foreach ($m as $k => $row_message) {
+            //$message[] = \get_object_vars($row_message);
+            foreach ($row_message as $key => $value) {
+                $message[$k][$key] = $value;
+            }
         }
-
         return $message;
     }
 

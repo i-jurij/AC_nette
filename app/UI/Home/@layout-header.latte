@@ -54,6 +54,12 @@
 				element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 			}
 		},
+		resetCountChatOffer: function(){
+			let cs = document.querySelector('#countChatMessagesClientOffer');
+			if (cs) {
+				cs.innerText = '0';
+			}
+		},
 		firstGetChat: function (client_id_who, offer_id) {
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
@@ -75,10 +81,7 @@
 					document.body.insertAdjacentHTML('beforeend', json);
 					document.querySelector('#chat_modal_window').checked = true;
 
-					let cs = document.querySelector('#countChatMessagesClientOffer');
-					if (cs) {
-						cs.innerText = '0';
-					}
+					Chat.resetCountChatOffer();
 				}
 			})
 			.catch(error => console.error('Error:', error));
@@ -103,11 +106,27 @@
 			})
 			.then(response => response.json())
 			.then(json => {
-				if (json && (typeof json === 'string' || json instanceof String)) {
+				if (json) {
 					if (document.querySelector('#chat_modal_window').checked != true) {
 						document.querySelector('#chat_modal_window').checked = true;
 					}
-					console.log(json)
+					
+					for (var key of Object.keys(json)) {
+						let html = '';
+						json[key].message.forEach(element => {
+						html += '<div class="bg-black rounded p1 mb1 ml2">'+
+							'<span class="h4" data-id="'+element.id+'" data-offer_id="'+element.offer_id+'"'+
+								' data-client_id_who="'+element.client_id_who+'"'+
+								' data-client_id_to_whom="'+element.client_id_to_whom+'"'+
+								'data-created_at="'+element.created_at+'">'+
+								'****' + json[key].name.slice(-4) + ', '+ new Date(element.created_at).toLocaleString() +
+								'</span>'+
+							'<p class="">'+element.message+'</p>'+
+							'</div>';
+						});
+						document.querySelector('#chat_message_wrapper_'+key).insertAdjacentHTML('beforebegin', html);
+					}
+					Chat.resetCountChatOffer();
 				}
 			})
 			.catch(error => console.error('Error:', error));
@@ -146,7 +165,7 @@
 							let html = '<div class="bgcontent rounded p1 mb1 mr1">'+
 								'<span class="h4" data-id="'+json.id+'" data-offer_id="'+json.offer_id+'"'+
 									'data-client_id_who="'+json.client_id_who+'"'+
-									'data-client_id_to_whom="'+json.client_id_who+'" data-created_at="'+json.created_at+'">'+
+									'data-client_id_to_whom="'+json.client_id_to_whom+'" data-created_at="'+json.created_at+'">'+
 									'Вы, '+ new Date(json.created_at).toLocaleString() +
 								'</span>'+
 								'<p class="">'+json.message+'</p>'+
