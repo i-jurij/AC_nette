@@ -122,11 +122,15 @@
 							cAO.count = `${json.offerNoRead}`;
 							cAO.innerText = `${json.offerNoRead}`;
 						}
+						let mw = document.querySelector('#chat_modal_window');
+						if (mw && mw.checked == true) {
+							Chat.updateChat({{$user->getId()}}, {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
+						}
 					}
 				})
 				.catch(error => console.error('Error:', error));
 			}
-		,10000),
+		,1000*60*10),
 		
 		updateChat: function(client_id_who, offer_id){
 			let formData = new FormData();

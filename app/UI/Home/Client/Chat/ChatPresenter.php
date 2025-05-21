@@ -40,6 +40,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                         $output[$message['client_id_who']]['name'] = $message['username'];
                         $output[$message['client_id_who']]['message'][] = $message;
                     }
+                    $res_mark_read = $this->markRead($messages);
                 }
 
                 if (!empty($this->post_data['createMessage_chat']) && $this->post_data['createMessage_chat'] === 'true') {
@@ -58,9 +59,6 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                     } else {
                         $output = false;
                     }
-
-
-
                 }
 
                 $this->sendJson($output);
@@ -82,6 +80,13 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
             $message = $this->chatFacade->getByClient(data: $d);
         }
 
+        $res_mark_read = $this->markRead($message);
+
+        return $message;
+    }
+
+    private function markRead(array $message): int|null
+    {
         if (!empty($message)) {
             $client_id = $this->user->getId();
             foreach ($message as $row) {
@@ -90,11 +95,10 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                 }
             }
             if (!empty($ids)) {
-                $this->chatFacade->markRead($ids);
+                return $this->chatFacade->markRead($ids);
             }
         }
-
-        return $message;
+        return null;
     }
 
     public function save(): array

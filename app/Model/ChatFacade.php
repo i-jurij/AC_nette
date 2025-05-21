@@ -79,9 +79,10 @@ class ChatFacade
         return [];
     }
 
-    public function markRead(array $ids)
+    public function markRead(array $ids): int|null
     {
-        $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+        $result = $this->db->query('UPDATE `chat` SET `read` = 1 WHERE id IN ?', $ids);
+        return $result->getRowCount();
     }
     public function create(ArrayHash $data)
     {
