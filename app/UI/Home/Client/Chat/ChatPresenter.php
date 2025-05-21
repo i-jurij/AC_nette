@@ -46,6 +46,23 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                     $output = $this->save();
                 }
 
+                if (!empty($this->post_data['updNoReadCount_chat']) && $this->post_data['updNoReadCount_chat'] === 'true') {
+                    $d = $this->preparePostData($this->post_data);
+                    if ($d->client_id_to_whom == $this->getUser()->getId()) {
+                        $allNoRead = $this->chatFacade->countChat(client_id: $d->client_id_to_whom);
+                        $output['allNoRead'] = $allNoRead;
+                        if (!empty($d->offer_id)) {
+                            $offerNoRead = $this->chatFacade->countChatOffer(client_id: $this->getUser()->getId(), offer_id: $d->offer_id);
+                            $output['offerNoRead'] = $offerNoRead;
+                        }
+                    } else {
+                        $output = false;
+                    }
+
+
+
+                }
+
                 $this->sendJson($output);
             } else {
                 $this->sendJson(false);

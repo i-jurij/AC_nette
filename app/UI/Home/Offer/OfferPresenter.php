@@ -55,7 +55,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $this->template->backlink = $this->storeRequest();
             $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
             if ($this->getUser()->isLoggedIn()) {
-                $this->template->count_offer_chat = $this->chat->countChat(client_id: $this->getUser()->getId(), offer_id: $id);
+                $this->template->count_offer_chat = $this->chat->countChatOffer(client_id: $this->getUser()->getId(), offer_id: $id);
             } else {
                 $this->template->count_offer_chat = 0;
             }

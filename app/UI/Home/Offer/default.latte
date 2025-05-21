@@ -258,7 +258,8 @@
                 </button>
                 <button n:if="$user->isLoggedIn()" onclick="Chat.getMessage({$user->getId()}, {$offers[0]['id']})">
                     Написать в чат на сайте
-                    <span class="label bg-olive" id="countChatMessagesClientOffer">{$count_offer_chat}</span>
+                    <span class="label bg-olive" id="countChatMessagesClientOffer"
+                        data-count="{$count_offer_chat}">{$count_offer_chat}</span>
                 </button>
             </p>
         </div>

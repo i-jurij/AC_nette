@@ -56,8 +56,15 @@
 		},
 		resetCountChatOffer: function(){
 			let cs = document.querySelector('#countChatMessagesClientOffer');
+			let cA = document.querySelector('#countChatMessagesClient');
+			let cOC = 0;
 			if (cs) {
 				cs.innerText = '0';
+				cOC = parseInt(cs.dataset.count);
+			}
+			if (cA) {
+				cAC = parseInt(cA.dataset.count) - cOC;
+				cA.innerText = cAC;
 			}
 		},
 		firstGetChat: function (client_id_who, offer_id) {
@@ -86,10 +93,41 @@
 			})
 			.catch(error => console.error('Error:', error));
 		},
-		updNoReadCount: function(client_id_who, offer_id){
-			// exec every 5 min eg
-			return 'number of no read ';
-		},
+		
+		updNoReadCount: window.setInterval(
+			function (){
+				let formData = new FormData();
+				formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+				formData.set('updNoReadCount_chat', 'true');
+				formData.set('client_id_to_whom', {{$user->getId()}});
+				formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
+				
+				fetch(url_chat, {
+					responseType: 'json',
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: {'X-Requested-With': 'XMLHttpRequest'},
+					body: formData
+				})
+				.then(response => response.json())
+				.then(json => {					
+					if (json && typeof json == "object") {
+						let cA = document.querySelector('#countChatMessagesClient');
+						if (cA && json.allNoRead && typeof json.allNoRead == "number") {
+							cA.count = `${json.allNoRead}`;
+							cA.innerText = `${json.allNoRead}`;
+						}
+						let cAO = document.querySelector('#countChatMessagesClientOffer');
+						if (cAO && json.offerNoRead && typeof json.offerNoRead == "number") {
+							cAO.count = `${json.offerNoRead}`;
+							cAO.innerText = `${json.offerNoRead}`;
+						}
+					}
+				})
+				.catch(error => console.error('Error:', error));
+			}
+		,10000),
+		
 		updateChat: function(client_id_who, offer_id){
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
@@ -182,7 +220,7 @@
 	}
 	
 	window.addEventListener("load", (event) => {
-
+		
 	});
 </script>
 {/block}

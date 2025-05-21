@@ -101,22 +101,28 @@ class ChatFacade
     /**
      * return int number of all replies to clients messages
      */
-    public function countChat(int $client_id, int $offer_id = null): int
+    public function countChat(int $client_id): int
     {
-        if (!empty($offer_id)) {
-            $sql = "SELECT COUNT(*) 
-                        FROM `chat` 
-                        WHERE `chat`.`offer_id` = ?
-                        AND `chat`.`client_id_to_whom` = ?
-                        AND `chat`.`read` = FALSE";
-            $res = $this->db->query($sql, $offer_id, $client_id)->fetchField();
-        } else {
-            $sql = "SELECT COUNT(*) 
-                        FROM `chat` 
-                        WHERE `chat`.`client_id_to_whom` = ?
-                        AND `chat`.`read` = FALSE";
-            $res = $this->db->query($sql, $client_id)->fetchField();
-        }
+        $sql = "SELECT COUNT(*) 
+                    FROM `chat` 
+                    WHERE `chat`.`client_id_to_whom` = ?
+                    AND `chat`.`read` = FALSE";
+        $res = $this->db->query($sql, $client_id)->fetchField();
+
+        return $res;
+    }
+
+    /**
+     * return int number of replies to clients messages on the offers page
+     */
+    public function countChatOffer(int $client_id, int $offer_id): int
+    {
+        $sql = "SELECT COUNT(*) 
+                    FROM `chat` 
+                    WHERE `chat`.`offer_id` = ?
+                    AND `chat`.`client_id_to_whom` = ?
+                    AND `chat`.`read` = FALSE";
+        $res = $this->db->query($sql, $offer_id, $client_id)->fetchField();
 
         return $res;
     }
