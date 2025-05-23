@@ -11,26 +11,8 @@ MAKE
 
 offer chat part
 js 
+chatpresenter make getOffersWithNewMessage - union by offer then get offers data 
 
-get
-for client 
-chat from headers button:
-list of count of messages split by offers
-after users click on offer then show window with count of the offer messages split by clients
-after users click on client show messages to user from selected client
-WHERE offer_id == selected offer->id 
-    AND (
-            (client_id_who = selected client->id AND client_id_to_whom == user->id) 
-            OR 
-            (client_id_who = user->id AND client_id_to_whom == selected client->id)
-        )
-then
-save
-INSERT  user->id === client_id_who AND client_id_to_whom == message->client_id_who
-
-
-при открытом окне чата рисовать мигающий знак новых сообщений и кнопку Получить новые или Обновить,
-при нажатии вызвать функцию updateChat()
 
 
 

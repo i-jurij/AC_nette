@@ -1,0 +1,66 @@
+<div class="modal">
+    <input id="chatNewMessageClient" type="checkbox" />
+    <label for="chatNewMessageClient" class="overlay"></label>
+    <article>
+        <header>
+            <h3>Новые сообщения</h3>
+            <label for="chatNewMessageClient" class="close">&times;</label>
+        </header>
+        <section class="content">
+            <div class="mb1 p1 bg-black rounded" n:foreach="$offers as $offer">
+                <div class="inline-block">
+                    <div class="flex items-center">
+                        <button title="Чат" class="m1" onclick="Chat.getMessage({$user->getId()}, {$offer['id']})">
+                            +{$offer['newChatNumber']}
+                        </button>
+                        <div class="flex-none">
+                            {if !empty($offer['thumbnails'])}
+                            <img src="data:image/png;base64, {base64_encode($offer['thumbnails'])}" alt="Фото"
+                                height="100px" />
+                            {else}
+                            <img src="{$baseUrl}/images/ddd.jpg" alt="Default offers picture" loading="lazy"
+                                height="100px" />
+                            {/if}
+                        </div>
+                        <div class="p1">
+                            <span>⚲ {$offer['city_name']}</span>
+                            <br>
+                            <span>
+                                {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                                Ищу работу
+                                {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                                Предлагаю работу
+                                {/if}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="inline-block m1">
+                    <div class="inline-block">
+                        <span n:if="!empty($offer['services']) && is_array($offer['services'])" class="ml0">
+                            {foreach $offer['services'] as $ca}
+                            {if $iterator->first}
+                            {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                            {else}
+                            {$ca['category_name']}:
+                            {/if}
+                            {foreach $ca['services'] as $se}
+                            {$se['name']}{if !$iterator->last}, {/if}
+                            {/foreach}
+                            {if !$iterator->last}и {/if}
+                            {/foreach}
+                        </span>
+                    </div>
+                    <div class="inline-block m1">
+                        {number_format($offer['price'], 0, ",", "")} руб.
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <label for="chatNewMessageClient" class="button dangerous">
+                Закрыть
+            </label>
+        </footer>
+    </article>
+</div>

@@ -9,8 +9,8 @@
 	<div class="right-align">
 		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink"
 			aria-label="Кнопка входа">Войти</a>
-		<button n:if="$user->isLoggedIn()" onclick="Chat.getMessage({$user->getId()}, false)"
-			aria-label="Кнопка новые сообщения" title="Новые сообщения" class="pseudo px0">
+		<button n:if="$user->isLoggedIn()" onclick="Chat.getOffersWithNewMessage()" aria-label="Кнопка новые сообщения"
+			title="Новые сообщения" class="pseudo px0">
 			<span class="label" id="countChatMessagesClient" data-count="{$count_client_chat}">
 				{$count_client_chat}
 			</span>
@@ -220,6 +220,52 @@
 					.catch(error => console.error('Error:', error));
 				}
 			}
+		},
+		getOffersWithNewMessage: function () {
+			let numberNoReadChatSpan = document.querySelector('#countChatMessagesClient');
+			if (numberNoReadChatSpan) {
+				nnrc = numberNoReadChatSpan.dataset.count;
+			}
+
+			if (nnrc) {
+				if (window.numberNoReadChat) {
+					if (window.numberNoReadChat == nnrc) {
+						let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
+						if (ci)	ci.checked = true;
+					} else {
+						window.numberNoReadChat = nnrc;
+						Chat.fetchNewChat();
+					}
+				} else {
+					window.numberNoReadChat = nnrc;
+					Chat.fetchNewChat();
+				}
+			}
+		},
+		fetchNewChat: function(){
+			let formData = new FormData();
+			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
+			formData.set('getOffersWithNewMessage', 'true');
+			formData.set('client_id_to_whom', {{$user->getId()}});
+			
+			fetch(url_chat, {
+			responseType: 'json',
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'},
+			body: formData
+			})
+			.then(response => response.json())
+			.then(json => {
+			if (json && typeof json == "string") {
+			document.body.insertAdjacentHTML('beforeend', json);
+			let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
+			if (ci) {
+			ci.checked = true;
+			}
+			}
+			})
+			.catch(error => console.error('Error:', error));
 		}
 	}
 	

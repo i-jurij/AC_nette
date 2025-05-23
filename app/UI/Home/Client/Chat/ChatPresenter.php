@@ -14,7 +14,7 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
     private array $post_data;
 
     public function __construct(
-        private ChatFacade $chatFacade
+        private ChatFacade $chatFacade,
     ) {
     }
 
@@ -61,6 +61,106 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
                     }
                 }
 
+                if (!empty($this->post_data['getOffersWithNewMessage']) && $this->post_data['getOffersWithNewMessage'] === 'true') {
+                    $d = $this->preparePostData($this->post_data);
+                    if ($d->client_id_to_whom == $this->getUser()->getId()) {
+                        $chat = $this->chatFacade->getByClient($d->client_id_to_whom);
+                        if (!empty($chat) && !empty($chat[0])) {
+                            $of_ids = array_column($chat, 'offer_id');
+                            $numberOfNewByOffer = array_count_values($of_ids); // return ['offer_id' => number, ...]
+                            $offers_ids = array_unique($of_ids, SORT_NUMERIC);
+
+                            $sql_offers = "SELECT
+                                            `offer`.`id`,
+                                            `offer`.`offers_type`,
+                                            `offer`.`city_id` ,
+                                            `offer`.`city_name`,
+                                            `offer`.`region_id`,
+                                            `offer`.`region_name`,
+                                            `offer`.`price`, 
+                                            `offer`.`message`,
+                                            `client`.`id` AS client_id,
+                                            `client`.`username` AS client_name
+                                        FROM offer 
+                                        INNER JOIN `client` ON offer.client_id = `client`.id
+                                        WHERE `offer`.`id` IN ?";
+
+                            $offers = $this->chatFacade->db->query($sql_offers, $offers_ids);
+
+                            $sql_images = 'SELECT * FROM `offer_image_thumb` WHERE';
+                            $offer_images = $this->chatFacade->db->query($sql_images, ['offer_id' => $offers_ids])->fetchAll();
+
+                            $sql_services = 'SELECT 
+                                `offer_service`.`offer_id`,
+                                `service`.`id`,
+                                `service`.`name`,
+                                `category`.`id` AS category_id,
+                                `category`.`name` AS category_name
+                                FROM `offer_service` 
+                                    INNER JOIN `service` ON `offer_service`.`service_id` = `service`.`id`
+                                    INNER JOIN `category` ON `service`.`category_id` = `category`.`id`  WHERE';
+                            $offer_services = $this->chatFacade->db->query($sql_services, ['offer_service.offer_id' => $offers_ids])->fetchAll();
+
+                            $categories = [];
+                            foreach ($offer_services as $vos) {
+                                $categories[$vos->offer_id][$vos->category_id] = [
+                                    'category_id' => $vos->category_id,
+                                    'category_name' => $vos->category_name,
+                                    'services' => []
+                                ];
+                            }
+                            foreach ($offer_services as $vos) {
+                                $categories[$vos->offer_id][$vos->category_id]['services'][$vos->id] = [
+                                    'id' => $vos->id,
+                                    'name' => $vos->name,
+                                ];
+                            }
+
+                            $res = [];
+                            foreach ($offers as $k => $offer) {
+                                $res[$k] = [];
+                                $res[$k] += ['newChatNumber' => $numberOfNewByOffer[$offer->id]];
+
+                                foreach ($offer as $m => $valu) {
+                                    $res[$k] += [$m => $valu];
+                                }
+
+                                if (!empty($categories)) {
+                                    $res[$k] += ['services' => []];
+                                    foreach ($categories as $offer_id => $cat) {
+                                        if ($res[$k]['id'] == $offer_id) {
+                                            $res[$k]['services'] = $cat;
+                                        }
+                                    }
+                                }
+                                if (!empty($offer_images)) {
+                                    $res[$k] += ['thumbnails' => []];
+                                    foreach ($offer_images as $j => $img) {
+                                        if ($res[$k]['id'] == $img->offer_id) {
+                                            //$res[$k]['thumbnails'] = base64_encode($img->thumb);
+                                            $res[$k]['thumbnails'] = $img->thumb;
+                                        }
+                                    }
+                                }
+                            }
+
+                            $latte = $this->template->getLatte();
+                            $params = [
+                                'offers' => $res,
+                                'user' => $this->user,
+                                'baseUrl' => $this->template->baseUrl,
+                            ];
+                            $template = APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR . 'chat_new.latte';
+                            $output = $latte->renderToString($template, $params);
+
+                        } else {
+                            $output = false;
+                        }
+                    } else {
+                        $output = false;
+                    }
+                }
+
                 $this->sendJson($output);
             } else {
                 $this->sendJson(false);
@@ -76,11 +176,8 @@ class ChatPresenter extends \Nette\Application\UI\Presenter
 
         if (!empty($d->offer_id)) {
             $message = $this->chatFacade->getByOffer(data: $d);
-        } else {
-            $message = $this->chatFacade->getByClient(data: $d);
+            $res_mark_read = $this->markRead($message);
         }
-
-        $res_mark_read = $this->markRead($message);
 
         return $message;
     }

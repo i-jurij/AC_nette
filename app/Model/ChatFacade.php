@@ -74,9 +74,18 @@ class ChatFacade
         return $message;
     }
 
-    public function getByClient(ArrayHash $data): array
+    public function getByClient(int $client_id_to_whom): array
     {
-        return [];
+        $sql = 'SELECT `chat`.`id`,
+                        `chat`.`offer_id`,
+                        `chat`.`client_id_who`
+                FROM `chat`
+                WHERE 
+                    `chat`.`client_id_to_whom` = ?
+                    AND `chat`.`moderated` = true
+                    AND `chat`.`read` = false';
+
+        return $this->db->query($sql, $client_id_to_whom)->fetchAll();
     }
 
     public function markRead(array $ids): int|null

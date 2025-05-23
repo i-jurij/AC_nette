@@ -230,7 +230,8 @@
                     {elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
                     {var $short = 'Предлагаю работу'}
                     Предлагаю работу
-                    {/if}</dt>
+                    {/if}
+                </dt>
                 <dd n:if="!empty($offers[0]['services']) && is_array($offers[0]['services'])" class="ml0">
                     {foreach $offers[0]['services'] as $ca}
                     {if $iterator->first}
