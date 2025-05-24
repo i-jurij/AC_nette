@@ -25,7 +25,7 @@ trait RequireLoggedUser
                 $this->flashMessage('You have been signed out due to inactivity. Please sign in again.');
                 $this->redirect(':Admin:Sign:in', ['backlink' => $this->storeRequest()]);
             } else {
-                $this->redirect('Sign:in');
+                $this->redirect(':Admin:Sign:in');
             }
         };
     }
