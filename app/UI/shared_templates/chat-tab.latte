@@ -41,7 +41,7 @@
                 <textarea name="message" id="chat_message_{$client_id}" placeholder="Напишите новое сообщение здесь"
                     class="flex-auto mb0 mr1"></textarea>
                 <button type="submit" title="Отправить" class="button h2"
-                    onclick="Chat.createMessage({$client_id})">&#128232;</button>
+                    onclick="Chat.createMessage({$client_id}, {$mes['message'][0]['offer_id']})">&#128232;</button>
             </div>
         </div>
     </div>

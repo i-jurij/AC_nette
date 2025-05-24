@@ -7,10 +7,11 @@
             <label for="chatNewMessageClient" class="close">&times;</label>
         </header>
         <section class="content">
-            <div class="mb1 p1 bg-black rounded" n:foreach="$offers as $offer">
+            <div class="mb1 p1 bg-black rounded" n:foreach="$offers as $offer" id="offer_{$offer['id']}_new_chat">
                 <div class="inline-block">
                     <div class="flex items-center">
-                        <button title="Чат" class="m1" onclick="Chat.getMessage({$user->getId()}, {$offer['id']})">
+                        <button title="Чат" class="m1"
+                            onclick="Chat.getMessage({$user->getId()}, {$offer['id']}, {$offer['newChatNumber']});">
                             +{$offer['newChatNumber']}
                         </button>
                         <div class="flex-none">

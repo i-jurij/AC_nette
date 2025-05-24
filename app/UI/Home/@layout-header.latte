@@ -54,20 +54,17 @@
 				element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 			}
 		},
-		resetCountChatOffer: function(){
+		resetCountChatOffer: function(newChatNumber){
 			let cs = document.querySelector('#countChatMessagesClientOffer');
 			let cA = document.querySelector('#countChatMessagesClient');
 			let cOC = 0;
-			if (cs) {
-				cs.innerText = '0';
-				cOC = parseInt(cs.dataset.count);
-			}
-			if (cA) {
-				cAC = parseInt(cA.dataset.count) - cOC;
+			if (cs) cs.innerText = '0';
+			if (cA && newChatNumber) {
+				cAC = cA.dataset.count - newChatNumber;
 				cA.innerText = cAC;
 			}
 		},
-		firstGetChat: function (client_id_who, offer_id) {
+		firstGetChat: function (client_id_who, offer_id, newChatNumber) {
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 			formData.set('firstGetChat', 'true');
@@ -88,7 +85,7 @@
 					document.body.insertAdjacentHTML('beforeend', json);
 					document.querySelector('#chat_modal_window').checked = true;
 
-					Chat.resetCountChatOffer();
+					Chat.resetCountChatOffer(newChatNumber);
 				}
 			})
 			.catch(error => console.error('Error:', error));
@@ -114,12 +111,12 @@
 					if (json && typeof json == "object") {
 						let cA = document.querySelector('#countChatMessagesClient');
 						if (cA && json.allNoRead && typeof json.allNoRead == "number") {
-							cA.count = `${json.allNoRead}`;
+							cA.dataset.count = `${json.allNoRead}`;
 							cA.innerText = `${json.allNoRead}`;
 						}
 						let cAO = document.querySelector('#countChatMessagesClientOffer');
 						if (cAO && json.offerNoRead && typeof json.offerNoRead == "number") {
-							cAO.count = `${json.offerNoRead}`;
+							cAO.dataset.count = `${json.offerNoRead}`;
 							cAO.innerText = `${json.offerNoRead}`;
 						}
 						let mw = document.querySelector('#chat_modal_window');
@@ -132,7 +129,7 @@
 			}
 		,1000*60*10),
 		
-		updateChat: function(client_id_who, offer_id){
+		updateChat: function(client_id_who, offer_id, newChatNumber){
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 			formData.set('update_chat', 'true');
@@ -168,20 +165,23 @@
 						});
 						document.querySelector('#chat_message_wrapper_'+key).insertAdjacentHTML('beforebegin', html);
 					}
-					Chat.resetCountChatOffer();
+					Chat.resetCountChatOffer(newChatNumber);
 				}
 			})
 			.catch(error => console.error('Error:', error));
 		},
-		getMessage: async function(client_id_who, offer_id){	
+		getMessage: async function(client_id_who, offer_id, newChatNumber){	
 			if (Chat.countUp === 0) {
-				Chat.firstGetChat(client_id_who, offer_id);
+				Chat.firstGetChat(client_id_who, offer_id, newChatNumber);
 			} else {
-				Chat.updateChat(client_id_who, offer_id);
+				Chat.updateChat(client_id_who, offer_id, newChatNumber);
 			}
 			Chat.countUp++;
+
+			let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
+			if (ci) ci.checked = false;
 		},
-		createMessage: function(client_id_to_whom){
+		createMessage: function(client_id_to_whom, offer_id = null){
 			let chat_message = document.querySelector('#chat_message_'+client_id_to_whom);
 			if (chat_message) {
 				let mes = chat_message.value;
@@ -191,7 +191,11 @@
 					formData.set('createMessage_chat', 'true');
 					formData.set('client_id_who', {{$user->getId()}});
 					formData.set('client_id_to_whom', client_id_to_whom);
-					formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
+					if (offer_id) {
+						formData.set('offer_id', offer_id);
+					} else {
+						formData.set('offer_id', {{(!empty($offers[0]['id'])) ? $offers[0]['id'] : null}});
+					}
 					formData.set('message', mes);
 					
 					fetch(url_chat, {
@@ -221,49 +225,26 @@
 				}
 			}
 		},
-		getOffersWithNewMessage: function () {
-			let numberNoReadChatSpan = document.querySelector('#countChatMessagesClient');
-			if (numberNoReadChatSpan) {
-				nnrc = numberNoReadChatSpan.dataset.count;
-			}
-
-			if (nnrc) {
-				if (window.numberNoReadChat) {
-					if (window.numberNoReadChat == nnrc) {
-						let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
-						if (ci)	ci.checked = true;
-					} else {
-						window.numberNoReadChat = nnrc;
-						Chat.fetchNewChat();
-					}
-				} else {
-					window.numberNoReadChat = nnrc;
-					Chat.fetchNewChat();
-				}
-			}
-		},
-		fetchNewChat: function(){
+		getOffersWithNewMessage: function(){
 			let formData = new FormData();
 			formData.set({{\Ijurij\Geolocation\Lib\Csrf::$token_name}}, {{\Ijurij\Geolocation\Lib\Csrf::getToken()}});
 			formData.set('getOffersWithNewMessage', 'true');
 			formData.set('client_id_to_whom', {{$user->getId()}});
 			
 			fetch(url_chat, {
-			responseType: 'json',
-			method: 'POST',
-			credentials: 'same-origin',
-			headers: {'X-Requested-With': 'XMLHttpRequest'},
-			body: formData
+				responseType: 'json',
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {'X-Requested-With': 'XMLHttpRequest'},
+				body: formData
 			})
 			.then(response => response.json())
 			.then(json => {
-			if (json && typeof json == "string") {
-			document.body.insertAdjacentHTML('beforeend', json);
-			let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
-			if (ci) {
-			ci.checked = true;
-			}
-			}
+				if (json && typeof json == "string") {
+					document.body.insertAdjacentHTML('beforeend', json);
+					let ci = document.querySelector('input[type="checkbox"]#chatNewMessageClient');
+					if (ci) ci.checked = true;
+				}
 			})
 			.catch(error => console.error('Error:', error));
 		}
