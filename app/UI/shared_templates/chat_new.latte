@@ -10,10 +10,15 @@
             <div class="mb1 p1 bg-black rounded" n:foreach="$offers as $offer" id="offer_{$offer['id']}_new_chat">
                 <div class="inline-block">
                     <div class="flex items-center">
+                        {* IF USE THEN IT NEED REWRITE SCRIPT IN Home/@layout-header.latte
                         <button title="Чат" class="m1"
                             onclick="Chat.getMessage({$user->getId()}, {$offer['id']}, {$offer['newChatNumber']});">
                             +{$offer['newChatNumber']}
                         </button>
+                        *}
+                        <a n:href=":Home:Offer:default $offer['id']" class="py1 px2 m1 bgcolor rounded">
+                            +{$offer['newChatNumber']}
+                        </a>
                         <div class="flex-none">
                             {if !empty($offer['thumbnails'])}
                             <img src="data:image/png;base64, {base64_encode($offer['thumbnails'])}" alt="Фото"
