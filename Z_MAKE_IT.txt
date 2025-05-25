@@ -1,14 +1,19 @@
 MAKE  
 
 ADMIN 
-admin clients customers executors, offers punkt "by location" make
+offers:
+search by, sort by
+image deleting
+editing
+
+comment editing
+
+grievance - open offer, comment and editing, remove
+
+authorize logging and users actions logging
 
 remove client (and him comments) from db if he dont have orders in 3 month eg
 remove from db orders from customers if it is 3 month old eg
-
-grievance - watch end offer, comment editing
-
-authorize logging and users actions logging
 
 -----------------------------------------------
 сделать среди объявлений вставку рекламы?

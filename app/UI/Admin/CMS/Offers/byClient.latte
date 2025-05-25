@@ -5,7 +5,81 @@
 {var $keywords = "Admin, SimpleCMS, Offers by client"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
-{block content}	
+{block content}
 <div class="container">
     <h2 class="text-center">Offers by client</h2>
 </div>
+<div class="flexx one two-500 three-900 four-1200 five-1500 six-2000 center">
+    {foreach $offers as $offer}
+    <div class="flex flex-column">
+        <article class="card round flex flex-column flex-auto">
+            {* <a n:href=":Home:offer $offer['id']" class=""> *}
+                <a n:href=":Home:Offer:default $offer['id']" class="">
+                    {if !empty($offer['thumbnails'])}
+                    <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
+                        alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="100%" height="auto" />
+                    {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
+                    {else}
+                    <img src='{$baseUrl}/images/ddd.jpg' alt="Default offers picture" loading="lazy" width="100%"
+                        height="auto" />
+                    {/if}
+                </a>
+                <section class="flex-auto">
+                    <a n:href=":Home:Offer:default $offer['id']" class="">
+                        <p class="bold">
+                            {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                            Ищу работу
+                            {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                            Предлагаю работу
+                            {/if}
+                        </p>
+                        <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                            {foreach $offer['services'] as $ca}
+                            {if $iterator->first}
+                            {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                            {else}
+                            {$ca['category_name']}:
+                            {/if}
+                            {foreach $ca['services'] as $se}
+                            {$se['name']}
+                            {if !$iterator->last}, {/if}
+                            {/foreach}
+                            {if !$iterator->last}и {/if}
+                            {/foreach}
+                        </p>
+                        <p> ⚲ {$offer['city_name']}</p>
+                        {* <p> Region: {$offer['region_name']}</p> *}
+                        <p>{number_format($offer['price'], 0, ",", " ")} руб.</p>
+                        {* <p> Message: {$offer['message']}</p> *}
+                        {* <p> Updated_at: {$offer['updated_at']}</p> *}
+                        {* <p> End_time: {$offer['end_time']}</p> *}
+                        <input type="hidden" name="offer_id" value="{$offer['id']}">
+                    </a>
+                </section>
+                <footer class="clearfix border-top">
+                    {var $par = ['o' => $offer['id'], 'c' => $offer['client_id']]}
+                    <a n:href=":Home:Client:Offer:edit, ...$par" class="button tooltip-right left"
+                        data-tooltip="Редактировать">✎</a>
+                    <a n:href="remove!, ...$par" class="button tooltip-left right" data-tooltip="Удалить">✖</a>
+                </footer>
+        </article>
+    </div>
+    {/foreach}
+</div>
+
+
+<!-- Paginator -->
+<div class="pagination center">
+    {if !$paginator->isFirst()}
+    <a class="pseudo button" n:href="default, 1">1</a>
+    <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
+    {/if}
+
+    &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
+
+    {if !$paginator->isLast()}
+    <a class="pseudo button" n:href="default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
+    <a class="pseudo button" n:href="default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
+    {/if}
+</div>
+{/block}

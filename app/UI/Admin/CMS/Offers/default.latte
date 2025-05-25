@@ -5,7 +5,75 @@
 {var $keywords = "Admin, SimpleCMS, Offers"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
-{block content}	
-<div class="container">
-    <h2 class="text-center">Offers</h2>
+{block content}
+<h2 class="text-center">{$title}</h2>
+<button class="btn btn-primary">Search by</button>
+<button class="btn btn-primary">Sort by</button>
+<h6 class="text-muted text-center pb-2">List of offer (total count: {$offersCount})</h6>
+
+<div class="table-responsive">
+    <table class="table">
+        <tbody n:inner-foreach="$offers as $offer">
+            <tr>
+                <td>
+                    {if !empty($offer['thumbnails'])}
+                    <a class="" n:href=":Admin:CMS:Offers:imageEdit, $offer['id']" title="Click to edit">
+                        <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
+                            alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="64px" height="auto" />
+                    </a>
+                    {else}
+                    <img src="{$baseUrl}/images/ddd.jpg" alt="Default offers picture" loading="lazy" width="64px"
+                        height="auto" />
+                    {/if}
+                </td>
+                <td>
+                    {$offer['offers_type']}:
+                    <br>
+                    {foreach $offer['services'] as $ca}
+                    {if $iterator->first}
+                    {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                    {else}
+                    {$ca['category_name']}:
+                    {/if}
+                    {foreach $ca['services'] as $se}
+                    {$se['name']}
+                    {if !$iterator->last}, {/if}
+                    {/foreach}
+                    {if !$iterator->last}и {/if}
+                    {/foreach}
+                </td>
+                <td>
+                    ⚲ {$offer['city_name']}, {$offer['region_name']}
+                </td>
+                <td>
+                    <span class="text-nowrap">{number_format($offer['price'], 0, ",", " ")}</span> руб.
+                </td>
+                <td>
+                    {\mb_strimwidth($offer['message'], 0, 100, "...")}
+                </td>
+                <td>
+                    {$offer['updated_at']}
+                </td>
+                <td>
+                    <a n:href=":Admin:CMS:Offers:edit, $offer['id']" class="btn btn-primary m-2">Edit</a>
+                    <a n:href=":Admin:CMS:Offers:delete, $offer['id']" class="btn btn-primary m-2">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Paginator -->
+<div n:if="isset($paginator)" class="">
+    {if !$paginator->isFirst()}
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, 1">1</a>
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
+    {/if}
+
+    &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
+
+    {if !$paginator->isLast()}
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
+    <a class="btn btn-primary"
+        n:href=":Admin:CMS:Offers:default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
+    {/if}
 </div>

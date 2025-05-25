@@ -71,28 +71,22 @@
                         </button>
 
 
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
-                                    n:if="$user->isAllowed('Offers', 'byClient')"
-                                >
-                                    Offers
-                                <span class="badge bg-secondary rounded-circle">
-                                    {$offers_count_by_client[$row->id]}
-                                </span>
-                            </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
-                                    n:if="$user->isAllowed('Comments', 'byClient')"
-                                >
-                                    Comments
-                                <span class="badge bg-secondary rounded-circle">
-                                    {$comments_count_by_client[$row->id]}
-                                </span>
-                            </button>
+                        <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                            formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                            n:if="$user->isAllowed('Offers', 'byClient')">
+                            Offers
+                            <span class="badge bg-secondary rounded-circle">
+                                {$offers_count_by_client[$row->id]}
+                            </span>
+                        </button>
+                        <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                            formaction="{link :Admin:CMS:Comments:byClient $row->id}"
+                            n:if="$user->isAllowed('Comments', 'byClient')">
+                            Comments
+                            <span class="badge bg-secondary rounded-circle">
+                                {$comments_count_by_client[$row->id]}
+                            </span>
+                        </button>
 
                     </div>
                     <!-- Modal -->
@@ -167,24 +161,18 @@
                                 Delete
                             </button>
 
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
-                                    n:if="$user->isAllowed('Offers', 'byClient')"
-                                >
-                                    Offers
+                            <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                                formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                                n:if="$user->isAllowed('Offers', 'byClient')">
+                                Offers
                                 <span class="badge bg-secondary rounded-circle">
                                     {$offers_count_by_client[$row->id]}
                                 </span>
                             </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
-                                    n:if="$user->isAllowed('Comments', 'byClient')"
-                                >
-                                    Comments
+                            <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                                formaction="{link :Admin:CMS:Comments:byClient $row->id}"
+                                n:if="$user->isAllowed('Comments', 'byClient')">
+                                Comments
                                 <span class="badge bg-secondary rounded-circle">
                                     {$comments_count_by_client[$row->id]}
                                 </span>
