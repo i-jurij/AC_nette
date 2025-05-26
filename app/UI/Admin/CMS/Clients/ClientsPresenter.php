@@ -115,6 +115,10 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         if (($this->getUser()->getId() === $id) || $this->getUser()->isAllowed('Clients', 'update')) {
             $this->template->client_data = $this->clientfacade->getClientData($id);
             $this->template->client_roles = $this->clientfacade->roleWithClientId($id);
+
+            $this->template->offers_count = count($this->clientfacade->db->table('offer')->where('client_id', $id)->fetchAll());
+            $this->template->comments_count = count($this->clientfacade->db->table('comment')->where('client_id', $id)->fetchAll());
+            $this->template->grievance_count = count($this->clientfacade->db->table('grievance')->where('client_id_who', $id)->fetchAll());
         } else {
             $this->flashMessage('You don\'t have permission for this', 'text-warning');
             $this->redirect(':Admin:');
@@ -163,7 +167,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
             $this->flashMessage($th);
         }
         // $this->redirect(':Admin:Users:');
-        $this->redirect(':Admin:CMS:Clients:list');
+        $this->redirect(':Admin:CMS:Clients:default');
     }
 
     public function createComponentClientSearchForm(): Form

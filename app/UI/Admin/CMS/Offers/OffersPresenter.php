@@ -37,7 +37,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     }
     public function renderDefault(int $page = 1)
     {
-        if (!$this->getUser()->isAllowed('Orders', '')) {
+        if (!$this->getUser()->isAllowed('Offers', '')) {
             $this->error('Forbidden', 403);
         }
         $this->setOfferPaginator($page);
@@ -60,7 +60,31 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function renderByClient(int $id): void
     {
+        $formdata = new stdClass();
+        $formdata->client_id = $this->getUser()->getId();
 
+        $this->template->offers = $this->of->getOffers(form_data: $formdata);
+    }
+
+    public function handleRemove(int $id)
+    {
+        if (!$this->getUser()->isAllowed('Offers', 'remove')) {
+            $this->error('Forbidden', 403);
+        }
+
+        if ($this->of->remove($id) > 0) {
+            $this->flashMessage('Объявление удалено из базы данных', 'success');
+        }
+
+        $images = Finder::findFiles([(string) $id . '_*.jpg', (string) $id . '_*.jpeg', (string) $id . '_*.png', (string) $id . '_*.webp'])
+            ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers");
+        foreach ($images as $name => $file) {
+            FileSystem::delete($name);
+        }
+        $this->flashMessage('Фото для объявления удалены', 'success');
+
+
+        $this->redirect('this');
     }
 
     #[Requires(sameOrigin: true)]
@@ -76,7 +100,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     }
 
     #[Requires(sameOrigin: true)]
-    public function renderDelete(int $id): void
+    public function actionDelete(int $id): void
     {
         $res = $this->of->remove($id);
         if ($res > 0) {

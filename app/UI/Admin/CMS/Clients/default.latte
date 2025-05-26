@@ -65,7 +65,7 @@
                     <div n:if="in_array('admin', $user->getRoles())" class="border-top pt-2">
                         <button class="btn btn-outline-primary m-1" form="postUsersForm"
                             formaction="{link edit $row['id']}">Edit</button>
-                        <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal"
+                        <button type="button" class="btn btn-outline-danger m-1" data-bs-toggle="modal"
                             data-bs-target="#sm{$row->username}{$row->id}">
                             Delete
                         </button>
@@ -111,7 +111,7 @@
                                     </p>
                                 </div>
                                 <div class="modal-footer btn-toolbar justify-content-between">
-                                    <button class="btn btn-outline-primary d-block m-2" form="postUsersForm"
+                                    <button class="btn btn-outline-danger d-block m-2" form="postUsersForm"
                                         formaction="{link delete $row['id']}">Delete</button>
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Close</button>
@@ -156,7 +156,7 @@
                         <td n:if="in_array('admin', $user->getRoles())">
                             <button class="btn btn-outline-primary m-1" form="postUsersForm"
                                 formaction="{link edit $row['id']}">Edit</button>
-                            <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-outline-danger m-1" data-bs-toggle="modal"
                                 data-bs-target="#{$row->username}{$row->id}">
                                 Delete
                             </button>
@@ -200,7 +200,7 @@
                                             </p>
                                         </div>
                                         <div class="modal-footer btn-toolbar justify-content-between">
-                                            <button class="btn btn-outline-primary d-block m-2" form="postUsersForm"
+                                            <button class="btn btn-outline-danger d-block m-2" form="postUsersForm"
                                                 formaction="{link delete $row['id']}">Delete</button>
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Close</button>

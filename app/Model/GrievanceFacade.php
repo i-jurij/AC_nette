@@ -21,6 +21,10 @@ class GrievanceFacade
         $this->gr = $this->db->table('grievance');
     }
 
+    public function getNotResolve()
+    {
+        return $this->gr->where('resolve', false)->fetchAll();
+    }
     public function create(array $data): int
     {
         $row = $this->gr->insert($data);

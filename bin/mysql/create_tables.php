@@ -180,6 +180,7 @@ $grievance = 'CREATE TABLE IF NOT EXISTS `grievance` (
 	`client_id_who` INTEGER UNSIGNED NOT NULL,
 	`message` varchar(500) NOT NULL,
 	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`resolve` TINYINT(1) DEFAULT 0,
 	`resolve_time` TIMESTAMP
 	) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 

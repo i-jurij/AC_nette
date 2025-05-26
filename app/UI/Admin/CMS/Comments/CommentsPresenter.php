@@ -18,4 +18,15 @@ final class CommentsPresenter extends \App\UI\Admin\BasePresenter
     {
 
     }
+
+    #[Requires(sameOrigin: true)]
+    public function renderEdit(int $id): void
+    {
+
+    }
+    #[Requires(sameOrigin: true)]
+    public function actionDelete(int $id): void
+    {
+
+    }
 }
