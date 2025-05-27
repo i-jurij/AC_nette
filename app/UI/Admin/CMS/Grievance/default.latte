@@ -7,13 +7,12 @@
 
 {block content}
 <div class="container">
-    <h2 class="text-center">Grievance</h2>
+    <h2 class="text-center">Not resolved grievance</h2>
 
     <a n:href=":Admin:CMS:Grievance:resolved" class="btn btn-secondary">Open resolved</a>
 
     <div class="table-responsive mt-4">
         <table class="table table-striped caption-top">
-            <caption>Not resolved grievance</caption>
             <thead>
                 <th>Id</th>
                 <th>Offer</th>
@@ -21,6 +20,7 @@
                 <th>Who wrote grievance</th>
                 <th>Message</th>
                 <th>Created_at</th>
+                <th>Mark as</th>
             </thead>
             <tbody n:inner-foreach="$grievance_not_resolve as $gr">
                 <tr>
@@ -43,14 +43,9 @@
                     <td>
                         {$gr->created_at}
                     </td>
-                    {*
                     <td>
-                        {$gr->resolve}
+                        <a n:href="markResolved! $gr->id" class="btn btn-secondary">Resolved</a>
                     </td>
-                    <td>
-                        {$gr->resolve_time}
-                    </td>
-                    *}
                 </tr>
             </tbody>
         </table>

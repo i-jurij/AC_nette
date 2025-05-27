@@ -8,4 +8,46 @@
 {block content}
 <div class="container">
     <h2 class="text-center">Resolved grievance</h2>
+
+    <a n:href="removeOld!" class="btn btn-secondary">Remove the grievance over a year old</a>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-striped caption-top">
+            <thead>
+                <th>Id</th>
+                <th>Offer</th>
+                <th>Comment</th>
+                <th>Who wrote grievance</th>
+                <th>Message</th>
+                <th>Created_at</th>
+                <th>Resolve time</th>
+            </thead>
+            <tbody n:inner-foreach="$grievance as $gr">
+                <tr>
+                    <td>
+                        {$gr->id}
+                    </td>
+                    <td>
+                        <a n:href=":Admin:CMS:Offers:edit $gr->offer_id" class="btn btn-secondary">Offer</a>
+                    </td>
+                    <td>
+                        <a n:if="!empty($gr->comment_id)" n:href=":Admin:CMS:Comments:edit $gr->comment_id"
+                            class="btn btn-secondary">Comment</a>
+                    </td>
+                    <td>
+                        <a n:href=":Admin:CMS:Clients:edit $gr->client_id_who" class="btn btn-secondary">Client</a>
+                    </td>
+                    <td>
+                        {$gr->message}
+                    </td>
+                    <td>
+                        {$gr->created_at}
+                    </td>
+                    <td>
+                        {$gr->resolve_time}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

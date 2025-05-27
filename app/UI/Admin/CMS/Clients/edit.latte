@@ -21,7 +21,8 @@
                     {$comments_count}
                 </span>
             </a>
-            <a n:href=":Admin:CMS:Grievance:byClient $client_data->id" class="btn btn-secondary">
+            <a n:href=":Admin:CMS:Grievance:byClient $client_data->id, $client_data->username"
+                class="btn btn-secondary">
                 Grievance
                 <span class="badge bg-secondary rounded-circle">
                     {$grievance_count}
