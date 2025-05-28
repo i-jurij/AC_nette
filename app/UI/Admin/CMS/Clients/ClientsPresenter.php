@@ -92,6 +92,14 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         $form->addEmail('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:');
 
+        /*
+        $form->addInteger('rating', 'Rating:')
+            ->setHtmlAttribute('step', 1)
+            ->setHtmlAttribute('min', 0)
+            ->setHtmlAttribute('max', 5)
+            ->addRule($form::Range, 'The rating must be between %d and %d.', [0, 5]);
+        */
+
         $roles = $this->clientfacade->db
             ->table('role')
             ->where('role_name', ['banned', 'client', 'executor', 'customer']);
@@ -189,6 +197,13 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         $form->addText('email', 'Email:')
             ->setHtmlAttribute('placeholder', 'Email:')
             ->setMaxLength(125);
+
+        $form->addInteger('rating', 'Rating:')
+            ->setHtmlAttribute('step', 1)
+            ->setHtmlAttribute('min', 0)
+            ->setHtmlAttribute('max', 5)
+            ->addRule($form::Range, 'The rating must be between %d and %d.', [0, 5]);
+
         $roles = $this->clientfacade->db->table('role')
             ->where('role_name', ['banned', 'client', 'executor', 'customer']);
         foreach ($roles as $role) {

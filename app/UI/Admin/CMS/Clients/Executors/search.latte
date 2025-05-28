@@ -16,227 +16,191 @@ sss
         Fill in only the required fields.
     </p>
 
-    <form 
-        n:if="$user->isAllowed('Executors', 'search')" 
-        n:name="executorSearchForm" 
-        class="mx-auto"
-    >
+    <form n:if="$user->isAllowed('Executors', 'search')" n:name="executorSearchForm" class="mx-auto">
         <ul class="error text-warning fst-italic" n:ifcontent>
             <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
         </ul>
         <div class="border-top pt-2 row">
             <div class="mb-4 col-sm-auto">
-                <label 
-                    n:name="username" 
-                    class="form-label border rounded p-2 w-100"
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#username_input_user_search" 
-                    role="button"
-                    aria-expanded="false" 
+                <label n:name="username" class="form-label border rounded p-2 w-100" data-bs-toggle="collapse"
+                    data-bs-target="#username_input_user_search" role="button" aria-expanded="false"
                     aria-controls="username_input_user_search">
-                    Username: 
+                    Username:
                 </label>
-                <input  n:name="username" size=20 
-                        class="form-control collapse" 
-                        id="username_input_user_search"
-                        minlength="3" 
-                        maxlength="25"
-                >
+                <input n:name="username" size=20 class="form-control collapse" id="username_input_user_search"
+                    minlength="3" maxlength="25">
                 <p class="error text-warning fst-italic" n:ifcontent>{inputError username}</p>
             </div>
 
             <div class="mb-4 col-sm-auto">
-                    <label 
-                        n:name="phone" 
-                        class="form-label border rounded p-2 w-100"
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#number" 
-                        role="button"
-                        aria-expanded="false" 
-                        aria-controls="number"
-                    >
-                        Phone:  
-                        <span class="text-muted">
-                            {ifset $user_data->phone}"{$user_data->phone}"{/ifset}
-                        </span>
-                    </label>
-                    <input  n:name="phone" 
-                            id="number" 
-                            class="form-control collapse"
-                            placeholder="eg 7 999 888 66 55"
-                    >
-                    <p class="error text-warning fst-italic" n:ifcontent>{inputError phone}</p>
+                <label n:name="phone" class="form-label border rounded p-2 w-100" data-bs-toggle="collapse"
+                    data-bs-target="#number" role="button" aria-expanded="false" aria-controls="number">
+                    Phone:
+                    <span class="text-muted">
+                        {ifset $user_data->phone}"{$user_data->phone}"{/ifset}
+                    </span>
+                </label>
+                <input n:name="phone" id="number" class="form-control collapse" placeholder="eg 7 999 888 66 55">
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError phone}</p>
+            </div>
+
+            <div class="mb-4 col-sm-auto">
+                <label n:name="email" class="form-label border rounded p-2 w-100" data-bs-toggle="collapse"
+                    data-bs-target="#email_user_edit" role="button" aria-expanded="false"
+                    aria-controls="email_user_edit">
+                    Email:
+                    <span class="text-muted">
+                        {ifset $user_data->email}"{$user_data->email}"{/ifset}
+                    </span>
+                </label>
+                <input n:name="email" id="email_user_edit" class="form-control collapse" placeholder="eg @example.com">
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError email}</p>
+            </div>
+
+            <div class="mb-4 col-sm-auto">
+                <label n:name="rating" class="form-label border rounded p-2 w-100" data-bs-toggle="collapse"
+                    data-bs-target="#rating_user_edit" role="button" aria-expanded="false"
+                    aria-controls="rating_user_edit">
+                    Rating:
+                    <span class="text-muted">
+                        {ifset $user_data->rating}{$user_data->rating}{/ifset}
+                    </span>
+                </label>
+                <input n:name="rating" id="rating_user_edit" class="form-control collapse" placeholder="0-5">
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError rating}</p>
+            </div>
+
+            <div class="mb-4 col-sm-auto">
+                <label class="form-label border rounded p-2 w-100" data-bs-toggle="collapse"
+                    data-bs-target="#roles_user_search" role="button" aria-expanded="false"
+                    aria-controls="roles_user_search">
+                    Roles:
+                </label>
+
+                <div class="mt-3 mb-2 p-2 border rounded collapse" id="roles_user_search">
+                    {foreach $form[roles]->items as $role_id => $role_name}
+                    <p class="m-3">
+                        <label n:name="roles" class="text-muted">
+                            <input type="checkbox" name="roles[]" n:attr="value: $role_id">
+                            {$role_name}
+                        </label>
+                    </p>
+                    {/foreach}
                 </div>
-
-                <div class="mb-4 col-sm-auto">
-                    <label 
-                        n:name="email" 
-                        class="form-label border rounded p-2 w-100"
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#email_user_edit" 
-                        role="button"
-                        aria-expanded="false" 
-                        aria-controls="email_user_edit"
-                    >
-                        Email:  
-                        <span class="text-muted">
-                            {ifset $user_data->email}"{$user_data->email}"{/ifset}
-                        </span>
-                    </label>
-                    <input  
-                        n:name="email" 
-                        id="email_user_edit"
-                        class="form-control collapse" 
-                        placeholder="eg @example.com"
-                    >
-                    <p class="error text-warning fst-italic" n:ifcontent>{inputError email}</p>
-                </div> 
-                
-                <div class="mb-4 col-sm-auto">
-                    <label 
-                        class="form-label border rounded p-2 w-100"
-                        data-bs-toggle="collapse" 
-                        data-bs-target="#roles_user_search" 
-                        role="button"
-                        aria-expanded="false" 
-                        aria-controls="roles_user_search"
-                    >
-                        Roles:
-                    </label>
-
-                    <div class="mt-3 mb-2 p-2 border rounded collapse" id="roles_user_search">
-                        {foreach $form[roles]->items as $role_id => $role_name}
-                            <p class="m-3">
-                                <label n:name="roles" class="text-muted" >
-                                    <input type="checkbox" 
-                                        name="roles[]"
-                                        n:attr="value: $role_id"
-                                    >
-                                    {$role_name}
-                                </label>
-                            </p>
-                        {/foreach}
-                    </div>
-                    <p class="error text-warning fst-italic" n:ifcontent>{inputError roles}</p>
-                </div>  
+                <p class="error text-warning fst-italic" n:ifcontent>{inputError roles}</p>
+            </div>
         </div>
-        
+
         <input type='submit' n:name="searchExecutor" class="btn btn-outline-primary w-50" />
     </form>
-</div> 
+</div>
 
 <!-- after form received -->
 {if ($user->isAllowed('Client', 'getAllClientsData') && !empty($show))}
-        <h2 class="text-center">Found Executors</h2>
-        <form method="post" id="postClientsSearchForm"></form>
-        <div class="container-fluid">
-            <div 
-                class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 g-lg-3"
-                n:inner-foreach="$show as $user_id => $row"
-            >
-            
-            {*if \in_array('customer', $row['roles'])*}
-                    <div class="card mx-auto">
-                        <div class="mx-auto p-1"  style="max-width: 250px;">
-                            {if !empty($row->image)}
-                                <img src="{$baseUrl}/{$row->image}" class="card-img-top " alt="Photo {$row['username']}">
-                            {else}
-                                <img src="{$baseUrl}/images/ddd.jpg" class="card-img-top" alt="Photo {$row['username']}">
-                            {/if}
-                        </div> 
-                        <div class="card-body">
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Name: </span>{$row['username']}
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Phone: </span>{$row['phone']}
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Phone verified: </span>{$row['phone_verified']}
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Email: </span>{$row['email']} 
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Email verified: </span>{$row['email_verified']} 
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Roles: </span>
-                                <span n:inner-foreach="$row['roles'] as $role">
-                                    {ifset $role->role_name}
-                                    {$role->role_name}{if !$iterator->last}, {/if}
-                                    {/ifset}
-                                </span>
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Created_at: </span>{$row['created_at']} 
-                            </p>
-                            <p class="border-top pt-2 mb-2">
-                                <span class="text-muted">Updated_at: </span>{$row['updated_at']} 
-                            </p>
+<h2 class="text-center">Found Executors</h2>
+<form method="post" id="postClientsSearchForm"></form>
+<div class="container-fluid">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2 g-lg-3"
+        n:inner-foreach="$show as $user_id => $row">
 
-                            <div class="border-top pt-2">
-                                                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
-                                    formaction="{link :Admin:CMS:Offers:byClient $user_id}"
-                                    n:if="$user->isAllowed('Offers', 'byClient')"
-                                >
-                                    Offers
-                                </button>
-                                <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postClientsSearchForm" 
-                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $user_id}"
-                                    n:if="$user->isAllowed('Comments', 'byClient')"
-                                >
-                                    Comments
-                                </button>
-                                <button 
-                                    class="btn btn-outline-primary" 
-                                    form="postClientsSearchForm" 
-                                    formaction="{link :Admin:CMS:Clients:edit $user_id}"
-                                    n:if="$user->isAllowed('Clients', 'update')"
-                                >
-                                    Edit
-                                </button>
-                                <button 
-                                    type="button" 
-                                    class="btn btn-outline-primary" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#smSearch{$row['username']}{$user_id}"
-                                    n:if="$user->isAllowed('Clients', 'deleteClientData')"
-                                >
+        {*if \in_array('customer', $row['roles'])*}
+        <div class="card mx-auto">
+            <div class="mx-auto p-1" style="max-width: 250px;">
+                {if !empty($row->image)}
+                <img src="{$baseUrl}/{$row->image}" class="card-img-top " alt="Photo {$row['username']}">
+                {else}
+                <img src="{$baseUrl}/images/ddd.jpg" class="card-img-top" alt="Photo {$row['username']}">
+                {/if}
+            </div>
+            <div class="card-body">
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Name: </span>{$row['username']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Phone: </span>{$row['phone']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Phone verified: </span>{$row['phone_verified']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Email: </span>{$row['email']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Email verified: </span>{$row['email_verified']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Rating: </span>{$row['rating']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Roles: </span>
+                    <span n:inner-foreach="$row['roles'] as $role">
+                        {ifset $role->role_name}
+                        {$role->role_name}{if !$iterator->last}, {/if}
+                        {/ifset}
+                    </span>
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Created_at: </span>{$row['created_at']}
+                </p>
+                <p class="border-top pt-2 mb-2">
+                    <span class="text-muted">Updated_at: </span>{$row['updated_at']}
+                </p>
+
+                <div class="border-top pt-2">
+                    <button class="btn btn-outline-primary m-1" form="postClientsSearchForm"
+                        formaction="{link :Admin:CMS:Offers:byClient $user_id}"
+                        n:if="$user->isAllowed('Offers', 'byClient')">
+                        Offers
+                    </button>
+                    <button class="btn btn-outline-primary m-1" form="postClientsSearchForm"
+                        formaction="{link :Admin:CMS:Comments:byClient $user_id}"
+                        n:if="$user->isAllowed('Comments', 'byClient')">
+                        Comments
+                    </button>
+                    <button class="btn btn-outline-primary" form="postClientsSearchForm"
+                        formaction="{link :Admin:CMS:Clients:edit $user_id}"
+                        n:if="$user->isAllowed('Clients', 'update')">
+                        Edit
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#smSearch{$row['username']}{$user_id}"
+                        n:if="$user->isAllowed('Clients', 'deleteClientData')">
+                        Delete
+                    </button>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="smSearch{$row['username']}{$user_id}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="smSearch{$row['username']}">Warning!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Do you really want to delete the user "{$row['username']}" with roles
+                                    <span n:inner-foreach="$row['roles'] as $role">
+                                        {ifset $role->role_name}
+                                        {$role->role_name}{if !$iterator->last}, {/if}
+                                        {/ifset}
+                                    </span>
+                                    ?
+                                </p>
+                            </div>
+                            <div class="modal-footer btn-toolbar justify-content-between">
+                                <button n:if="$user->isAllowed('Clients', 'deleteClientData')"
+                                    class="btn btn-outline-danger d-block m-2" form="postClientsSearchForm"
+                                    formaction="{link :Admin:CMS:Clients:delete $user_id}">
                                     Delete
                                 </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
-                                <!-- Modal -->
-                                <div class="modal fade" id="smSearch{$row['username']}{$user_id}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="smSearch{$row['username']}">Warning!</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Do you really want to delete the user "{$row['username']}" with roles 
-                                                <span n:inner-foreach="$row['roles'] as $role">
-                                                    {ifset $role->role_name}
-                                                    {$role->role_name}{if !$iterator->last}, {/if}
-                                                    {/ifset}
-                                                </span>
-                                            ?</p>
-                                        </div>
-                                        <div class="modal-footer btn-toolbar justify-content-between">
-                                            <button n:if="$user->isAllowed('Clients', 'deleteClientData')" class="btn btn-outline-primary d-block m-2" form="postClientsSearchForm" formaction="{link :Admin:CMS:Clients:delete $user_id}">Delete</button>
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
                         </div>
                     </div>
-                {*/if*}
+                </div>
             </div>
         </div>
-    {/if}
+        {*/if*}
+    </div>
+</div>
+{/if}

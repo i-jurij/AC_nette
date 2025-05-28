@@ -107,6 +107,21 @@
             <p class="error text-warning fst-italic" n:ifcontent>{inputError email}</p>
         </div>
 
+        {*
+        <div class="mb-4">
+            <label n:name="rating" class="form-label border rounded p-2" data-bs-toggle="collapse"
+                data-bs-target="#rating_client_edit" role="button" aria-expanded="false"
+                aria-controls="rating_client_edit">
+                Rating:
+                <span class="text-muted">
+                    {ifset $client_data->rating}"{$client_data->rating}"{/ifset}
+                </span>
+            </label>
+            <input n:name="rating" id="rating_client_edit" class="form-control collapse" placeholder="0, 1, 2, 3, 4, 5">
+            <p class="error text-warning fst-italic" n:ifcontent>{inputError rating}</p>
+        </div>
+        *}
+
         <div n:if="$user->isInRole('admin')" class="mb-4">
             <p class="text-warning"> Select ALL required roles!</p>
             <span class="border rounded p-2" data-bs-toggle="collapse" data-bs-target="#roles_user_edit" role="button"

@@ -25,19 +25,22 @@ class GrievanceFacade
 
     public function getNotResolve(): array
     {
-        return $this->gr->where('resolve', false)->fetchAll();
+        return $this->gr
+            ->where('resolve', false)
+            ->order('created_at ASC')
+            ->fetchAll();
     }
 
     public function getResolved(): array
     {
-        return $this->gr->where('resolve', true)->fetchAll();
+        return $this->gr->where('resolve', true)->order('created_at DESC')->fetchAll();
     }
 
     public function getByClient(int $id): array
     {
         return $this->gr
-            ->where('resolve', false)
             ->where('client_id_who', $id)
+            ->order('created_at DESC')
             ->fetchAll();
     }
 

@@ -49,6 +49,9 @@
                         <span class="text-muted">Email verified: </span>{$row->email_verified}
                     </p>
                     <p class="border-top pt-2 mb-2">
+                        <span class="text-muted">Rating: </span>{$row->rating}
+                    </p>
+                    <p class="border-top pt-2 mb-2">
                         <span class="text-muted">Roles: </span>
                         <span n:inner-foreach="$users_roles[$row->id] as $role">
                             <span n:class="$role === 'banned' ? 'text-danger'">{$role}{if !$iterator->last},
@@ -136,6 +139,7 @@
                         <th scope="col">Phone verify</th>
                         <th scope="col">Email</th>
                         <th scope="col">Email verify</th>
+                        <th scope="col">Rating</th>
                         <th scope="col">Role</th>
                         <th scope="col">CreatedAt</th>
                         <th scope="col">UpdatedAt</th>
@@ -213,6 +217,7 @@
                         <td>{$row['phone_verified']}</td>
                         <td>{$row['email']}</td>
                         <td>{$row['email_verified']}</td>
+                        <td>{$row->rating}</td>
                         <td>
                             <span n:inner-foreach="$users_roles[$row->id] as $role">
                                 <span n:class="$role === 'banned' ? 'text-danger'">{$role}{if !$iterator->last},

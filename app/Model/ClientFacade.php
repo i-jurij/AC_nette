@@ -18,8 +18,18 @@ use Nette\Utils\Validators;
  */
 class ClientFacade
 {
-    use \App\UI\Accessory\TableForUserFacade;
-
+    public const ColumnId = 'id';
+    public const ColumnName = 'username';
+    public const ColumnImage = 'image';
+    public const ColumnPasswordHash = 'password';
+    public const ColumnPhone = 'phone';
+    public const ColumnPhoneVerified = 'phone_verified';
+    public const ColumnEmail = 'email';
+    public const ColumnEmailVerified = 'email_verified';
+    public const ColumnAuthToken = 'auth_token';
+    public const ColumnRating = 'rating';
+    public const ColumnCreatedAt = 'created_at';
+    public const ColumnUpdatedAt = 'updated_at';
     public string $table;
     private string $table_role_user;
 
@@ -29,6 +39,14 @@ class ClientFacade
     ) {
         $this->table = 'client';
         $this->table_role_user = 'role_client';
+    }
+
+    public static function getColumns(): string
+    {
+        $ref = new \ReflectionClass(__CLASS__);
+        $column_array = $ref->getConstants();
+
+        return \implode(', ', $column_array);
     }
 
     #[Requires(methods: 'POST', sameOrigin: true)]
@@ -245,9 +263,10 @@ class ClientFacade
     protected function prepareSearch($data)
     {
         $data_array = [
-            self::ColumnName => $data->username ?? null,
+            self::ColumnName => !empty($data->username) ? strip_tags($data->username) : null,
             self::ColumnPhone => isset($data->phone) ? PhoneNumber::toDb($data->phone) : null,
-            self::ColumnEmail => $data->email ?? null,
+            self::ColumnEmail => !empty($data->email) ? strip_tags($data->email) : null,
+            self::ColumnRating => (int) $data->rating ?? null,
             'roles' => $data->roles ?? null,
         ];
 
@@ -275,6 +294,10 @@ class ClientFacade
                 $email = $pre_data[self::ColumnEmail];
                 $query = $query->where('email LIKE ?', "%$email%");
             }
+            if (!empty($pre_data[self::ColumnRating])) {
+                $rating = $pre_data[self::ColumnRating];
+                $query = $query->where('rating = ?', $rating);
+            }
 
             foreach ($query as $user) {
                 $users_data[$user->id] = [
@@ -283,6 +306,7 @@ class ClientFacade
                     'phone_verified' => $user->phone_verified,
                     'email' => $user->email,
                     'email_verified' => $user->email_verified,
+                    'rating' => $user->rating,
                     'created_at' => $user->created_at,
                     'updated_at' => $user->updated_at,
                 ];

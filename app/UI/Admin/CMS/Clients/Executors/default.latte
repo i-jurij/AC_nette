@@ -7,13 +7,13 @@
 {block content}
 <div class="container">
     <h2 class="text-center">Executors</h2>
-    
+
     {include menu from $shared_templates.'menu.latte', $currentPageMenu}
 
     {if $user->isAllowed('Executors', 'getAllClientsData')}
     <div class="container-fluid">
         <a n:if="$user->isAllowed('Executors','search')" class="btn btn-secondary"
-                n:href=":Admin:CMS:Clients:Executors:search">Search</a>
+            n:href=":Admin:CMS:Clients:Executors:search">Search</a>
         <form method="post" id="postUsersForm"></form>
 
         <h6 class="text-muted text-center pb-2">List of Executors (total count: {$count})</h6>
@@ -45,6 +45,9 @@
                         <span class="text-muted">Email verified: </span>{$row->email_verified}
                     </p>
                     <p class="border-top pt-2 mb-2">
+                        <span class="text-muted">Rating: </span>{$row->rating}
+                    </p>
+                    <p class="border-top pt-2 mb-2">
                         <span class="text-muted">Roles: </span>
                         <span n:inner-foreach="$users_roles[$row->id] as $role">
                             <span n:class="$role === 'banned' ? 'text-danger'">{$role}{if !$iterator->last},
@@ -65,28 +68,22 @@
                             data-bs-target="#sm{$row->username}{$row->id}">
                             Delete
                         </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
-                                    n:if="$user->isAllowed('Offers', 'byClient')"
-                                >
-                                    Offers
-                                <span class="badge bg-secondary">
-                                    {$offers_count_by_client[$row->id]}
-                                </span>
-                            </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
-                                    n:if="$user->isAllowed('Comments', 'byClient')"
-                                >
-                                    Comments
-                                <span class="badge bg-secondary">
-                                    {$comments_count_by_client[$row->id]}
-                                </span>
-                            </button>
+                        <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                            formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                            n:if="$user->isAllowed('Offers', 'byClient')">
+                            Offers
+                            <span class="badge bg-secondary">
+                                {$offers_count_by_client[$row->id]}
+                            </span>
+                        </button>
+                        <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                            formaction="{link :Admin:CMS:Comments:byClient $row->id}"
+                            n:if="$user->isAllowed('Comments', 'byClient')">
+                            Comments
+                            <span class="badge bg-secondary">
+                                {$comments_count_by_client[$row->id]}
+                            </span>
+                        </button>
                     </div>
                     <!-- Modal -->
                     <div class="modal fade" id="sm{$row->username}{$row->id}" tabindex="-1"
@@ -135,6 +132,7 @@
                         <th scope="col">Phone verify</th>
                         <th scope="col">Email</th>
                         <th scope="col">Email verify</th>
+                        <th scope="col">Rating</th>
                         <th scope="col">Role</th>
                         <th scope="col">CreatedAt</th>
                         <th scope="col">UpdatedAt</th>
@@ -159,24 +157,18 @@
                                 data-bs-target="#{$row->username}{$row->id}">
                                 Delete
                             </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:byClient $row->id}"
-                                    n:if="$user->isAllowed('Offers', 'byClient')"
-                                >
-                                    Offers
+                            <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                                formaction="{link :Admin:CMS:Offers:byClient $row->id}"
+                                n:if="$user->isAllowed('Offers', 'byClient')">
+                                Offers
                                 <span class="badge bg-secondary">
                                     {$offers_count_by_client[$row->id]}
                                 </span>
                             </button>
-                            <button 
-                                    class="btn btn-outline-primary m-1" 
-                                    form="postUsersForm" 
-                                    formaction="{link :Admin:CMS:Offers:Comments:byClient $row->id}"
-                                    n:if="$user->isAllowed('Comments', 'byClient')"
-                                >
-                                    Comments
+                            <button class="btn btn-outline-primary m-1" form="postUsersForm"
+                                formaction="{link :Admin:CMS:Comments:byClient $row->id}"
+                                n:if="$user->isAllowed('Comments', 'byClient')">
+                                Comments
                                 <span class="badge bg-secondary">
                                     {$comments_count_by_client[$row->id]}
                                 </span>
@@ -216,6 +208,7 @@
                         <td>{$row['phone_verified']}</td>
                         <td>{$row['email']}</td>
                         <td>{$row['email_verified']}</td>
+                        <td>{$row->rating}</td>
                         <td>
                             <span n:inner-foreach="$users_roles[$row->id] as $role">
                                 <span n:class="$role === 'banned' ? 'text-danger'">{$role}{if !$iterator->last},
