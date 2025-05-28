@@ -61,7 +61,8 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     public function renderByClient(int $id): void
     {
         $formdata = new stdClass();
-        $formdata->client_id = $this->getUser()->getId();
+        $formdata->client_id = $id;
+        $formdata->with_banned = true;
 
         $this->template->offers = $this->of->getOffers(form_data: $formdata);
     }

@@ -28,13 +28,20 @@ class OfferFacade
             $table = $reflection->getTable($this->table);
         }
         $this->allowed_columns = $table->columns;
+
         $this->sql_params = ['end_time > CURRENT_TIMESTAMP'];
+        $this->sql_params['nobanned'] = "{$this->table}.`client_id` NOT IN (SELECT `role_client`.`user_id` FROM `role_client` 
+                INNER JOIN `role` ON `role_client`.`role_id` = `role`.`id`
+                WHERE `role`.`role_name` = 'banned')";
         $this->limit_sql = '';
         $this->order_sql = 'ORDER BY end_time DESC';
     }
 
     private function setSqlParams(array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
     {
+        if (!empty($form_data->with_banned)) {
+            unset($this->sql_params['nobanned']);
+        }
         // offer id from request "Home:offer $offer_id" for page of offer by user case
         if (!empty($form_data->id) && is_int($form_data->id)) {
             $this->sql_params = ["`{$this->table}`.`id` = $form_data->id"];

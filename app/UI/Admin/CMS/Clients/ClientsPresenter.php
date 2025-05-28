@@ -139,7 +139,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
         if (($this->getUser()->getId() == $data->id) || $this->getUser()->isAllowed('Clients', 'update')) {
             // update profile throw clientfacade? and show profile again with updated data;
             try {
-                $id = $data->id;
+                $id = (int) $data->id;
                 unset($data->id);
                 $update = array_filter((array) $data);
                 if (!empty($update)) {
@@ -160,7 +160,7 @@ class ClientsPresenter extends \App\UI\Admin\BasePresenter
             $this->error('Forbidden', 403);
         }
 
-        $this->redirect(':Admin:');
+        $this->redirect(':Admin:CMS:Clients:default');
     }
 
     public function actionDelete(int $id): void
