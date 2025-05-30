@@ -89,27 +89,32 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     }
 
     #[Requires(sameOrigin: true)]
-    public function renderImageEdit(int $id): void
+    public function renderPictures($id): void
     {
+        $id = strip_tags($id);
+        $images = Finder::findFiles([(string) $id . '_*.jpg', (string) $id . '_*.jpeg', (string) $id . '_*.png', (string) $id . '_*.webp'])
+            ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers");
+        foreach ($images as $value) {
+            $this->template->pictures[] = $value->getBasename();
+        }
+    }
 
+    #[Requires(sameOrigin: true)]
+    public function handleRemovePicture(string $basename): void
+    {
+        try {
+            FileSystem::delete(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers" . DIRECTORY_SEPARATOR . $basename);
+            $this->flashMessage('Фото удалено', 'success');
+        } catch (\Nette\IOException $th) {
+            $this->flashMessage('Фото не удалено' . $th, 'error');
+        }
+
+        $this->redirect('this');
     }
 
     #[Requires(sameOrigin: true)]
     public function renderEdit(int $id): void
     {
 
-    }
-
-    #[Requires(sameOrigin: true)]
-    public function actionDelete(int $id): void
-    {
-        $res = $this->of->remove($id);
-        if ($res > 0) {
-            $this->flashMessage('Offer was removed', 'success');
-        } else {
-            $this->flashMessage('Offer was not removed', 'error');
-        }
-
-        $this->redirect('default');
     }
 }

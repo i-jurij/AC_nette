@@ -1,23 +1,18 @@
 MAKE  
-Home
-заблокировать вывод всех объявлений пользователя или его конкретных объявлений
-
 
 ADMIN 
 
 offers:
+image show and deleting
 search by, sort by
-image deleting
 editing
 
-comment editing
-
-grievance - open offer, comment and editing, remove
-
-authorize logging and users actions logging
+comment show, editing (deleting)
 
 remove client (and him comments) from db if he dont have orders in 3 month eg
 remove from db orders from customers if it is 3 month old eg
+
+authorize logging and users actions logging
 
 -----------------------------------------------
 сделать среди объявлений вставку рекламы?

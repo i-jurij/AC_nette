@@ -1,0 +1,25 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Offers pictures"}
+{var $description = "Admin Simple CMS Offers pictures"}
+{var $keywords = "Admin, SimpleCMS, Offers pictures"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Offers pictures</h2>
+    <div n:if="!empty($pictures)" n:inner-foreach="$pictures as $key => $image" class="d-flex flex-wrap">
+        <div class="w-50 p-2">
+            <img src="{$baseUrl . '/images/offers/' .$image}" class="img-thumbnail" alt="Image {$key}">
+            <div class="clearfix p-2">
+                <a n:href="removePicture! $image" class="btn btn-secondary float-start">Remove</a>
+            </div>
+        </div>
+        <div class="w-50 p-2">
+            <img src="{$baseUrl . '/images/offers/' .$image}" class="img-thumbnail" alt="Image {$key}">
+            <div class="clearfix p-2">
+                <a n:href="removePicture! $image" class="btn btn-secondary float-start">Remove</a>
+            </div>
+        </div>
+    </div>
+</div>

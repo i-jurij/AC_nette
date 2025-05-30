@@ -17,7 +17,7 @@
             <tr>
                 <td>
                     {if !empty($offer['thumbnails'])}
-                    <a class="" n:href=":Admin:CMS:Offers:imageEdit, $offer['id']" title="Click to edit">
+                    <a class="" n:href=":Admin:CMS:Offers:pictures, $offer['id']" title="Click to show and edit">
                         <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
                             alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="64px" height="auto" />
                     </a>
@@ -55,8 +55,8 @@
                     {$offer['updated_at']}
                 </td>
                 <td>
-                    <a n:href=":Admin:CMS:Offers:edit, $offer['id']" class="btn btn-primary m-2">Edit</a>
-                    <a n:href=":Admin:CMS:Offers:delete, $offer['id']" class="btn btn-primary m-2">Delete</a>
+                    {* <a n:href=":Admin:CMS:Offers:edit, $offer['id']" class="btn btn-primary m-2">Edit</a> *}
+                    <a n:href="remove!, $offer['id']" class="btn btn-primary m-2">Delete</a>
                 </td>
             </tr>
         </tbody>
