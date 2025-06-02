@@ -35,11 +35,50 @@ class CommentFacade
         return $this->db->table($this->table)->where('offer_id', $offer_id)->count();
     }
 
-    public function edit()
+    /**
+     * @param array $offers - array of active row with id field (after fetchAll() eg)
+     */
+    public function commentsCount(array $offers): array
     {
+        $offer_ids = array_column($offers, 'id');
+        $cc = $this->db->table('comment')
+            ->select('offer_id, COUNT(offer_id) AS count')
+            ->where('offer_id IN', $offer_ids)
+            ->group('offer_id');
+        foreach ($cc as $value) {
+            $res[$value->offer_id] = $value->count;
+        }
+        return $res ?? [];
     }
 
-    public function delete()
+    public function getByOffer(int $offer_id): \Nette\Database\Table\Selection
     {
+        $cc = $this->db->table('comment')
+            ->where('offer_id', $offer_id)
+            ->order('created_at ASC');
+        // ->fetchAll();
+        return $cc;
+    }
+
+    public function get(int $id)
+    {
+        return $this->db->table('comment')->get($id);
+    }
+
+    public function update(int $id, string $comment_text)
+    {
+        $c = $this->db->table('comment')->get($id);
+        return $c->update([
+            'comment_text' => $comment_text,
+        ]);
+    }
+
+
+    public function delete(int $id)
+    {
+        $res = $this->db->table('comment')
+            ->get($id)
+            ->delete();
+        return $res;
     }
 }

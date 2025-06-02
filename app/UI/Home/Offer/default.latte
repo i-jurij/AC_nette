@@ -450,7 +450,7 @@
     }
 
     function sort_comments( comments_array ) {
-        var map = {}, node, roots = [], i;
+        let map = {}, node, roots = [], i;
 
         for (i = 0; i < comments_array.length; i += 1) {
             map[comments_array[i].id] = i; 

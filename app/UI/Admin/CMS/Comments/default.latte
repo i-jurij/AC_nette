@@ -5,7 +5,49 @@
 {var $keywords = "Admin, SimpleCMS, Offers Comments"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
-{block content}	
+{block content}
 <div class="container">
     <h2 class="text-center">Offers Comments</h2>
+
+    {if !empty($comments)}
+    {define showComments, $comments, $n}
+    {var $mar = 0}
+    {if isset($comments[$n])}
+    <ul class="list-unstyled ps-2">
+        {foreach $comments[$n] as $comment}
+        <li class="card mb-2 p-2">
+            <div class="row g-0">
+                <div class="col-md-10">
+                    <div class="card-header">
+                        ***{\mb_substr($comment->client->username, 0, 4)}
+                        {* \Nette\Utils\DateTime::from($comment->created_at)->format('d.m.Y H:i:s') *}
+                        &nbsp;
+                        {IntlDateFormatter::formatObject($comment->created_at, IntlDateFormatter::MEDIUM, 'ru_RU')}
+                    </div>
+                    <p class="card-text">{$comment->comment_text}</p>
+                </div>
+                <div class="col-md-2 ps-2">
+                    <a n:href="edit $comment->id" class="btn btn-secondary mb-2">Edit</a>
+                    <a n:href="delete! $comment->id" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </li>
+        {include showComments, $comments, $comment->id}
+        {/foreach}
+    </ul>
+    {/if}
+    {/define}
+
+    <div id="commentParentDiv" class="bg-success py-2 pe-2 rounded">
+        {include showComments, $comments, 0}
+    </div>
 </div>
+{else}
+<p>
+    Объявление не выбрано.
+</p>
+<p>
+    <span class="pe-2">Выберите объявление здесь:</span>
+    <a n:href=":Admin:CMS:Offers:default" class="btn btn-secondary">Offers</a>
+</p>
+{/if}

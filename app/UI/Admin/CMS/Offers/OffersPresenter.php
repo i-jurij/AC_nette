@@ -7,6 +7,7 @@ namespace App\UI\Admin\CMS\Offers;
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
 use \App\Model\ChatFacade;
+use \App\Model\CommentFacade;
 use App\UI\Accessory\IsBot;
 use Nette\Application\UI\Form;
 use Nette\Utils\Paginator;
@@ -31,6 +32,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     public function __construct(
         protected OfferFacade $of,
         protected ServiceFacade $sf,
+        protected CommentFacade $comment,
         protected ChatFacade $chat
     ) {
         parent::__construct();
@@ -43,6 +45,8 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $this->setOfferPaginator($page);
         $this->template->service_list = $this->sf->getAllServices();
         $this->template->offers = $this->of->getOffers(limit: $this->template->paginator->getLength(), offset: $this->template->paginator->getOffset());
+
+        $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
     }
 
     protected function setOfferPaginator(int $page)
@@ -65,7 +69,23 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $formdata->with_banned = true;
 
         $this->template->offers = $this->of->getOffers(form_data: $formdata);
+        $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
     }
+
+    /*
+    private function commentsCount(array $offers)
+    {
+        $offer_ids = array_column($offers, 'id');
+        $cc = $this->of->db->query("SELECT offer_id, COUNT(offer_id) AS count 
+                                            FROM `comment`
+                                            WHERE offer_id IN ? 
+                                            GROUP BY offer_id", $offer_ids);
+        foreach ($cc as $value) {
+            $res[$value->offer_id] = $value->count;
+        }
+        return $res ?? [];
+    }
+    */
 
     public function handleRemove(int $id)
     {
@@ -113,8 +133,10 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     }
 
     #[Requires(sameOrigin: true)]
-    public function renderEdit(int $id): void
+    public function renderRequest($id): void
     {
-
+        $sql = "SELECT `request_data` FROM `offer` WHERE id=?";
+        $req = $this->of->db->query($sql, (int) $id)->fetchField();
+        $this->template->request = !empty($req) ? unserialize($req) : [];
     }
 }

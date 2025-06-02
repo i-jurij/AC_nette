@@ -2,12 +2,11 @@ MAKE
 
 ADMIN 
 
+comment show, editing (deleting)
+
 offers:
-image show and deleting
 search by, sort by
 editing
-
-comment show, editing (deleting)
 
 remove client (and him comments) from db if he dont have orders in 3 month eg
 remove from db orders from customers if it is 3 month old eg

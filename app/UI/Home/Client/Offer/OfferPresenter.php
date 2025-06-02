@@ -184,8 +184,8 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
         $form_data->client_id = (int) $data['client_id'];
 
-        $form_data->city_name = $this->locality['city'] ?: false;
-        $form_data->region_name = $this->locality['region'] ?: false;
+        $form_data->city_name = $this->locality['city'] ?: '';
+        $form_data->region_name = $this->locality['region'] ?: '';
 
         $form_data->offers_type = (in_array($data['offers_type'], ['workoffer', 'serviceoffer'])) ? $data['offers_type'] : false;
         $form_data->price = (int) $data['price'];
@@ -198,7 +198,16 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             $form_data->moderated = 1;
         }
 
-        $form_data->request_data = \serialize($_SERVER);
+        $form_data->request_data = \serialize([
+            'REQUEST_METHOD' => $_SERVER['REQUEST_METHOD'],
+            'REMOTE_USER' => $_SERVER['REMOTE_USER'] ?? '',
+            'REDIRECT_REMOTE_USER' => $_SERVER['REDIRECT_REMOTE_USER'] ?? '',
+            'HTTP_USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
+            'HTTP_REFERER' => $_SERVER['HTTP_REFERER'],
+            'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'],
+            'REMOTE_PORT' => $_SERVER['REMOTE_PORT'],
+            'REQUEST_TIME' => \date('d.m.Y H:i:s', $_SERVER['REQUEST_TIME']),
+        ]);
 
         return $form_data;
     }
@@ -207,7 +216,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     {
         $form_data = $this->prepareOfferFormData($form, $data);
 
-        if (!empty($form_data) && $form_data->moderated === 1) {
+        if (!empty($form_data) && $form_data->moderated === 1 && !empty($form_data->city_name)) {
             $new_offer_id = $this->of->add($form_data);
 
             if (!empty($new_offer_id)) {
@@ -249,7 +258,12 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
                 $this->flashMessage('Объявление не добавлено. Попробуйте позже.', 'error');
             }
         } else {
-            $this->flashMessage('Объявление не добавлено. В сообщении не должно быть ссылок или ругательств', 'success');
+            if (empty($form_data->city_name)) {
+                $this->flashMessage('Объявление не добавлено. Выберите город', 'error');
+            }
+            if ($form_data->moderated != 1) {
+                $this->flashMessage('Объявление не добавлено. В сообщении не должно быть ссылок или ругательств', 'error');
+            }
         }
     }
 

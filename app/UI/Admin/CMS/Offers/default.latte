@@ -55,8 +55,14 @@
                     {$offer['updated_at']}
                 </td>
                 <td>
-                    {* <a n:href=":Admin:CMS:Offers:edit, $offer['id']" class="btn btn-primary m-2">Edit</a> *}
-                    <a n:href="remove!, $offer['id']" class="btn btn-primary m-2">Delete</a>
+                    <a n:href=":Admin:CMS:Comments:default $offer['id']" class="btn btn-primary m-2">
+                        Comments
+                        <span n:if="!empty($comments_count[$offer['id']])" class="badge bg-secondary">
+                            {$comments_count[$offer['id']]}
+                        </span>
+                    </a>
+                    <a n:href="request, $offer['id']" class="btn btn-primary m-2">Request</a>
+                    <a n:href="remove!, $offer['id']" class="btn btn-danger m-2">Delete</a>
                 </td>
             </tr>
         </tbody>
