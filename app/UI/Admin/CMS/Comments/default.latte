@@ -17,18 +17,19 @@
         {foreach $comments[$n] as $comment}
         <li class="card mb-2 p-2">
             <div class="row g-0">
-                <div class="col-md-10">
+                <div class="col-md-9">
                     <div class="card-header">
                         ***{\mb_substr($comment->client->username, 0, 4)}
                         {* \Nette\Utils\DateTime::from($comment->created_at)->format('d.m.Y H:i:s') *}
                         &nbsp;
                         {IntlDateFormatter::formatObject($comment->created_at, IntlDateFormatter::MEDIUM, 'ru_RU')}
                     </div>
-                    <p class="card-text">{$comment->comment_text}</p>
+                    <p class="card-text pt-2">{$comment->comment_text}</p>
                 </div>
-                <div class="col-md-2 ps-2">
-                    <a n:href="edit $comment->id" class="btn btn-secondary mb-2">Edit</a>
-                    <a n:href="delete! $comment->id" class="btn btn-danger">Delete</a>
+                <div class="col-md-3 ps-2">
+                    <a n:href="request $comment->id" class="btn btn-secondary mb-2 fs-4" title="Request data">🛈</a>
+                    <a n:href="edit $comment->id" class="btn btn-secondary mb-2 fs-4" title="Edit">✎</a>
+                    <a n:href="delete! $comment->id" class="btn btn-danger mb-2 fs-4" title="Delete">✖</a>
                 </div>
             </div>
         </li>
@@ -43,7 +44,7 @@
     </div>
 </div>
 {else}
-<p>
+<p class="text-warning">
     Объявление не выбрано.
 </p>
 <p>

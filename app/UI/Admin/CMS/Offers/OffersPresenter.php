@@ -139,4 +139,16 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $req = $this->of->db->query($sql, (int) $id)->fetchField();
         $this->template->request = !empty($req) ? unserialize($req) : [];
     }
+
+    #[Requires(sameOrigin: true)]
+    public function renderDetail($id): void
+    {
+        $formdata = new stdClass();
+        $formdata->id = (int) $id;
+        $formdata->with_banned = true;
+
+        $this->template->offers = $this->of->getOffers(form_data: $formdata);
+        $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
+
+    }
 }

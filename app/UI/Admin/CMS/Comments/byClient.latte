@@ -5,7 +5,31 @@
 {var $keywords = "Admin, SimpleCMS, Comments by client"}
 {var $robots = "NOINDEX,NOFOLLOW"}
 
-{block content}	
+{block content}
 <div class="container">
     <h2 class="text-center">Comments by client</h2>
+
+    <div n:if="!empty($comments)" n:inner-foreach="$comments as $comment" class="bg-success rounded p-2">
+        <div class="card mb-2 p-2">
+            <div class="row g-0">
+                <div class="col-md-9">
+                    <div class="card-header">
+                        Offer #{$comment->offer_id},
+                        {IntlDateFormatter::formatObject($comment->created_at, IntlDateFormatter::MEDIUM, 'ru_RU')}
+                        <a n:href=":Admin:CMS:Offers:detail $comment->offer_id" class="btn btn-secondary me-2">
+                            Offers detail
+                        </a>
+                    </div>
+                    <p class="card-text pt-2">
+                        {$comment->comment_text}
+                    </p>
+                </div>
+                <div class="col-md-3 ps-2">
+                    <a n:href="request $comment->id" class="btn btn-secondary mb-2 fs-4" title="Request data">🛈</a>
+                    <a n:href="edit $comment->id" class="btn btn-secondary mb-2 fs-4" title="Edit">✎</a>
+                    <a n:href="delete! $comment->id" class="btn btn-danger mb-2 fs-4" title="Delete">✖</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

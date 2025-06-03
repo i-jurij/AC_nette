@@ -39,9 +39,9 @@ final class CommentsPresenter extends \App\UI\Admin\BasePresenter
 
 
     #[Requires(methods: 'POST', sameOrigin: true)]
-    public function renderByClient(int $id): void
+    public function renderByClient(int $client_id): void
     {
-
+        $this->template->comments = $this->comment->getByClient((int) $client_id);
     }
 
     #[Requires(sameOrigin: true)]
@@ -102,5 +102,13 @@ final class CommentsPresenter extends \App\UI\Admin\BasePresenter
         }
 
         $this->redirect('this');
+    }
+
+
+    #[Requires(sameOrigin: true)]
+    public function renderRequest($id): void
+    {
+        $req = $this->comment->getRequest((int) $id);
+        $this->template->request = !empty($req) ? unserialize($req) : [];
     }
 }

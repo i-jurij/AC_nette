@@ -1,0 +1,65 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Offes detail"}
+{var $description = "Admin Simple CMS Offers detail"}
+{var $keywords = "Admin, SimpleCMS, Offers detail"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="table-responsive" n:if="!empty($offers) && is_array($offers)">
+    <table class="table table-striped">
+        <tbody n:inner-foreach="$offers as $offer">
+            <tr>
+                <td>
+                    {if !empty($offer['thumbnails'])}
+                    <a class="" n:href=":Admin:CMS:Offers:pictures, $offer['id']" title="Click to show and edit">
+                        <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
+                            alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="64px" height="auto" />
+                    </a>
+                    {else}
+                    <img src="{$baseUrl}/images/ddd.jpg" alt="Default offers picture" loading="lazy" width="64px"
+                        height="auto" />
+                    {/if}
+                </td>
+                <td>
+                    {$offer['offers_type']}:
+                    <br>
+                    {foreach $offer['services'] as $ca}
+                    {if $iterator->first}
+                    {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                    {else}
+                    {$ca['category_name']}:
+                    {/if}
+                    {foreach $ca['services'] as $se}
+                    {$se['name']}
+                    {if !$iterator->last}, {/if}
+                    {/foreach}
+                    {if !$iterator->last}и {/if}
+                    {/foreach}
+                </td>
+                <td>
+                    ⚲ {$offer['city_name']}, {$offer['region_name']}
+                </td>
+                <td>
+                    <span class="text-nowrap">{number_format($offer['price'], 0, ",", " ")}</span> руб.
+                </td>
+                <td>
+                    {\mb_strimwidth($offer['message'], 0, 100, "...")}
+                </td>
+                <td>
+                    {$offer['updated_at']}
+                </td>
+                <td>
+                    <a n:href=":Admin:CMS:Comments:default $offer['id']" class="btn btn-primary m-2">
+                        Comments
+                        <span n:if="!empty($comments_count[$offer['id']])" class="badge bg-secondary">
+                            {$comments_count[$offer['id']]}
+                        </span>
+                    </a>
+                    <a n:href="request, $offer['id']" class="btn btn-primary m-2">Request</a>
+                    <a n:href="remove!, $offer['id']" class="btn btn-danger m-2">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

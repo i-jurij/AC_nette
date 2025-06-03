@@ -47,7 +47,7 @@ class OfferFacade
             $this->sql_params = ["`{$this->table}`.`id` = $form_data->id"];
             $this->order_sql = '';
 
-            return;
+            return true;
         }
 
         // service

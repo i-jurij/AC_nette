@@ -1,0 +1,23 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Comments request"}
+{var $description = "Admin Simple CMS Comments request"}
+{var $keywords = "Admin, SimpleCMS, Comments request"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">{$title}</h2>
+    <table n:if="!empty($request)">
+        <tbody n:inner-foreach="$request as $key => $val">
+            <tr>
+                <td>
+                    {$key}
+                </td>
+                <td>
+                    {$val}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

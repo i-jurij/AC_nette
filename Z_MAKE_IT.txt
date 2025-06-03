@@ -2,8 +2,6 @@ MAKE
 
 ADMIN 
 
-comment show, editing (deleting)
-
 offers:
 search by, sort by
 editing

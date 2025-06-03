@@ -56,13 +56,25 @@ class CommentFacade
         $cc = $this->db->table('comment')
             ->where('offer_id', $offer_id)
             ->order('created_at ASC');
-        // ->fetchAll();
+        return $cc;
+    }
+
+    public function getByClient(int $client_id): \Nette\Database\Table\Selection
+    {
+        $cc = $this->db->table('comment')
+            ->where('client_id', $client_id)
+            ->order('offer_id, created_at ASC');
         return $cc;
     }
 
     public function get(int $id)
     {
         return $this->db->table('comment')->get($id);
+    }
+
+    public function getRequest(int $id)
+    {
+        return $this->db->table('comment')->get($id)->request_data;
     }
 
     public function update(int $id, string $comment_text)
