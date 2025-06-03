@@ -25,7 +25,7 @@
                         {$gr->id}
                     </td>
                     <td>
-                        <a n:href=":Admin:CMS:Offers:edit $gr->offer_id" class="btn btn-secondary">Offer</a>
+                        <a n:href=":Admin:CMS:Offers:detail $gr->offer_id" class="btn btn-secondary">Offer</a>
                     </td>
                     <td>
                         <a n:if="!empty($gr->comment_id)" n:href=":Admin:CMS:Comments:edit $gr->comment_id"
