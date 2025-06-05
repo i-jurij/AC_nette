@@ -8,21 +8,9 @@ use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
 use \App\Model\ChatFacade;
 use \App\Model\CommentFacade;
-use App\UI\Accessory\IsBot;
-use Nette\Application\UI\Form;
 use Nette\Utils\Paginator;
-use App\UI\Accessory\Location\Location;
-use Nette\Forms\Container;
-use App\UI\Accessory\PhoneNumber;
-use Nette\Http\FileUpload;
-use App\UI\Accessory\Moderating\ModeratingText;
-use \Nette\Utils\ArrayHash;
-use Nette\Utils\Image;
-use Nette\Utils\ImageColor;
-use Nette\Utils\ImageType;
 use Nette\Utils\FileSystem;
 use Nette\Utils\Finder;
-use App\UI\Accessory\RequireLoggedClient;
 use stdClass;
 
 final class OffersPresenter extends \App\UI\Admin\BasePresenter
@@ -47,6 +35,20 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $this->template->offers = $this->of->getOffers(limit: $this->template->paginator->getLength(), offset: $this->template->paginator->getOffset());
 
         $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
+        $this->template->chat_count = $this->chat->countByOffer($this->template->offers);
+    }
+
+
+    #[Requires(methods: 'POST', sameOrigin: true)]
+    public function renderByClient(int $id): void
+    {
+        $formdata = new stdClass();
+        $formdata->client_id = (int) $id;
+        $formdata->with_banned = true;
+
+        $this->template->offers = $this->of->getOffers(form_data: $formdata);
+        $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
+        $this->template->chat_count = $this->chat->countByOffer($this->template->offers);
     }
 
     protected function setOfferPaginator(int $page)
@@ -60,32 +62,6 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
 
         $this->template->paginator = $paginator;
     }
-
-    #[Requires(methods: 'POST', sameOrigin: true)]
-    public function renderByClient(int $id): void
-    {
-        $formdata = new stdClass();
-        $formdata->client_id = $id;
-        $formdata->with_banned = true;
-
-        $this->template->offers = $this->of->getOffers(form_data: $formdata);
-        $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
-    }
-
-    /*
-    private function commentsCount(array $offers)
-    {
-        $offer_ids = array_column($offers, 'id');
-        $cc = $this->of->db->query("SELECT offer_id, COUNT(offer_id) AS count 
-                                            FROM `comment`
-                                            WHERE offer_id IN ? 
-                                            GROUP BY offer_id", $offer_ids);
-        foreach ($cc as $value) {
-            $res[$value->offer_id] = $value->count;
-        }
-        return $res ?? [];
-    }
-    */
 
     public function handleRemove(int $id)
     {

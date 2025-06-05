@@ -43,7 +43,7 @@ class CommentFacade
         $offer_ids = array_column($offers, 'id');
         $cc = $this->db->table('comment')
             ->select('offer_id, COUNT(offer_id) AS count')
-            ->where('offer_id IN', $offer_ids)
+            ->where('offer_id IN ?', $offer_ids)
             ->group('offer_id');
         foreach ($cc as $value) {
             $res[$value->offer_id] = $value->count;

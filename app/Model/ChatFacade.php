@@ -137,11 +137,66 @@ class ChatFacade
         return $res;
     }
 
+
+    /**
+     * return int number of replies to clients messages on the offers page
+     */
+    public function countByOffer(array $offers): array
+    {
+        $offer_ids = array_column($offers, 'id');
+        $sql = "SELECT offer_id, COUNT(offer_id) AS count 
+                    FROM `chat` 
+                    WHERE `chat`.`offer_id` IN ?
+                    GROUP BY offer_id";
+        $cc = $this->db->query($sql, $offer_ids);
+        foreach ($cc as $value) {
+            $res[$value->offer_id] = $value->count;
+        }
+        return $res ?? [];
+    }
+
     public function edit()
     {
     }
 
-    public function delete()
+    public function delete(int $id): int|null
     {
+        return $this->db->query('DELETE FROM `chat` WHERE id = ?', $id)->getRowCount();
+    }
+
+
+    public function deleteByOffer(int $offer_id): int|null
+    {
+        return $this->db->query('DELETE FROM `chat` WHERE offer_id = ?', $offer_id)->getRowCount();
+    }
+
+    public function deleteByOfferClient(int $offer_id, int $client_id): int|null
+    {
+        return $this->db->query(
+            'DELETE FROM `chat` WHERE offer_id = ? AND (client_id_who = ? OR client_id_to_whom = ?)',
+            $offer_id,
+            $client_id,
+            $client_id
+        )->getRowCount();
+    }
+
+    public function AdmGetByOffer(int $offer_id)
+    {
+        $sql = 'SELECT `chat`.`id`,
+                        `chat`.`parent_id`,
+                        `chat`.`offer_id`,
+                        `chat`.`client_id_who`,
+                        `chat`.`client_id_to_whom`,
+                        `chat`.`message`,
+                        `chat`.`request_data`,
+                        `chat`.`created_at`,
+                        `client`.`username` 
+                        FROM `chat` 
+                INNER JOIN `client` ON `chat`.`client_id_who` = `client`.`id`
+                WHERE 
+                `chat`.`offer_id` = ?';
+        $m = $this->db->query($sql, $offer_id)->fetchAll();
+
+        return $m;
     }
 }

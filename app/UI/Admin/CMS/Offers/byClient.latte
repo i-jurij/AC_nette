@@ -60,8 +60,15 @@
                             {$comments_count[$offer['id']]}
                         </span>
                     </a>
-                    <a n:href="request, $offer['id']" class="btn btn-primary m-2">Request</a>
-                    <a n:href="remove!, $offer['id']" class="btn btn-danger m-2">Delete</a>
+                    <a n:href=":Admin:CMS:Offers:Chat:detail $offer['id'], $offer['client_id']"
+                        class="btn btn-primary m-2">
+                        Chat
+                        <span n:if="!empty($chat_count[$offer['id']])" class="badge bg-secondary">
+                            {$chat_count[$offer['id']]}
+                        </span>
+                    </a>
+                    <a n:href="request, $offer['id']" class="btn btn-primary m-2" title="Request data">🛈</a>
+                    <a n:href="remove!, $offer['id']" class="btn btn-danger m-2" title="Delete">✖</a>
                 </td>
             </tr>
         </tbody>

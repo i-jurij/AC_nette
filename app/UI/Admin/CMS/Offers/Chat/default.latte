@@ -1,0 +1,22 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Offers chat"}
+{var $description = "Admin Simple CMS Offers chat"}
+{var $keywords = "Admin, SimpleCMS, Offers chat"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<div class="container">
+    <h2 class="text-center">Offers chat</h2>
+    {if !empty($chat)}
+    chat detail
+    {else}
+    <p class="text-warning">
+        Объявление не выбрано.
+    </p>
+    <p>
+        <span class="pe-2">Выберите объявление здесь:</span>
+        <a n:href=":Admin:CMS:Offers:default" class="btn btn-secondary">Offers</a>
+    </p>
+    {/if}
+</div>

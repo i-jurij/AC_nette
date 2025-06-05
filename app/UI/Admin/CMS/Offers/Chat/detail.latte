@@ -1,0 +1,84 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Offers chat detail"}
+{var $description = "Admin Simple CMS Offers chat detail"}
+{var $keywords = "Admin, SimpleCMS, Offers chat detail"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+
+{define messagesData, $messages_by_client, $client_id}
+<div n:foreach="$messages_by_client as $message" n:class="$message['client_id_who'] !== $client_id ? ms-3, 'card mb-1'">
+    <div class="row g-0">
+        <div class="col-md-10">
+            <div class="card-header">
+                <span n:if="$message['client_id_who'] !== $client_id" class="fs-6 text-muted ">Offer owner,</span>
+                <span n:else>***{\mb_substr($message['username'], 0, 4)},</span>
+                {* \Nette\Utils\DateTime::from($comment->created_at)->format('d.m.Y H:i:s') *}
+                {IntlDateFormatter::formatObject($message['created_at'], IntlDateFormatter::MEDIUM, 'ru_RU')}
+            </div>
+            <p class="card-text p-2">{$message['message']}</p>
+        </div>
+        <div class="col-md-2 ps-2">
+            <button type="button" class="btn btn-secondary mb-2 fs-4" title="Request data" data-bs-toggle="modal"
+                data-bs-target="#chatMessage{$offer_id}_{$message['id']}RequestModal">
+                🛈
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade " id="chatMessage{$offer_id}_{$message['id']}RequestModal" tabindex="-1"
+                aria-labelledby="chatMessage{$offer_id}_{$message['id']}RequestModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="chatMessage{$offer_id}_{$message['id']}RequestModalLabel">
+                                Chat message request data
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <table n:if="!empty($message['request_data'])">
+                                <tbody n:inner-foreach="\unserialize($message['request_data']) as $key => $val">
+                                    <tr>
+                                        <td>
+                                            {$key}
+                                        </td>
+                                        <td>
+                                            {$val}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a n:href="delete! $message['id']" class="btn btn-danger mb-2 fs-4" title="Delete">✖</a>
+        </div>
+    </div>
+</div>
+{/define}
+
+{define clientMes, $chat}
+<div n:foreach="$chat as $client_id => $messages_by_client" class="bg-success rounded mb-2 p-2">
+    <a n:href=":Admin:CMS:Clients:edit $client_id" class="btn btn-primary mb-2">Watch client data</a>
+    <a n:href="delete $offer_id, $client_id" class="btn btn-danger mb-2">
+        Delete the chat
+    </a>
+    {include messagesData, $messages_by_client, $client_id}
+</div>
+{/define}
+
+<div class="container">
+    <h2 class="text-center">Offers chat</h2>
+    <a n:href=":Admin:CMS:Clients:edit $offer_owner_id" class="btn btn-primary mb-2">
+        Watch offer owner data
+    </a>
+    <a n:href="delete $offer_id" class="btn btn-danger mb-2">
+        Delete all chats
+    </a>
+    {include clientMes, $chat}
+</div>
