@@ -16,6 +16,9 @@ final class CommentsPresenter extends \App\UI\Admin\BasePresenter
     }
     public function renderDefault($offer_id = null)
     {
+        if (empty($offer_id)) {
+            $this->redirect(':Admin:CMS:Offers:');
+        }
         if (!$this->getUser()->isAllowed('Comments', '')) {
             $this->error('Forbidden', 403);
         }

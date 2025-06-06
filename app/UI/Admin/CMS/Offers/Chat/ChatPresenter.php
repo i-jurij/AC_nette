@@ -15,6 +15,11 @@ final class ChatPresenter extends \App\UI\Admin\BasePresenter
         parent::__construct();
     }
 
+    public function renderDefault()
+    {
+        $this->redirectPermanent(':Admin:CMS:Offers:');
+    }
+
     #[Requires(sameOrigin: true)]
     public function renderDetail($offer_id, $offer_owner_id)
     {
