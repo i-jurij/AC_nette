@@ -164,6 +164,22 @@ class OfferFacade
         return $this->db->query($sql)->fetchField();
     }
 
+
+    public function offersCountOld(): int
+    {
+        $sql = "SELECT COUNT(`id`) FROM {$this->table} WHERE `end_time` < CURRENT_TIMESTAMP";
+        return $this->db->query($sql)->fetchField();
+    }
+
+    public function deleteOld(): array
+    {
+        $ids_sql = "SELECT `id` FROM {$this->table} WHERE `end_time` < CURRENT_TIMESTAMP";
+        $ids = $this->db->query($ids_sql)->fetchPairs(null, 'id');
+        $sql = "DELETE FROM `{$this->table}` WHERE `end_time` < CURRENT_TIMESTAMP";
+        $res = $this->db->query($sql)->getRowCount();
+        return ['ids' => $ids, 'countDeleted' => $res];
+    }
+
     public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): array
     {
         // $sql = "SELECT * FROM {$this->table} WHERE";

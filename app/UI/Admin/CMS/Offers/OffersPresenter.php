@@ -46,6 +46,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $formdata->client_id = (int) $id;
         $formdata->with_banned = true;
 
+        $this->template->offersOld = $this->of->offersCountOld();
         $this->template->offers = $this->of->getOffers(form_data: $formdata);
         $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
         $this->template->chat_count = $this->chat->countByOffer($this->template->offers);
@@ -125,6 +126,31 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
 
         $this->template->offers = $this->of->getOffers(form_data: $formdata);
         $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
+    }
 
+    #[Requires(sameOrigin: true)]
+    public function handleDeleteOld()
+    {
+        if (!$this->getUser()->isAllowed('Offers', 'deleteOld')) {
+            $this->error('Forbidden', 403);
+        }
+
+        $ids_count = $this->of->deleteOld();
+
+        if ($ids_count['countDeleted'] > 0) {
+            $this->flashMessage('Объявления удалены', 'success');
+            if (!empty($ids_count['ids'])) {
+                foreach ($ids_count['ids'] as $id) {
+                    $images = Finder::findFiles([(string) $id . '_*.jpg', (string) $id . '_*.jpeg', (string) $id . '_*.png', (string) $id . '_*.webp'])
+                        ->in(WWWDIR . DIRECTORY_SEPARATOR . "images" . DIRECTORY_SEPARATOR . "offers");
+                    foreach ($images as $name => $file) {
+                        FileSystem::delete($name);
+                    }
+                }
+                $this->flashMessage('Фото для объявлений удалены', 'success');
+            }
+        }
+
+        $this->redirect('this');
     }
 }

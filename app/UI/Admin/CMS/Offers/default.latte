@@ -9,6 +9,12 @@
 <h2 class="text-center">{$title}</h2>
 {* <button class="btn btn-primary">Search by</button>
 <button class="btn btn-primary">Sort by</button> *}
+<a n:href="deleteOld!" title="Delete offer where end_time < now" class="btn btn-danger">
+    Delete old
+    <span n:if="!empty($offersOld)" class="badge bg-secondary">
+        {$offersOld}
+    </span>
+</a>
 <h6 class="text-muted text-center pb-2">List of offer (total count: {$offersCount})</h6>
 
 <div class="table-responsive">
