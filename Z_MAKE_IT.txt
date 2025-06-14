@@ -1,13 +1,13 @@
 MAKE  
 
+реализовать поиск объявлений в радиусе х км от выбранного города
+
 ADMIN 
+! меню и crud для категорий и услуг в категориях
 
 offers:
 search by, sort by
 editing
-
-remove client (and him comments) from db if he dont have orders in 3 month eg
-remove from db orders from customers if it is 3 month old eg
 
 authorize logging and users actions logging
 
@@ -21,8 +21,5 @@ authorize logging and users actions logging
 сделать размещение ссылок на сайты или мессенджеры и прочее платными 
 
 сделать платные объявления, которые всегда в топе?
-
-поиск объявлений в радиусе х км от выбранного города
-похожие объявления по региону 
 
 для клиентов возможность указать удобный способ связи (почта, смс, тлф, мессенджер или все сразу) 

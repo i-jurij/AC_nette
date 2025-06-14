@@ -173,10 +173,13 @@ class OfferFacade
 
     public function deleteOld(): array
     {
+        //date('Y-m-d H:i:s','1299762201428')
         $ids_sql = "SELECT `id` FROM {$this->table} WHERE `end_time` < CURRENT_TIMESTAMP";
         $ids = $this->db->query($ids_sql)->fetchPairs(null, 'id');
-        $sql = "DELETE FROM `{$this->table}` WHERE `end_time` < CURRENT_TIMESTAMP";
-        $res = $this->db->query($sql)->getRowCount();
+        // $sql = "DELETE FROM `{$this->table}` WHERE `end_time` < CURRENT_TIMESTAMP";
+        // $res = $this->db->query($sql)->getRowCount();
+        $sql = "DELETE FROM `{$this->table}` WHERE `id` IN ?";
+        $res = $this->db->query($sql, $ids)->getRowCount();
         return ['ids' => $ids, 'countDeleted' => $res];
     }
 

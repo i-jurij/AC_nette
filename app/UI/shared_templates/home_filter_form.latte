@@ -174,7 +174,10 @@
         <span class="right" style='font-size:1rem;'>&#10006;</span>
     </label>
 
-    <p n:if="!$user->isLoggedIn()" class="">Фильтрация работает после входа на сайт</p>
+    <p n:if="!$user->isLoggedIn()" class="">
+        <span class="h2 blue">&#9432;</span>
+        Фильтрация работает после входа на сайт
+    </p>
 
     <form name="offersfilterform" id="offersfilterform" action="{link filterphp!}" method="post">
         <input type="hidden" name="{$csrf_name}" required value="{$csrf}" />
@@ -189,8 +192,7 @@
                 </div>
                 <div class="form_radio_group-item">
                     <input id="offertypework" type='radio' name="offertype"
-                        n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'work'"
-                        value="work">
+                        n:attr="checked: !empty($form_data->offertype) && $form_data->offertype == 'work'" value="work">
                     <label for="offertypework">Заказы</label>
                 </div>
                 <div class="form_radio_group-item">
@@ -201,8 +203,7 @@
                 </div>
                 *}
                 <select name="offertype" class="select form_radio_group-item" id="offertype">
-                    <option value="all"
-                        n:attr="selected: empty($form_data->offertype) || $form_data->offertype=='all'">
+                    <option value="all" n:attr="selected: empty($form_data->offertype) || $form_data->offertype=='all'">
                         Все
                     </option>
                     <option value="work"
@@ -247,8 +248,7 @@
                 </div>
                 <div class="form_radio_group-item">
                     <input id="order_type_asc" type='radio' name="order_type"
-                        n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'"
-                        value="ASC">
+                        n:attr="checked: !empty($form_data->order_type) && $form_data->order_type == 'ASC'" value="ASC">
                     <label for="order_type_asc">
                         {* &#129029;
                         *}
@@ -298,8 +298,7 @@
                 <span class="select" id="for_show_if_cat_not_choose">...</span>
                 {foreach $service_list as $cat}
                 // вместо селекта - дропдаун лист чекбоксов
-                <select name="service" id="cat_{$cat['category_id']}"
-                    class="select form_radio_group-item display-none">
+                <select name="service" id="cat_{$cat['category_id']}" class="select form_radio_group-item display-none">
                     <option value="9999999" selected>Выбрать все</option>
                     <optgroup label="{$cat['category_name']}" n:inner-foreach="$cat['services'] as $serv">
                         <option value="{$serv['id']}"
@@ -322,9 +321,9 @@
                 </div>
                 <div class="inline-block">
                     <p class="filter_form_submit_p">Цена до:</p>
-                    <input type="range" value="{$price_max}" min="{$price['price_min']}"
-                        max="{$price['price_max']}" step="10" id="pricefiltermax" name="price_max"
-                        oninput="pricevaluemax.value=value" class="block" />
+                    <input type="range" value="{$price_max}" min="{$price['price_min']}" max="{$price['price_max']}"
+                        step="10" id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value"
+                        class="block" />
                     <output id="pricevaluemax" class="block">{$price_max}</output>
                 </div>
             </div>
@@ -334,4 +333,3 @@
         </div>
     </form>
 </div>
-

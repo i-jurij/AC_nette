@@ -1,6 +1,8 @@
 {*layout '@layout.latte'*}
 {block footer}
 <div class="">
+	<a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
+	<br />
 	{if date('Y') != '2024' }
 	2024 - {date('Y') . PHP_EOL}
 	{else}
@@ -8,6 +10,7 @@
 	{/if}
 	{*<br /><small id="mail">Copyright © <a
 			href="mailto:jurijlunjov@yandex.com&body=Hi!?subject=AC_Nette">I-Jurij</a></small> *}
-	<br /><small id="mail">Copyright © <a href="https://github.com/i-jurij">I-Jurij</a></small>
+	<br />
+	<small class="" id="mail">Copyright © I-Jurij</small>
 </div>
 {/block}
