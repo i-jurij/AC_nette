@@ -1,0 +1,53 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Services"}
+{var $description = "Admin Simple CMS Services"}
+{var $keywords = "Admin, SimpleCMS, Services"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<h2 class="text-center">{$title}</h2>
+<a n:href="catServAdd" class="btn btn-primary">Add category and services</a>
+
+<div class="accordion mt-3" n:if="!empty($services)" id="category_service_list">
+    <div class="accordion-item" n:foreach="$services as $category_id => $category">
+        {if $iterator->first}
+        {var $exp = 'true'} {var $show = 'show'}
+        {else}
+        {var $exp = 'false'}{var $show = ''}
+        {/if}
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#service_list_{$category_id}" aria-expanded="{$exp}"
+                aria-controls="service_list_{$category_id}">
+                {$category['category_name']}
+            </button>
+        </h2>
+        {var $cat_edit_args = ['c', $category_id]}
+        <a n:href="edit ...$cat_edit_args" class="btn btn-secondary fs-4" title="Edit {$category['category_name']}">
+            ✎
+        </a>
+        <a n:href="catDelete! $category_id" class="btn btn-danger fs-4" title="Delete {$category['category_name']}">
+            ✖
+        </a>
+        <a n:href="serviceAdd $category_id" class="btn btn-secondary fs-4"
+            title="Add services to {$category['category_name']}">
+            +
+        </a>
+        <div id="service_list_{$category_id}" class="accordion-collapse collapse {$show}" aria-labelledby="headingOne"
+            data-bs-parent="#category_service_list">
+            <div class="accordion-body">
+                <div n:foreach="$category['services'] as $service" class="d-inline-block border rounded p-2">
+                    <p class="">{$service['name']}</p>
+                    <p>
+                        {var $serv_edit_args = ['s', $service['id']]}
+                        <a n:href="edit ...$serv_edit_args" class="btn btn-secondary fs-4"
+                            title="Edit {$service['name']}">✎</a>
+                        <a n:href="servDelete! $service['id']" class="btn btn-danger fs-4"
+                            title="Delete {$service['name']}">✖</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
