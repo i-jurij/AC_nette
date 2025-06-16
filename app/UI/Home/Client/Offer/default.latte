@@ -7,60 +7,70 @@
 
 {block content}
 <h1 class="h2 center">Ваши объявления</h1>
+<div class="bgcontent rounded p2 mb2 center">
+    <span>&#9432; Нужно продлить срок размещения? Обновите информацию в объявлении.</span>
+</div>
+
 <div class="flexx one two-500 three-900 four-1200 five-1500 six-2000 center">
     {foreach $offers as $offer}
     <div class="flex flex-column">
-        <article class="card round flex flex-column flex-auto">
-            {* <a n:href=":Home:offer $offer['id']" class=""> *}
-                <a n:href=":Home:Offer:default $offer['id']" class="">
-                    {if !empty($offer['thumbnails'])}
-                    <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
-                        alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="100%" height="auto" />
-                    {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
-                    {else}
-                    <img src='{$baseUrl}/images/ddd.jpg' alt="Default offers picture" loading="lazy" width="100%"
-                        height="auto" />
-                    {/if}
-                </a>
-                <section class="flex-auto">
+        <div class="flex flex-auto relative">
+            <article class="card round">
+                {* <a n:href=":Home:offer $offer['id']" class=""> *}
                     <a n:href=":Home:Offer:default $offer['id']" class="">
-                        <p class="bold">
-                            {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
-                            Ищу работу
-                            {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
-                            Предлагаю работу
-                            {/if}
-                        </p>
-                        <p n:if="!empty($offer['services']) && is_array($offer['services'])">
-                            {foreach $offer['services'] as $ca}
-                            {if $iterator->first}
-                            {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
-                            {else}
-                            {$ca['category_name']}:
-                            {/if}
-                            {foreach $ca['services'] as $se}
-                            {$se['name']}
-                            {if !$iterator->last}, {/if}
-                            {/foreach}
-                            {if !$iterator->last}и {/if}
-                            {/foreach}
-                        </p>
-                        <p> ⚲ {$offer['city_name']}</p>
-                        {* <p> Region: {$offer['region_name']}</p> *}
-                        <p>{number_format($offer['price'], 0, ",", " ")} руб.</p>
-                        {* <p> Message: {$offer['message']}</p> *}
-                        {* <p> Updated_at: {$offer['updated_at']}</p> *}
-                        {* <p> End_time: {$offer['end_time']}</p> *}
-                        <input type="hidden" name="offer_id" value="{$offer['id']}">
+                        {if !empty($offer['thumbnails'])}
+                        <img src="data:image/png;base64, {base64_encode($offer['thumbnails']['thumb'])}"
+                            alt="Picture {$offer['thumbnails']['caption']}" loading="lazy" width="100%" height="auto" />
+                        {* <p> Image caption: {$offer['thumbnails']['caption']}</p> *}
+                        {else}
+                        <img src='{$baseUrl}/images/ddd.jpg' alt="Default offers picture" loading="lazy" width="100%"
+                            height="auto" />
+                        {/if}
                     </a>
-                </section>
-                <footer class="clearfix border-top">
-                    {var $par = ['o' => $offer['id'], 'c' => $offer['client_id']]}
-                    <a n:href=":Home:Client:Offer:edit, ...$par" class="button tooltip-right left"
-                        data-tooltip="Редактировать">✎</a>
-                    <a n:href="remove!, ...$par" class="button tooltip-left right" data-tooltip="Удалить">✖</a>
-                </footer>
-        </article>
+                    <section class="flex-auto">
+                        <a n:href=":Home:Offer:default $offer['id']" class="">
+                            <p class="bold">
+                                {if !empty($offer['offers_type']) && $offer['offers_type'] === 'serviceoffer'}
+                                Ищу работу
+                                {elseif !empty($offer['offers_type']) && $offer['offers_type'] === 'workoffer'}
+                                Предлагаю работу
+                                {/if}
+                            </p>
+                            <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                                {foreach $offer['services'] as $ca}
+                                {if $iterator->first}
+                                {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
+                                {else}
+                                {$ca['category_name']}:
+                                {/if}
+                                {foreach $ca['services'] as $se}
+                                {$se['name']}
+                                {if !$iterator->last}, {/if}
+                                {/foreach}
+                                {if !$iterator->last}и {/if}
+                                {/foreach}
+                            </p>
+                            <p> ⚲ {$offer['city_name']}</p>
+                            {* <p> Region: {$offer['region_name']}</p> *}
+                            <p>{number_format($offer['price'], 0, ",", " ")} руб.</p>
+                            {* <p> Message: {$offer['message']}</p> *}
+                            {* <p> Updated_at: {$offer['updated_at']}</p> *}
+                            {* <p> End_time: {$offer['end_time']}</p> *}
+                            <input type="hidden" name="offer_id" value="{$offer['id']}">
+                        </a>
+                    </section>
+
+            </article>
+            <div class="absolute top-0 right-0">
+                {var $par = ['o' => $offer['id'], 'c' => $offer['client_id']]}
+                <a n:href=":Home:Client:Offer:edit, ...$par" class="h1 button block tooltip-left shadow"
+                    data-tooltip="Редактировать">✎</a>
+                <br>
+                <br>
+                <a n:href="remove!, ...$par" class="h2 button bg-red block tooltip-left shadow"
+                    data-tooltip="Удалить">✖</a>
+            </div>
+        </div>
     </div>
     {/foreach}
 </div>

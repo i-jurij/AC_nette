@@ -9,12 +9,38 @@
 <h2 class="text-center">{$title}</h2>
 {* <button class="btn btn-primary">Search by</button>
 <button class="btn btn-primary">Sort by</button> *}
-<a n:href="deleteOld!" title="Delete offer where end_time < now" class="btn btn-danger">
-    Delete old
-    <span n:if="!empty($offersOld)" class="badge bg-secondary">
-        {$offersOld}
-    </span>
-</a>
+<div class=" clearfix">
+    <a n:href="deleteOld!" title="Delete offer where end_time < now" class="btn btn-danger float-end">
+        Delete old
+        <span n:if="!empty($offersOld)" class="badge bg-secondary">
+            {$offersOld}
+        </span></a>
+</div>
+
+<ul class="nav nav-tabs my-3">
+    <li class="nav-item">
+        <a class="nav-link " href="#">Last 1 hour</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last 6 hour</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last 12 hour</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last day</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last week</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="#">Last month</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#">All</a>
+    </li>
+</ul>
+
 <h6 class="text-muted text-center pb-2">List of offer (total count: {$offersCount})</h6>
 
 <div class="table-responsive">
