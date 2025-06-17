@@ -41,12 +41,14 @@ class CommentFacade
     public function commentsCount(array $offers): array
     {
         $offer_ids = array_column($offers, 'id');
-        $cc = $this->db->table('comment')
-            ->select('offer_id, COUNT(offer_id) AS count')
-            ->where('offer_id IN ?', $offer_ids)
-            ->group('offer_id');
-        foreach ($cc as $value) {
-            $res[$value->offer_id] = $value->count;
+        if (!empty($offer_ids)) {
+            $cc = $this->db->table('comment')
+                ->select('offer_id, COUNT(offer_id) AS count')
+                ->where('offer_id IN ?', $offer_ids)
+                ->group('offer_id');
+            foreach ($cc as $value) {
+                $res[$value->offer_id] = $value->count;
+            }
         }
         return $res ?? [];
     }

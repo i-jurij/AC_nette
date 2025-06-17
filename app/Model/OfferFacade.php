@@ -50,6 +50,10 @@ class OfferFacade
             return true;
         }
 
+        // get by updated_at > $form_data->created_time (datetime object)
+        if (!empty($form_data->created_time)) {
+            $this->sql_params[] = "`{$this->table}`.`updated_at` > '$form_data->created_time '";
+        }
         // service
         if (!empty($form_data->service)) {
             $ids = \unserialize($form_data->service, ['allowed_classes' => false]);
@@ -176,11 +180,15 @@ class OfferFacade
         //date('Y-m-d H:i:s','1299762201428')
         $ids_sql = "SELECT `id` FROM {$this->table} WHERE `end_time` < CURRENT_TIMESTAMP";
         $ids = $this->db->query($ids_sql)->fetchPairs(null, 'id');
-        // $sql = "DELETE FROM `{$this->table}` WHERE `end_time` < CURRENT_TIMESTAMP";
-        // $res = $this->db->query($sql)->getRowCount();
-        $sql = "DELETE FROM `{$this->table}` WHERE `id` IN ?";
-        $res = $this->db->query($sql, $ids)->getRowCount();
-        return ['ids' => $ids, 'countDeleted' => $res];
+        if (!empty($ids)) {
+            // $sql = "DELETE FROM `{$this->table}` WHERE `end_time` < CURRENT_TIMESTAMP";
+            // $res = $this->db->query($sql)->getRowCount();
+            $sql = "DELETE FROM `{$this->table}` WHERE `id` IN ?";
+            $res = $this->db->query($sql, $ids)->getRowCount();
+            return ['ids' => $ids, 'countDeleted' => $res];
+        } else {
+            return [];
+        }
     }
 
     public function getOffers(array $location = [], int $limit = 1000, ?int $offset = null, ?object $form_data = null): array

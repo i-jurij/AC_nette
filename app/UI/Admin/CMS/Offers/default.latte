@@ -10,34 +10,34 @@
 {* <button class="btn btn-primary">Search by</button>
 <button class="btn btn-primary">Sort by</button> *}
 <div class=" clearfix">
-    <a n:href="deleteOld!" title="Delete offer where end_time < now" class="btn btn-danger float-end">
+    <a n:if="!empty($offersOld)" n:href="deleteOld!" title="Delete offer where end_time < now" class="btn btn-danger float-end">
         Delete old
-        <span n:if="!empty($offersOld)" class="badge bg-secondary">
+        <span  class="badge bg-secondary">
             {$offersOld}
         </span></a>
 </div>
 
 <ul class="nav nav-tabs my-3">
     <li class="nav-item">
-        <a class="nav-link " href="#">Last 1 hour</a>
+        <a n:class="(!isset($tm) || $tm=='one') ? active, nav-link" n:href="default">Last 1 hour</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Last 6 hour</a>
+        <a n:class="$tm=='six' ? active, nav-link" n:href="default, tm:six">Last 6 hour</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Last 12 hour</a>
+        <a n:class="$tm=='twelve' ? active, nav-link" n:href="default, tm:twelve">Last 12 hour</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Last day</a>
+        <a n:class="$tm=='day' ? active, nav-link" n:href="default, tm:day">Last day</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Last week</a>
+        <a n:class="$tm=='week' ? active, nav-link" n:href="default, tm:week">Last week</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">Last month</a>
+        <a n:class="$tm=='month' ? active, nav-link" n:href="default, tm:month">Last month</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="#">All</a>
+        <a n:class="$tm=='all' ? active, nav-link" n:href="default, tm:all">All</a>
     </li>
 </ul>
 
@@ -108,17 +108,17 @@
     </table>
 </div>
 <!-- Paginator -->
-<div n:if="isset($paginator)" class="">
+<div n:if="!empty($offers) && isset($paginator)" class="">
     {if !$paginator->isFirst()}
-    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, 1">1</a>
-    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, tm: $tm, p:1">1</a>
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, tm: $tm, p:$paginator->page-1">&nbsp;&#60;&nbsp;</a>
     {/if}
 
     &nbsp;Стр.&nbsp;{$paginator->getPage()}&nbsp;из&nbsp;{$paginator->getPageCount()}&nbsp;
 
     {if !$paginator->isLast()}
-    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, $paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
+    <a class="btn btn-primary" n:href=":Admin:CMS:Offers:default, tm: $tm, p:$paginator->getPage() + 1">&nbsp;&#62;&nbsp;</a>
     <a class="btn btn-primary"
-        n:href=":Admin:CMS:Offers:default, $paginator->getPageCount()">{$paginator->getPageCount()}</a>
+        n:href=":Admin:CMS:Offers:default, tm: $tm, p:$paginator->getPageCount()">{$paginator->getPageCount()}</a>
     {/if}
 </div>

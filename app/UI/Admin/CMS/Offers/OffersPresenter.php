@@ -25,19 +25,51 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
     ) {
         parent::__construct();
     }
-    public function renderDefault(int $page = 1)
+
+    /**
+     * @param string $tm - '-1 hour', '-1 day' eg
+     */
+    public function renderDefault(string $tm = 'one', int $p = 1)
     {
         if (!$this->getUser()->isAllowed('Offers', '')) {
             $this->error('Forbidden', 403);
         }
-        $this->setOfferPaginator($page);
+
         $this->template->service_list = $this->sf->getAllServices();
-        $this->template->offers = $this->of->getOffers(limit: $this->template->paginator->getLength(), offset: $this->template->paginator->getOffset());
+
+        $formdata = new stdClass;
+        $tmstr = '-1 hour';
+
+        if ($tm === 'six') {
+            $tmstr = '-6 hour';
+        }
+        if ($tm === 'twelve') {
+            $tmstr = '-12 hour';
+        }
+        if ($tm === 'day') {
+            $tmstr = '-1 day';
+        }
+        if ($tm === 'week') {
+            $tmstr = '-1 week';
+        }
+        if ($tm === 'month') {
+            $tmstr = '-1 month';
+        }
+        if ($tm === 'all') {
+            unset($tmstr);
+        }
+
+        if (isset($tmstr)) {
+            $formdata->created_time = new \DateTimeImmutable()->modify($tmstr)->format('Y-m-d H:i:s');
+        }
+
+        $formdata->with_banned = 1;
+        $this->setOfferPaginator(page: $p, form_data: $formdata, tm: strip_tags($tm));
+        $this->template->offers = $this->of->getOffers(limit: $this->template->paginator->getLength(), offset: $this->template->paginator->getOffset(), form_data: $formdata);
 
         $this->template->comments_count = $this->comment->commentsCount($this->template->offers);
         $this->template->chat_count = $this->chat->countByOffer($this->template->offers);
     }
-
 
     #[Requires(methods: 'POST', sameOrigin: true)]
     public function renderByClient(int $id): void
@@ -52,9 +84,9 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $this->template->chat_count = $this->chat->countByOffer($this->template->offers);
     }
 
-    protected function setOfferPaginator(int $page)
+    protected function setOfferPaginator(int $page, object $form_data, string $tm)
     {
-        $offersCount = $this->of->offersCount();
+        $offersCount = $this->of->offersCount(form_data: $form_data);
         $this->template->offersCount = $offersCount;
         $paginator = new Paginator();
         $paginator->setItemCount($offersCount);
@@ -62,6 +94,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         $paginator->setPage($page);
 
         $this->template->paginator = $paginator;
+        $this->template->tm = $tm;
     }
 
     public function handleRemove(int $id)
@@ -137,7 +170,7 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
 
         $ids_count = $this->of->deleteOld();
 
-        if ($ids_count['countDeleted'] > 0) {
+        if (isset($ids_count['countDeleted']) && $ids_count['countDeleted'] > 0) {
             $this->flashMessage('Объявления удалены', 'success');
             if (!empty($ids_count['ids'])) {
                 foreach ($ids_count['ids'] as $id) {

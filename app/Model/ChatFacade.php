@@ -144,13 +144,15 @@ class ChatFacade
     public function countByOffer(array $offers): array
     {
         $offer_ids = array_column($offers, 'id');
-        $sql = "SELECT offer_id, COUNT(offer_id) AS count 
+        if (!empty($offer_ids)) {
+            $sql = "SELECT offer_id, COUNT(offer_id) AS count 
                     FROM `chat` 
                     WHERE `chat`.`offer_id` IN ?
                     GROUP BY offer_id";
-        $cc = $this->db->query($sql, $offer_ids);
-        foreach ($cc as $value) {
-            $res[$value->offer_id] = $value->count;
+            $cc = $this->db->query($sql, $offer_ids);
+            foreach ($cc as $value) {
+                $res[$value->offer_id] = $value->count;
+            }
         }
         return $res ?? [];
     }
