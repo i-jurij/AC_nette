@@ -14,7 +14,7 @@ trait RequireLoggedClient
      * Injects the requirement for a logged-in user.
      * Attaches a callback to the startup event of the presenter.
      */
-    public function RequireLoggedClient(): void
+    public function injectRequireLoggedClient(): void
     {
         $this->onStartup[] = function () {
             $user = $this->getUser();

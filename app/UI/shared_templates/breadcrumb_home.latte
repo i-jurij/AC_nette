@@ -1,5 +1,5 @@
 {block breadcrumbMenuHome}
-
+{if $user->isLoggedIn()}
 {foreach $breadcrumb as $ey => $br}
 	{if \in_array($br['short'], ['Home', 'home'])}
 		{var $breadcrumb[$ey]['short'] = 'Главная'}
@@ -37,3 +37,4 @@
 	{if !$iterator->last}/{/if}
 </div>
 
+{/if}

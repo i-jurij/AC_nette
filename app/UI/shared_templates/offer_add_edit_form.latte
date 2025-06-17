@@ -1,4 +1,5 @@
 {block offer_add_edit_form}
+{if $user->isLoggedIn()}
 <style>
     .tab {
         position: relative
@@ -74,7 +75,7 @@
         <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
     </ul>
 
-    {var $user_phone = $user->getIdentity()->getData()['phone']}
+    {var $user_phone = !empty($user->getIdentity()) ? $user->getIdentity()->getData()['phone'] : ''}
     {var $phone_value = !empty($user_phone) ? \App\UI\Accessory\PhoneNumber::fromDb($user_phone) : ''}
     <div class="bg-black rounded py1 px2 mb2">
         <label n:name=phone>
@@ -280,3 +281,4 @@
         }
     });
 </script>
+{/if}

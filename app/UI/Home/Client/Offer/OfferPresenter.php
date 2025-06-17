@@ -47,18 +47,23 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function renderDefault(int $page = 1)
     {
-        $formdata = new \stdClass();
-        $formdata->client_id = $this->getUser()->getId();
+        if ($this->getUser()->isLoggedIn()) {
+            $formdata = new \stdClass();
+            $formdata->client_id = $this->getUser()->getId();
 
-        //$offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
-        $offersCount = $this->of->offersCount(form_data: $formdata);
-        $paginator = new Paginator();
-        $paginator->setItemCount($offersCount);
-        $paginator->setItemsPerPage($this->items_on_page_paginator);
-        $paginator->setPage($page);
-        $this->template->paginator = $paginator;
+            //$offersCount = $this->of->offersCount(location: $this->locality, form_data: $formdata);
+            $offersCount = $this->of->offersCount(form_data: $formdata);
+            $paginator = new Paginator();
+            $paginator->setItemCount($offersCount);
+            $paginator->setItemsPerPage($this->items_on_page_paginator);
+            $paginator->setPage($page);
+            $this->template->paginator = $paginator;
 
-        $this->template->offers = $this->of->getOffers(form_data: $formdata);
+            $this->template->offers = $this->of->getOffers(form_data: $formdata);
+        } else {
+            $this->redirect(':Home:Sign:in', ['backlink' => $this->storeRequest()]);
+        }
+
     }
 
     public function actionAdd()
