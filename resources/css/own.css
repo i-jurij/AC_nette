@@ -231,7 +231,7 @@ span.error {
     opacity: 1;
     visibility: visible;
     animation-name: swingdown;
-    animation-duration: 1s;
+    animation-duration: 100ms;
     animation-timing-function: ease;
 }
 

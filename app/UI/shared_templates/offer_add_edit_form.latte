@@ -138,8 +138,12 @@
 
 
     <div n:if="empty($images)" class="block fit bg-black rounded py1 px2 mb2" id="image_inputs_offer_add_form">
-        <span class="block">Фото<span class="h6"> (до 10МБ каждое):</span></span>
-        &#9432; <span class="h6">Первое фото будет основным.</span>
+        <span class="block">
+            Фото<span class="h6"> (до 10МБ каждое):</span>
+        </span>
+        &#9432; 
+        <span class="h6">Первое фото будет основным.</span>
+        <div class="mx-auto">
         <div class="mt1">
             <label n:name=photo1 class="image_label_offer_add_form">
                 <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
@@ -163,6 +167,7 @@
                 <input n:name=photo4 title="Перетащите сюда изображение или нажмите эту кнопку">
             </label>
             <span class=error n:ifcontent>{inputError photo4}</span>
+        </div>
         </div>
     </div>
 

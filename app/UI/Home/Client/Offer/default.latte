@@ -7,11 +7,12 @@
 
 {block content}
 <h1 class="h2 center">Ваши объявления</h1>
-<div class="bgcontent rounded p2 mb2 center">
+<div class="bgcontent rounded p2 mb2 center" n:if="!empty($offers)">
     <span>&#9432; Нужно продлить срок размещения? Обновите информацию в объявлении.</span>
 </div>
+<div  class="bgcontent rounded p2 mb2 center" n:else>У вас пока нет объявлений</div>
 
-<div class="flexx one two-500 three-900 four-1200 five-1500 six-2000 center">
+<div class="flexx one two-500 three-900 four-1200 five-1500 six-2000 center" n:if="!empty($offers)">
     {foreach $offers as $offer}
     <div class="flex flex-column">
         <div class="flex flex-auto relative">
@@ -77,7 +78,7 @@
 
 
 <!-- Paginator -->
-<div class="pagination center">
+<div n:if="!empty($offers) && isset($paginator)" class="pagination center">
     {if !$paginator->isFirst()}
     <a class="pseudo button" n:href="default, 1">1</a>
     <a class="pseudo button" n:href="default, $paginator->page-1">&nbsp;&#60;&nbsp;</a>
