@@ -15,7 +15,7 @@
 
     {if $user->isAllowed('Clients', 'getAllClientsData')}
     <div class="container-fluid">
-        <a n:if="$user->isAllowed('Clients','search')" class="btn btn-secondary"
+        <a n:if="($user->isAllowed('Clients','search') && !empty($count))" class="btn btn-secondary"
             n:href=":Admin:CMS:Clients:search">Search</a>
 
         <form method="post" id="postUsersForm"></form>
@@ -232,7 +232,7 @@
             </table>
         </div>
 
-        <div class="pagination btn-toolbar mt-4" role="paginator" aria-label="Paginator for clients data">
+        <div n:if="!empty($count)" class="pagination btn-toolbar mt-4" role="paginator" aria-label="Paginator for clients data">
             {if $page > 1}
             <div class="btn-group me-2" role="group" aria-label="First group">
                 <a n:href="default, 1" class="btn btn-outline-info">

@@ -1,12 +1,14 @@
 MAKE  
 
+del all table in db
+migrate
+add new admins user
+добавить список категорий и услуг, добавить в bin/insert_sql.php
+make dump of data of db, save to yd
+
 реализовать поиск объявлений в радиусе х км от выбранного города
 
 ADMIN 
-offers:
-search by, sort by
-editing
-
 authorize logging and users actions logging
 
 -----------------------------------------------

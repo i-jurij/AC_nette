@@ -1,8 +1,10 @@
 {*layout '@layout.latte'*}
 {block footer}
 <div class="">
-	<a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
+	{* 
+	<a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a> 
 	<br />
+	*}
 	{if date('Y') != '2024' }
 	2024 - {date('Y') . PHP_EOL}
 	{else}
