@@ -1,0 +1,66 @@
+{*layout '../@layout.latte'*}
+
+{var $title = "Requests for adding services"}
+{var $description = "Admin requests for adding services"}
+{var $keywords = "Admin, requests, adding, services"}
+{var $robots = "NOINDEX,NOFOLLOW"}
+
+{block content}
+<h2 class="text-center">{$title}</h2>
+
+<div n:inner-foreach="$services as $service" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-2 g-lg-3">
+    <div class="card" style="width: 18rem;">
+    <div class="card-body">
+        <div n:if="!empty($service->new_category)">
+            <p class="card-text">
+                <span n:ifcontent>
+                   Категория: {$service->new_category}
+                </span>
+            </p>
+            <p class="card-text">
+                <span n:ifcontent>
+                   Услуга: {$service->service}
+                </span>
+            </p>
+            <p>
+                <a href="addCatServ cat: $service->new_category, serv: $service->service, rec: $service->id" 
+                    class="btn btn-primary me-2"  title="Добавить">
+                    +
+                </a>
+                <a href="ready $service->id" class="btn btn-primary" title="Добавлено">✓</a>
+            </p>
+        </div>
+
+        <div n:if="empty($service->new_category)">
+            <p class="card-text">
+                <span n:ifcontent>
+                    Категория: {$service->ref('category', 'category_id')->name}
+                </span>
+            </p>
+            <p class="card-text">
+                <span n:ifcontent>
+                    Услуга: {$service->service}
+                </span>
+            </p>
+            <p>
+                <a  n:href="addServ! cat: $service->category_id, serv: $service->service, rec: $service->id" 
+                    class="btn btn-primary me-2"
+                    title="Добавить">
+                    +
+                </a>
+                <a href="ready $service->id" class="btn btn-primary" title="Добавлено">✓</a>
+            </p>
+        </div>
+        
+        <p class="card-text">
+            <a n:ifcontent n:href=":Admin:CMS:Clients:edit $service->client_id">
+                Клиент: {$service->ref('client', 'client_id')->username}
+            </a>
+            <br>
+            <span n:ifcontent>
+                {$service->updated_at}
+            </span>
+        </p>
+    </div>
+    </div>
+</div>

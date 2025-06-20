@@ -432,6 +432,50 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $city = $this->locality['city'] ?: '';
         $this->sendJson($city);
     }
+
+    protected function createComponentRequestForAddingServiceForm(): Form
+    {
+        /*
+        $rescat = ["xxx" => "Нет нужной категории"];
+        $categories = $this->sf->getCategories();
+        foreach ($categories as $row) {
+            $rescat = [$row->id => $row->name] + $rescat;
+        }
+        */
+        $form = new Form;
+
+        //$form->addSelect('category_id', 'Выберите категорию:', $rescat);
+        $form->addSelect('category_id', 'Выберите категорию:');
+
+        $form->addText('new_category', 'Введите название для категории:')
+            ->setHtmlAttribute('min', '3')
+            ->setHtmlAttribute('max', '512')
+            ->addRule($form::Pattern, 'Только буквы, пробел, запятая, дефис', '^[\p{L} ,\-]+$');
+
+        $form->addText('service', 'Введите название услуги:')
+            ->setHtmlAttribute('min', '3')
+            ->setHtmlAttribute('max', '512')
+            ->addRule($form::Pattern, 'Только буквы, пробел, запятая, дефис', '^[\p{L} ,\-]+$')
+            ->setRequired("Укажите название услуги");
+
+        $form->addHidden(name: 'client_id', default: $this->getUser()->id);
+
+        $form->addSubmit('send', 'Отправить');
+        $form->onSuccess[] = [$this, 'requestForAddingServiceFormSucceeded'];
+        return $form;
+    }
+
+    public function requestForAddingServiceFormSucceeded(Form $form, $data): void
+    {
+        $category_id = $form->getHttpData($form::DataLine, 'category_id');
+        if (!empty($category_id && $category_id != 'xxx')) {
+            $data = ['category_id' => $category_id] + (array) $data;
+        }
+
+        $this->sf->db->table('requestforaddingservice')->insert($data);
+        $this->flashMessage('Ваш запрос отправлен', 'success');
+        $this->redirect('this');
+    }
 }
 
 class OfferTemplate extends \App\UI\Home\BaseTemplate

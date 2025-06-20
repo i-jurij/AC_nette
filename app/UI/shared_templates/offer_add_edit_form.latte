@@ -1,4 +1,61 @@
 {block offer_add_edit_form}
+
+{define need_cat_serv_add}
+<form n:name="requestForAddingServiceForm" class="px2">
+   {default $checked_modal_form = ''}
+    {if $form[category_id]->hasErrors() || $form[new_category]->hasErrors() || $form[service]->hasErrors()}
+    {var $checked_modal_form = "checked"}
+    {/if}
+<div class="modal">
+    <input id="need_cat_serv_add" type="checkbox" {$checked_modal_form} />
+    <label for="need_cat_serv_add" class="overlay"></label>
+            <article >
+                <header class="">Напишите, добавим</header>
+                <label for="need_cat_serv_add" class="close">&times;</label>
+                <ul class="errors" n:ifcontent>
+                    <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+                </ul>
+                <p>
+                    {*
+                    {label category_id}
+                        Выберите категорию:
+                        {input category_id, autofocus: true}
+                    {/label}
+                    <span class="red" n:ifcontent>{inputError category_id}</span>
+                    *}
+
+                    {* <label for="category-select">Выберите категорию:</label> *}
+                    <select name="category_id" id="category-select" class="select">
+                        <option value="xxx">Выберите категорию:</option>
+                        {foreach $services as $category_id => $category}
+                            <option value="{$category_id}">{$category['category_name']}</option>
+                        {/foreach}
+                        <option value="xxx">Нет нужной категории</option>
+                    </select>
+                    <span class="red" n:ifcontent>{inputError category_id}</span>
+                </p>
+                <p>
+                    {label new_category}
+                        Или введите название новой категории, если ее нет в списке:
+                        {input new_category}
+                    {/label}
+                    <span class="red" n:ifcontent>{inputError new_category}</span>
+                </p>
+                <p>
+                    {label service}Введите название услуги: {input service}{/label}
+                    <span class="red" n:ifcontent>{inputError service}</span>
+                </p>
+                <p>
+                    {input send, class: "btn btn-default"}
+                    <label for="need_cat_serv_add" class="button dangerous">
+                        Закрыть
+                    </label>
+	            </p>                
+            </article>
+</div>
+</form>
+{/define}
+
 {if $user->isLoggedIn()}
 <style>
     .tab {
@@ -183,7 +240,7 @@
         <span class=error n:ifcontent>{inputError offers_type}</span>
     </div>
 
-    <div class="block fit bg-black rounded py1 px2 mb2">
+    <div class="block fit bg-black rounded py1 px2 mb2">   
         <div class="tab">
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
             {foreach $services as $category_id => $category}
@@ -214,6 +271,11 @@
             </div>
             {/foreach}
         </div>
+
+        <p class="border rounded olive px2 h5 clearfix">
+            <span class="left py1">Нет нужной услуги? Сообщите нам -> </span>
+            <label for="need_cat_serv_add" class="button right">✉</label>
+        </p>
     </div>
 
     <div class="block fit bg-black rounded py1 px2 mb2">
@@ -234,6 +296,7 @@
     </div>
 </form>
 
+{include need_cat_serv_add}
 {*
 <!-- <script defer src="{webpack js/maskito.js}"></script> --> *}
 <script defer src="{webpack js/phoneMask.js}"></script>

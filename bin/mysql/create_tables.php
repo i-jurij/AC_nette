@@ -202,6 +202,19 @@ $chat = 'CREATE TABLE IF NOT EXISTS `chat` (
 	FOREIGN KEY (`offer_id`) REFERENCES `offer`(`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci';
 
+$requestforaddingservice = 'CREATE TABLE IF NOT EXISTS `requestforaddingservice` (
+	`id` INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`client_id` INTEGER UNSIGNED NOT NULL,
+	`category_id` INTEGER UNSIGNED DEFAULT NULL,
+	`new_category` varchar(255) DEFAULT NULL,
+	`service` varchar(500) NOT NULL,
+	`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (`client_id`) REFERENCES `client`(`id`) ON DELETE CASCADE,
+	FOREIGN KEY (`category_id`) REFERENCES `category`(`id`) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  ';
+
 $create_sqls = [
 	'role' => $role,
 	'permission' => $permission,
@@ -219,5 +232,6 @@ $create_sqls = [
 	'service' => $service,
 	'offer_service' => $offer_service,
 	'grievance' => $grievance,
-	'chat' => $chat
+	'chat' => $chat,
+	'requestforaddingservice' => $requestforaddingservice
 ];
