@@ -14,7 +14,7 @@
         <div n:if="!empty($service->new_category)">
             <p class="card-text">
                 <span n:ifcontent>
-                   Категория: {$service->new_category}
+                   Категория: {$service->new_category} <span class="text-warning">(новая)</span>
                 </span>
             </p>
             <p class="card-text">
@@ -23,11 +23,11 @@
                 </span>
             </p>
             <p>
-                <a href="addCatServ cat: $service->new_category, serv: $service->service, rec: $service->id" 
+                <a n:href="addCatServ! cat: $service->new_category, serv: $service->service, rec: $service->id" 
                     class="btn btn-primary me-2"  title="Добавить">
                     +
                 </a>
-                <a href="ready $service->id" class="btn btn-primary" title="Добавлено">✓</a>
+                <a n:href="delete! $service->id" class="btn btn-primary" title="Удалить">✖</a>
             </p>
         </div>
 
@@ -48,7 +48,7 @@
                     title="Добавить">
                     +
                 </a>
-                <a href="ready $service->id" class="btn btn-primary" title="Добавлено">✓</a>
+                <a n:href="delete! $service->id" class="btn btn-primary" title="Удалить">✖</a>
             </p>
         </div>
         
