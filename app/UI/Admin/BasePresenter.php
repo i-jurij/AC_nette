@@ -18,7 +18,7 @@ abstract class BasePresenter extends \App\UI\BasePresenter
     public function __construct()
     {
         parent::__construct();
-        $this->dirList = $this->linkFromFileSystem(APPDIR.DIRECTORY_SEPARATOR.'UI');
+        $this->dirList = $this->linkFromFileSystem(APPDIR . DIRECTORY_SEPARATOR . 'UI');
     }
 
     public function beforeRender()
