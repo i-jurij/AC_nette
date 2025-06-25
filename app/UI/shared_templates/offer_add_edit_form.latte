@@ -201,7 +201,7 @@
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
             {foreach $services as $category_id => $category}
             <div class="tab-panel left-align border-bottom">
-                <p class="block tab-nav" for="tab-{$category_id}">{$category['category_name']}</p>
+                <p class="block tab-nav">{$category['category_name']}</p>
                 <div class="tab-inner">
                     {foreach $category['services'] as $service}
                     <label class="block tab-label-serv p1 m1 rounded">
