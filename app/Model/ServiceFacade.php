@@ -82,11 +82,13 @@ final class ServiceFacade
 
     public function addService(array $data): int
     {
-        $res = $this->db->table('service')->insert([
-            'category_id' => (int) $data['category_id'],
-            'name' => htmlspecialchars(strip_tags($data['name'])),
-        ]);
-
+        $name = htmlspecialchars(strip_tags($data['name']));
+        if (!empty($name)) {
+            $res = $this->db->table('service')->insert([
+                'category_id' => (int) $data['category_id'],
+                'name' => $name,
+            ]);
+        }
         return !empty($res->id) ? $res->id : 0;
     }
 
@@ -101,6 +103,11 @@ final class ServiceFacade
 
     public function addServices(array $data): int // $data = [ 0 => ['category_id' => int, 'name' => 'string'], 1 => ...]
     {
+        foreach ($data as $key => $value) {
+            if (empty($value['name'])) {
+                unset($data[$key]);
+            }
+        }
         $res = $this->db->table('service')->insert($data);
 
         return !empty($res->id) ? $res->id : 0;

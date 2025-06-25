@@ -10,16 +10,10 @@
 <a n:href="catServAdd" class="btn btn-primary">Add category and services</a>
 
 <div class="accordion mt-3" n:if="!empty($services)" id="category_service_list">
-    <div class="accordion-item" n:foreach="$services as $category_id => $category">
-        {if $iterator->first}
-        {var $exp = 'true'} {var $show = 'show'}
-        {else}
-        {var $exp = 'false'}{var $show = ''}
-        {/if}
+    <div class="accordion-item pb-2" n:foreach="$services as $category_id => $category">
         <h2 class="accordion-header" id="headingOne">
             <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                data-bs-target="#service_list_{$category_id}" aria-expanded="{$exp}"
-                aria-controls="service_list_{$category_id}">
+                data-bs-target="#service_list_{$category_id}" aria-controls="service_list_{$category_id}">
                 {$category['category_name']}
             </button>
         </h2>
@@ -34,7 +28,7 @@
             title="Add services to {$category['category_name']}">
             +
         </a>
-        <div id="service_list_{$category_id}" class="accordion-collapse collapse {$show}" aria-labelledby="headingOne"
+        <div id="service_list_{$category_id}" class="accordion-collapse collapse" aria-labelledby="headingOne"
             data-bs-parent="#category_service_list">
             <div class="accordion-body">
                 <div n:foreach="$category['services'] as $service" class="d-inline-block border rounded p-2">

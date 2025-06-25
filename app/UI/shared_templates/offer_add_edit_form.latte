@@ -2,88 +2,66 @@
 
 {define need_cat_serv_add}
 <form n:name="requestForAddingServiceForm" class="px2">
-   {default $checked_modal_form = ''}
+    {default $checked_modal_form = ''}
     {if $form[category_id]->hasErrors() || $form[new_category]->hasErrors() || $form[service]->hasErrors()}
     {var $checked_modal_form = "checked"}
     {/if}
-<div class="modal">
-    <input id="need_cat_serv_add" type="checkbox" {$checked_modal_form} />
-    <label for="need_cat_serv_add" class="overlay"></label>
-            <article >
-                <header class="">Напишите, добавим</header>
-                <label for="need_cat_serv_add" class="close">&times;</label>
-                <ul class="errors" n:ifcontent>
-                    <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
-                </ul>
-                <p>
-                    {*
-                    {label category_id}
-                        Выберите категорию:
-                        {input category_id, autofocus: true}
-                    {/label}
-                    <span class="red" n:ifcontent>{inputError category_id}</span>
-                    *}
+    <div class="modal">
+        <input id="need_cat_serv_add" type="checkbox" {$checked_modal_form} />
+        <label for="need_cat_serv_add" class="overlay"></label>
+        <article>
+            <header class="">Напишите, добавим</header>
+            <label for="need_cat_serv_add" class="close">&times;</label>
+            <ul class="errors" n:ifcontent>
+                <li n:foreach="$form->getOwnErrors() as $error">{$error}</li>
+            </ul>
+            <p>
+                {*
+                {label category_id}
+                Выберите категорию:
+                {input category_id, autofocus: true}
+                {/label}
+                <span class="red" n:ifcontent>{inputError category_id}</span>
+                *}
 
-                    {* <label for="category-select">Выберите категорию:</label> *}
-                    <select name="category_id" id="category-select" class="select">
-                        <option value="xxx">Выберите категорию:</option>
-                        {foreach $services as $category_id => $category}
-                            <option value="{$category_id}">{$category['category_name']}</option>
-                        {/foreach}
-                        <option value="xxx">Нет нужной категории</option>
-                    </select>
-                    <span class="red" n:ifcontent>{inputError category_id}</span>
-                </p>
-                <p>
-                    {label new_category}
-                        Или введите название новой категории, если ее нет в списке:
-                        {input new_category}
-                    {/label}
-                    <span class="red" n:ifcontent>{inputError new_category}</span>
-                </p>
-                <p>
-                    {label service}Введите название услуги: {input service}{/label}
-                    <span class="red" n:ifcontent>{inputError service}</span>
-                </p>
-                <p>
-                    {input send, class: "btn btn-default"}
-                    <label for="need_cat_serv_add" class="button dangerous">
-                        Закрыть
-                    </label>
-	            </p>                
-            </article>
-</div>
+                {* <label for="category-select">Выберите категорию:</label> *}
+                <select name="category_id" id="category-select" class="select">
+                    <option value="xxx">Выберите категорию:</option>
+                    {foreach $services as $category_id => $category}
+                    <option value="{$category_id}">{$category['category_name']}</option>
+                    {/foreach}
+                    <option value="xxx">Нет нужной категории</option>
+                </select>
+                <span class="red" n:ifcontent>{inputError category_id}</span>
+            </p>
+            <p>
+                {label new_category}
+                Или введите название новой категории, если ее нет в списке:
+                {input new_category}
+                {/label}
+                <span class="red" n:ifcontent>{inputError new_category}</span>
+            </p>
+            <p>
+                {label service}Введите название услуги: {input service}{/label}
+                <span class="red" n:ifcontent>{inputError service}</span>
+            </p>
+            <p>
+                {input send, class: "btn btn-default"}
+                <label for="need_cat_serv_add" class="button dangerous">
+                    Закрыть
+                </label>
+            </p>
+        </article>
+    </div>
 </form>
 {/define}
 
 {if $user->isLoggedIn()}
 <style>
-    .tab {
-        position: relative
-    }
-
-    .tab-panel {
-        /* display: inline-block;
-            /* min-height: 150px; */
-    }
-
     .tab-panel .tab-open {
         display: none;
     }
 
-
-    .tab-nav {
-        /* background-image: linear-gradient(to bottom, #333b33 0%, #030702 100%);
-            cursor: pointer;
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            margin-right: 1rem; */
-        max-width: 45%;
-    }
-
-    .tab-open,
-    .tab-nav:hover,
-    .tab-open:checked~.tab-nav,
     .tab-label-serv:hover,
     .tab-label-serv:has(> .tab-check:checked),
     .type-rad-label:hover,
@@ -91,39 +69,17 @@
         background-color: #666500;
     }
 
-    .tab-nav:hover::after,
-    .tab-open:checked~.tab-nav::after {
+    .tab-nav::after {
         content: " ›";
     }
 
     .tab-inner {
-        opacity: 0;
-        position: absolute;
-        top: 1.6rem;
-        left: 50%;
-        width: 50%;
-        transition: opacity .1s;
-        visibility: hidden;
-        transform-origin: 50% 0%;
-    }
-
-    .tab-open:focus:checked~.tab-nav {
-        outline: thin dotted
-    }
-
-    .tab-open:checked~.tab-inner {
-        opacity: 100;
-        visibility: visible;
-        transition: opacity .6s ease
+        margin-left: 2rem;
     }
 
     .form_offer_add {
         max-width: 30rem;
         margin: 0 auto;
-    }
-
-    .tab-panel .button {
-        text-align: justify;
     }
 </style>
 
@@ -198,33 +154,33 @@
         <span class="block">
             Фото<span class="h6"> (до 10МБ каждое):</span>
         </span>
-        &#9432; 
+        &#9432;
         <span class="h6">Первое фото будет основным.</span>
         <div class="mx-auto">
-        <div class="mt1">
-            <label n:name=photo1 class="image_label_offer_add_form">
-                <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
-            </label>
-            <span class=error n:ifcontent>{inputError photo1}</span>
-        </div>
-        <div>
-            <label n:name=photo2 class="image_label_offer_add_form">
-                <input n:name=photo2 title="Перетащите сюда изображениe или нажмите эту кнопку">
-            </label>
-            <span class=error n:ifcontent>{inputError photo2}</span>
-        </div>
-        <div>
-            <label n:name=photo3 class="image_label_offer_add_form">
-                <input n:name=photo3 title="Перетащите сюда изображениe или нажмите эту кнопку">
-            </label>
-            <span class=error n:ifcontent>{inputError photo3}</span>
-        </div>
-        <div>
-            <label n:name=photo4 class="image_label_offer_add_form">
-                <input n:name=photo4 title="Перетащите сюда изображение или нажмите эту кнопку">
-            </label>
-            <span class=error n:ifcontent>{inputError photo4}</span>
-        </div>
+            <div class="mt1">
+                <label n:name=photo1 class="image_label_offer_add_form">
+                    <input n:name=photo1 title="Перетащите сюда изображениe или нажмите эту кнопку">
+                </label>
+                <span class=error n:ifcontent>{inputError photo1}</span>
+            </div>
+            <div>
+                <label n:name=photo2 class="image_label_offer_add_form">
+                    <input n:name=photo2 title="Перетащите сюда изображениe или нажмите эту кнопку">
+                </label>
+                <span class=error n:ifcontent>{inputError photo2}</span>
+            </div>
+            <div>
+                <label n:name=photo3 class="image_label_offer_add_form">
+                    <input n:name=photo3 title="Перетащите сюда изображениe или нажмите эту кнопку">
+                </label>
+                <span class=error n:ifcontent>{inputError photo3}</span>
+            </div>
+            <div>
+                <label n:name=photo4 class="image_label_offer_add_form">
+                    <input n:name=photo4 title="Перетащите сюда изображение или нажмите эту кнопку">
+                </label>
+                <span class=error n:ifcontent>{inputError photo4}</span>
+            </div>
         </div>
     </div>
 
@@ -240,23 +196,15 @@
         <span class=error n:ifcontent>{inputError offers_type}</span>
     </div>
 
-    <div class="block fit bg-black rounded py1 px2 mb2">   
+    <div class="block fit bg-black rounded py1 px2 mb2">
         <div class="tab">
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
             {foreach $services as $category_id => $category}
-            <div class="tab-panel">
-                {if isset($offers) && array_key_exists($category_id, $offers['services']) }
-                <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}"
-                    checked>
-                {else}
-                <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}">
-                {/if}
-
-                <label class="block button tab-nav" for="tab-{$category_id}">{$category['category_name']}</label>
+            <div class="tab-panel left-align border-bottom">
+                <p class="block tab-nav" for="tab-{$category_id}">{$category['category_name']}</p>
                 <div class="tab-inner">
                     {foreach $category['services'] as $service}
-                    <label class="block button tab-label-serv">
-
+                    <label class="block tab-label-serv p1 m1 rounded">
                         {if isset($offers['services'][$category_id]) && array_key_exists($service['id'],
                         $offers['services'][$category_id]['services'])}
                         <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}" checked>
@@ -333,20 +281,6 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         imageLabels();
-
-        let categories = document.querySelectorAll('input[name="category"]');
-        let services = document.querySelectorAll('input[name="service[]"]');
-        if (categories) {
-            categories.forEach(
-                elem => { 
-                    elem.addEventListener('change', function () {
-                        services.forEach(function (el) {
-                            el.checked = false;
-                        })
-                    });
-                }
-            );
-        }
     });
 </script>
 {/if}
