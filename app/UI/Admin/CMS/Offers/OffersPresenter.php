@@ -60,7 +60,8 @@ final class OffersPresenter extends \App\UI\Admin\BasePresenter
         }
 
         if (isset($tmstr)) {
-            $formdata->created_time = new \DateTimeImmutable()->modify($tmstr)->format('Y-m-d H:i:s');
+            $date = new \DateTimeImmutable();
+            $formdata->created_time = $date->modify($tmstr)->format('Y-m-d H:i:s');
         }
 
         $formdata->with_banned = 1;
