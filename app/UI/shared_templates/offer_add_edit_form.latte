@@ -58,10 +58,17 @@
 
 {if $user->isLoggedIn()}
 <style>
+    .tab {
+        scroll-behavior: smooth;
+    }
+
     .tab-panel .tab-open {
         display: none;
     }
 
+    .tab-open,
+    .tab-nav:hover,
+    .tab-open:checked~.tab-nav,
     .tab-label-serv:hover,
     .tab-label-serv:has(> .tab-check:checked),
     .type-rad-label:hover,
@@ -75,6 +82,11 @@
 
     .tab-inner {
         margin-left: 2rem;
+        display: none;
+    }
+
+    .tab-open:checked~.tab-inner {
+        display: block;
     }
 
     .form_offer_add {
@@ -200,11 +212,19 @@
         <div class="tab">
             <span class="mr2">Категория&nbsp;›&nbsp;Услуги:</span>
             {foreach $services as $category_id => $category}
-            <div class="tab-panel left-align border-bottom">
-                <p class="block tab-nav">{$category['category_name']}</p>
-                <div class="tab-inner">
+            <div class="tab-panel left-align">
+                {if isset($offers) && array_key_exists($category_id, $offers['services']) }
+                <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}"
+                    checked>
+                {else}
+                <input class="tab-open" id="tab-{$category_id}" name="category" type="radio" value="{$category_id}">
+                {/if}
+                <label class="button tab-nav" for="tab-{$category_id}"
+                    id="tab-{$category_id}-label">{$category['category_name']}</label>
+
+                <div class="tab-inner" id="tab-{$category_id}-inner">
                     {foreach $category['services'] as $service}
-                    <label class="block tab-label-serv p1 m1 rounded">
+                    <label class="button tab-label-serv">
                         {if isset($offers['services'][$category_id]) && array_key_exists($service['id'],
                         $offers['services'][$category_id]['services'])}
                         <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}" checked>
@@ -279,8 +299,46 @@
         }
     }
 
+    function scrollIntoViewIfOutOfView (el) {
+        let topOfPage = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        let heightOfPage = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        let elY = 0;
+        let elH = 0;
+        if (document.layers) { // NS4
+            elY = el.y;
+            elH = el.height;
+        }
+        else {
+            for (let p = el; p && p.tagName != 'BODY'; p = p.offsetParent) {
+                elY += p.offsetTop;
+            }
+            elH = el.offsetHeight;
+        }
+        if ((topOfPage + heightOfPage) < (elY + elH)) {
+            el.scrollIntoView(false);
+        }
+        else if (elY < topOfPage) {
+            el.scrollIntoView(true);
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         imageLabels();
+
+        let categories = document.querySelectorAll('input[name="category"]');
+        let services = document.querySelectorAll('input[name="service[]"]');
+        if (categories) {
+            categories.forEach(
+                elem => { 
+                    elem.addEventListener('change', function () {
+                        services.forEach(function (el) {
+                            el.checked = false;
+                        });
+                        scrollIntoViewIfOutOfView(this.nextElementSibling);
+                    });
+                }
+            );
+        }
     });
 </script>
 {/if}
