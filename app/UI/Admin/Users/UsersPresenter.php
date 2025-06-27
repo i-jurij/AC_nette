@@ -21,8 +21,8 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
 
     public function __construct(
         protected UserFacade $userfacade,
-        private FormFactory $formFactory)
-    {
+        private FormFactory $formFactory
+    ) {
         parent::__construct();
     }
 
@@ -81,6 +81,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
             ->addRule($form::MinLength, 'Имя длиной не менее %d символов', 3)
             ->addRule($form::MaxLength, 'Имя длиной до 25 символов', 25)
             ->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9_\-]+$')
+            //->addRule($form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[\p{L}0-9 _\-]+$')
             ->setMaxLength(25);
 
         $form->addPassword('password', 'Password:')
@@ -142,20 +143,20 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                 if (!empty($update)) {
                     if ($this->getUser()->isInRole('admin') || $this->getUser()->getIdentity()->getId() == $id) {
                         $this->userfacade->update($id, $update);
-                        $this->flashMessage(\json_encode($update).' User updated', 'text-success');
+                        $this->flashMessage(\json_encode($update) . ' User updated', 'text-success');
                     } else {
-                        $this->flashMessage($this->getUser()->getIdentity()->getId().'/'.$id.'/'.\json_encode($update).'You not permissions for user data updating');
+                        $this->flashMessage($this->getUser()->getIdentity()->getId() . '/' . $id . '/' . \json_encode($update) . 'You not permissions for user data updating');
                     }
                 } else {
                     $this->flashMessage('Nothing was updated', 'text-success');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage('Caught Exception!'.PHP_EOL
-                    .'Error message: '.$e->getMessage().PHP_EOL
-                    .'File: '.$e->getFile().PHP_EOL
-                    .'Line: '.$e->getLine().PHP_EOL
-                    .'Error code: '.$e->getCode().PHP_EOL
-                    .'Trace: '.$e->getTraceAsString().PHP_EOL, 'text-danger');
+                $this->flashMessage('Caught Exception!' . PHP_EOL
+                    . 'Error message: ' . $e->getMessage() . PHP_EOL
+                    . 'File: ' . $e->getFile() . PHP_EOL
+                    . 'Line: ' . $e->getLine() . PHP_EOL
+                    . 'Error code: ' . $e->getCode() . PHP_EOL
+                    . 'Trace: ' . $e->getTraceAsString() . PHP_EOL, 'text-danger');
             }
         } else {
             $this->error('Forbidden', 403);
@@ -228,7 +229,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
             $new_user = $this->userfacade->add($data);
             $this->flashMessage('You have successfully user add.', 'text-success');
         } catch (\Exception $e) {
-            $this->flashMessage("Such a name, email or number is already in the database.\nError: ".$e->getMessage(), 'text-danger');
+            $this->flashMessage("Such a name, email or number is already in the database.\nError: " . $e->getMessage(), 'text-danger');
         }
 
         $this->redirect(':Admin:');
@@ -278,9 +279,9 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
             if (!empty($data->roles)) {
                 // send email for verification (url with auth_token)
                 $mail = new Email();
-                $mail->from = 'admin@'.SITE_NAME;
+                $mail->from = 'admin@' . SITE_NAME;
                 $mail->to = $data->email;
-                $mail->subject = 'Register on '.SITE_NAME;
+                $mail->subject = 'Register on ' . SITE_NAME;
                 $mail->body = (string) $url;
                 $mail->sendEmail();
                 $message = 'Email for verify received.';
@@ -303,7 +304,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                 $this->flashMessage('Assign a user a role', 'text-warning');
             }
         } catch (\Exception $e) {
-            $this->flashMessage('Error: '.$e->getMessage(), 'text-danger');
+            $this->flashMessage('Error: ' . $e->getMessage(), 'text-danger');
         }
         $this->redirect(':Admin:Users:applicationsforregistration');
     }
@@ -355,7 +356,7 @@ final class UsersPresenter extends \App\UI\Admin\BasePresenter
                     $this->redirect('this');
                 }
             } catch (\Exception $e) {
-                $this->flashMessage("\n".$e->getMessage(), 'text-danger');
+                $this->flashMessage("\n" . $e->getMessage(), 'text-danger');
                 $this->redirect('this');
             }
         }
