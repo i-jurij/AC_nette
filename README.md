@@ -57,6 +57,8 @@ Then run console command into project folder:
 `php ./bin/start.php migrate`  
 for created db tables. It safely for data in existing tables.  
 SQL query for tables created is in file "create_sql.php".
+Then if you need you can added category and services manually from dump file of database  
+AC_start_need_create_admin_user_from_console.sql
 
 Then run:  
 `php ./bin/start.php useradd <username> <password>`  
@@ -202,3 +204,17 @@ This can be change into `\App\UI\Model\CommentFacade.php`
 #### Grievance
 
 Жалобы на объявления или комментарии
+
+## DB
+
+Mariadb 10.4 - 10.6  
+В случае создания БД не из дампа, а с нуля:
+
+---
+
+### TEST data for DB
+
+Only for testing  
+php bin/factorys/client create 10  
+php bin/factorys/service create  
+php bin/factorys/offers create 25
