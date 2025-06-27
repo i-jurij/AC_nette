@@ -1,9 +1,0 @@
-database:
-	mysql:
-		dsn: 'mysql:host=127.0.0.1;dbname=AC'
-		user: 'acnette'
-		password: 'acnette'
-		autowired: true
-		options:
-			lazy: yes
-			charset: utf8mb4
