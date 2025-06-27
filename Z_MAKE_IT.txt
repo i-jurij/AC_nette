@@ -1,9 +1,5 @@
 MAKE  
 
-добавить список категорий и услуг
-make dump of data of db, save to yd
- добавить в bin/insert_sql.php ???
-
 ADMIN 
 grievance, reqforaddservice count, other info to infoboard on each admins page 
 -------------------------------------------------------------

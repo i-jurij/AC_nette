@@ -64,8 +64,14 @@ for user with admin grants creating.
 Password minimal length = 7, it can be change in config.
 
 **_After user with specific permissions adding you must first permissions added_**  
-Other users can be added from the admin panel.  
+Other users can be added from the admin panel.
+
 Before user creating you can create permissions (resource, action) then roles.
+
+1. Create PERMISSIONS for user
+2. Create ROLES with permissions for user
+3. Create USER
+
 Permissions can be added automatically from classes names of models directory and their methods (you can change it from presenters and theirs methods) or manually.  
 If you set in permissions only resource without action - you allow all actions of the resource.
 
@@ -97,7 +103,8 @@ See directory "bin/mysql".
 ### Accessory
 
 Traits and classes for using in presenters.  
-`RequireLoggedUser` - trait for page that need autentication (in user not logged - redirect to sign in)
+`RequireLoggedUser` - trait for admins pages that need autentication (in user not logged - redirect to sign in)
+`RequireLoggedClient` - trait for home pages that need autentication (in client not logged - redirect to sign in)
 
 ### Authentication
 
@@ -171,7 +178,7 @@ List, show, clear logs
 
 #### CMS
 
-SEO --- MAKE IT!!!
+SEO --- MAKE IT!!!  
 Create, update, delete clients (customers, executors)  
 Create, update, delete offers, comments, rating
 
@@ -191,3 +198,7 @@ This can be change into `\App\UI\Model\CommentFacade.php`
 и открывает список комнат чата, где можно выбрать конкретную.  
 На странице объявления кнопка после телефона показывает количество новых сообщений от владельца объявления  
 и открывает комнату чата этого объявления.
+
+#### Grievance
+
+Жалобы на объявления или комментарии
