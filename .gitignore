@@ -2,5 +2,5 @@
 /vendor
 /log
 /temp
-/config/secret.neon
 /config/db.neon
+/config/secret.neon
