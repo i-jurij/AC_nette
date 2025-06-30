@@ -36,9 +36,13 @@ class Authenticator implements Nette\Security\Authenticator, Nette\Security\Iden
         // Authentication checks
         if (!$user) {
             throw new AuthenticationException('The username is incorrect.', self::IdentityNotFound);
-        } elseif (!$this->passwords->verify($password, $user[$this->userfacade::ColumnPasswordHash])) {
+        }
+
+        if (!$this->passwords->verify($password, $user[$this->userfacade::ColumnPasswordHash])) {
             throw new AuthenticationException('The password is incorrect.', self::InvalidCredential);
-        } elseif ($this->passwords->needsRehash($user[$this->userfacade::ColumnPasswordHash])) {
+        }
+
+        if ($this->passwords->needsRehash($user[$this->userfacade::ColumnPasswordHash])) {
             $user->update([
                 $this->userfacade::ColumnPasswordHash => $this->passwords->hash($password),
             ]);

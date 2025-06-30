@@ -5,50 +5,55 @@ declare(strict_types=1);
 namespace App\UI\Accessory;
 
 use Nette\Utils\Random;
+use Nette\Security\SimpleIdentity;
 
 trait OauthLogin
 {
     public function oauthLogin(array $user_data): void
     {
-        if (!empty($user_data['error'])) {
+        if (!empty($user_data['error'][0])) {
             foreach ($user_data['error'] as $error) {
-                $this->flashMessage($error, 'text-danger');
+                $this->flashMessage($error, 'error');
             }
-            $this->redirect(':Home:');
-        }
+        } else {
+            if (!empty($user_data['data'])) {
+                // check if user not isset in db
+                $phone = !empty($user_data['data']['phone']) ? PhoneNumber::toDb($user_data['data']['phone']) : '';
+                $email = !empty($user_data['data']['email']) ? $user_data['data']['email'] : '';
 
-        if (!empty($user_data['data'])) {
-            // check if user not isset in db
-            $check_array = [];
-            foreach ($user_data['data'] as $key => $value) {
-                if (!empty($value)) {
-                    $check_array[$key] = $value;
+                $user_isset = $this->cf->db->table($this->cf->table)->where([
+                    'phone' => $phone,
+                    'email' => $email
+                ])->fetch();
+
+                $data = (object) $user_data['data'];
+
+                $user = $this->getUser();
+
+                if (empty($user_isset->id)) {
+                    // then add user to db: $res = $this->cf->add($data);
+                    $data->roles = 'client';
+                    $data->password = Random::generate(10);
+                    $res = $this->cf->add($data);
+
+                    $this->flashMessage("Вы можете входить на сайт используя ваш номер телефона и пароль '$data->password' или дальше использовать вход через сторонние сервисы.", 'success');
+                    if (!empty($data->username)) {
+                        $user->login($data->username, $data->password);
+                    }
+                    if (!empty($data->phone)) {
+                        $user->login(PhoneNumber::toDb($data->phone), $data->password);
+                    }
+
+                } else {
+                    $arr = $user_isset->toArray();
+                    unset($arr[$this->cf::ColumnPasswordHash]);
+                    $roles = $this->cf->getRoless($user_isset[$this->cf::ColumnId]);
+                    $identity = new SimpleIdentity($user_isset[$this->cf::ColumnId], $roles, $arr);
+                    $user->login($identity);
                 }
-            }
-
-            $user_isset = $this->userfacade->db->table($this->userfacade->table)->where($check_array)->fetch();
-
-            $data = (object) $user_data['data'];
-            if (empty($user_isset)) {
-                // then add user to db: $res = $this->userfacade->add($data);
-                $data->roles = 'client';
-                $data->password = Random::generate(10);
-                $res = $this->userfacade->add($data);
             } else {
-                $data->password = $user_isset['password'];
+                $this->flashMessage('Не получены данные пользователя', 'error');
             }
-            // login
-            $user = $this->getUser();
-            if (!empty($data->username)) {
-                $user->login($data->username, $data->password);
-            }
-            if (!empty($data->phone)) {
-                $user->login(PhoneNumber::toDb($data->phone), $data->password);
-            }
-
-            $this->restoreRequest($this->backlink);
-
-            $this->redirect(':Home:');
         }
     }
 }

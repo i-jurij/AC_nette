@@ -77,40 +77,35 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
     }
 
+    public function actionYLTest(): void
+    {
+        $user_data['data'] = [
+            'email' => 'vvvvv@gmail.com',
+            'phone' => '+7 (944) 509 14 56',
+        ];
+        $this->oauthLogin($user_data);
+        $this->restoreRequest($this->backlink);
+        $this->redirect(':Home:');
+    }
+
     public function actionYandexLogin(): void
     {
-        try {
-            $user_data = $this->getUserDataYandex();
-            $this->oauthLogin($user_data);
-        } catch (\Exception $e) {
-            $this->flashMessage('Error', 'text-danger');
-            // write logged error
-            $this->redirect(':Home:');
-        }
+        $user_data = $this->getUserDataYandex();
+        $this->oauthLogin($user_data);
+        $this->restoreRequest($this->backlink);
+        $this->redirect(':Home:');
     }
 
     public function actionTelegramLogin(): void
     {
-        try {
-            $user_data = $this->getUserDataTelegram();
-            $this->oauthLogin($user_data);
-        } catch (\Exception $e) {
-            $this->flashMessage('Error', 'text-danger');
-            // write logged error
-            $this->redirect(':Home:');
-        }
+        $user_data = $this->getUserDataTelegram();
+        $this->oauthLogin($user_data);
     }
 
     public function actionVkLogin(): void
     {
-        try {
-            $user_data = $this->getUserDataVK();
-            $this->oauthLogin($user_data);
-        } catch (\Exception $e) {
-            $this->flashMessage('Error', 'text-danger');
-            // write logged error
-            $this->redirect(':Home:');
-        }
+        $user_data = $this->getUserDataVK();
+        $this->oauthLogin($user_data);
     }
 
     public function renderIn()
