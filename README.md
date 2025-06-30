@@ -84,7 +84,7 @@ If you set in permissions only resource without action - you allow all actions o
 ### Config
 
 Configs files are located in "app/config". Read this [documentation](https://doc.nette.org/en/configuring).  
-Config `pages_sqlite` is require for page menu on main page and admin pages.
+Change configs as you need: site name, db name, passwords and other things.
 
 ### Routing
 
@@ -207,14 +207,10 @@ This can be change into `\App\UI\Model\CommentFacade.php`
 
 ## DB
 
-Mariadb 10.4 - 10.6  
+Mariadb 10.4 - 10.10  
 В случае создания БД не из дампа, а с нуля:
 
----
-
-### TEST data for DB
-
-Only for testing  
-php bin/factorys/client create 10  
+TEST data for DB Only for testing  
+`php bin/factorys/client create 10  
 php bin/factorys/service create  
-php bin/factorys/offers create 25
+php bin/factorys/offers create 25`

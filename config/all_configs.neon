@@ -1,4 +1,5 @@
 includes:
+    - http.neon
     - captcha.neon
     - common.neon
     - db.neon

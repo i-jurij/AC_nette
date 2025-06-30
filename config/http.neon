@@ -1,0 +1,21 @@
+http:
+# headers that are sent with each request
+	headers:
+		X-Powered-By: jobaround
+		#X-Content-Type-Options: nosniff
+		#X-XSS-Protection: '1; mode=block'
+
+	# affects the X-Frame-Options header
+	#frames: ...      # (string|bool) defaults to 'SAMEORIGIN'
+
+	# cookie scope by path
+	#cookiePath: ...          # (string) defaults to '/'
+
+	# domains that can receive the cookie
+	#cookieDomain: 'example.com'  # (string|domain) defaults to unset
+
+	# send cookies only via HTTPS?
+	cookieSecure: true       # (bool|auto) defaults to auto
+
+	# disables sending the cookie that Nette uses for CSRF protection
+	#disableNetteCookie: ...  # (bool) defaults to false
