@@ -38,7 +38,7 @@
         width: 8rem;
     }
 
-    select {
+    .select_filter {
         max-width: 15rem;
     }
 
@@ -268,7 +268,7 @@
 
             <div class="form_radio_group" aria-labelledby="filter_form_service_p">
                 <p class="my0" id="filter_form_service_p">Услуги:</p>
-                <select name="service" class="select form_radio_group-item">
+                <select name="service" class="select select_filter form_radio_group-item">
                     <option value="">Все</option>
                     {foreach $service_list as $cat}
                     <optgroup label="{$cat['category_name']}">

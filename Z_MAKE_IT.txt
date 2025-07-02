@@ -18,7 +18,7 @@ authorize logging and users actions logging
  
 HOME
 
-geolocation: hide modal after city choice need to fix!!!
+classes select then modal width
 
 restore password by email rewrite to webmaster@jobaround.ru
 
