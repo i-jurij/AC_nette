@@ -18,8 +18,6 @@ authorize logging and users actions logging
  
 HOME
 
-classes select then modal width
-
 restore password by email rewrite to webmaster@jobaround.ru
 
 vk выдает телефон только бизнес vkid... 

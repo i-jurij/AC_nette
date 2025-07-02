@@ -219,8 +219,11 @@ span.error {
     z-index: 1;
     width: auto;
     padding: 0;
+    /*
     opacity: 0;
     visibility: hidden;
+    */
+    display: none;
     background: transparent;
     overflow: hidden;
     transform-origin: 50% 0%;
@@ -228,8 +231,9 @@ span.error {
 
 #profile_input:checked+.dropdown_menu {
     background-color: var(--bgcolor-content, rgb(44, 46, 43));
-    opacity: 1;
-    visibility: visible;
+    /* opacity: 1;
+    visibility: visible; */
+    display: block;
     animation-name: swingdown;
     animation-duration: 100ms;
     animation-timing-function: ease;
@@ -268,7 +272,7 @@ span.error {
 }
 
 /* ----------- resolution up to 620px ----------------- */
-/*
+
 @media screen and (max-width: 620px) {
     body {
         font-size: var(--small-fontsize);
@@ -279,4 +283,3 @@ span.error {
         font-size: var(--middle-fontsize);
     }
 }
-*/
