@@ -6,18 +6,21 @@ namespace App\UI\Accessory;
 
 use Ijurij\Geolocation\Lib\Csrf;
 use Ijurij\Geolocation\Lib\Session;
+use Nette\Utils\Random;
 
 trait VKLogin
 {
     public function VKLoginUrl(): string
     {
-        $code_verifier = Csrf::token(256);
-        $code_challenge = rtrim(strtr(base64_encode(hash('sha256', $code_verifier, true)), '+/', '-_'), '=');
-        Session::set('code_verifier', $code_verifier);
+        $code_verifier = Random::generate(48, '0-9a-z');
+        $code_challenge = base64_encode(hash('sha256', $code_verifier, true));
+        if (!Session::has('code_verifier')) {
+            Session::set('code_verifier', $code_verifier);
+        }
 
         $params = [
             'client_id' => VKLOGIN_ID,
-            'redirect_uri' => $this->link(':Home:Sign:vkLogin'),
+            'redirect_uri' => "https://" . SITE_NAME . $this->link(':Home:Sign:vklogin'),
             'response_type' => 'code',
             'scope' => 'email phone vkid.personal_info',
             'scheme' => 'dark',
@@ -26,7 +29,7 @@ trait VKLogin
             'code_challenge_method' => 'S256',
         ];
 
-        $url = 'https://id.vk.com/authorize?'.urldecode(http_build_query($params));
+        $url = 'https://id.vk.com/authorize?' . urldecode(http_build_query($params));
 
         return $url;
     }
@@ -37,7 +40,7 @@ trait VKLogin
         $data = [];
 
         // check csrf and then execute code
-        if (hash_equals(Session::get('token'), $_GET['state'])) {
+        if (hash_equals(Session::get(Csrf::$token_name), $_GET['state'])) {
             if (!empty($_GET['code'])) {
                 // Отправляем код для получения токена (POST-запрос).
                 $params = [
@@ -54,13 +57,18 @@ trait VKLogin
                 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_HEADER, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                //curl_setopt($ch, CURLOPT_HEADER, false);
                 $d = curl_exec($ch);
                 curl_close($ch);
 
-                $d = json_decode($d, true);
-                if (hash_equals(Session::get('token'), $d['state']) && !empty($d['access_token'])) {
+                if ($d !== false) {
+                    $d = json_decode($d, true);
+                } else {
+                    $errors[] = 'Ошибка! Попробуйте позже';
+                }
+
+                if (!empty($d['state']) && hash_equals(Session::get(Csrf::$token_name), $d['state']) && !empty($d['access_token'])) {
                     // Токен получили, получаем данные пользователя.
                     $params = [
                         'client_id' => VKLOGIN_ID,
@@ -78,19 +86,22 @@ trait VKLogin
 
                     $data = json_decode($info, true);
                 } else {
-                    $errors[] = 'Access token not received or state is invalid (csrf not valid)';
+                    //$errors[] = 'Access token not received or state is invalid';
+                    $errors[] = 'Ошибка! Попробуйте позже или зарегистрируйтесь с помощью формы на сайте';
                 }
             } else {
-                $errors[] = 'Authorization code not received';
+                //$errors[] = 'Authorization code not received';
+                $errors[] = 'Ошибка! Попробуйте позже';
             }
         } else {
-            $errors[] = 'State is invalid (csrf not valid)';
+            //$errors[] = 'State is invalid (csrf not valid)';
+            $errors[] = 'Ошибка! Закройте страницу, откройте снова и попробуйте еще раз';
         }
 
         return [
             'error' => $errors,
             'data' => [
-                'username' => $data['user']['first_name'].'_id_'.$data['user_id'],
+                // 'username' => $data['user']['first_name'] . '_id_' . $data['user_id'],
                 'email' => $data['user']['email'] ?? '',
                 'phone' => $data['user']['phone'] ?? '',
             ],

@@ -94,7 +94,6 @@ trait YandexLogin
                         $errors[] = 'Ошибка! Попробуйте позже';
                     }
 
-
                     if (!empty($d['access_token'])) {
                         // Токен получили, получаем данные пользователя.
                         $ch = curl_init('https://login.yandex.ru/info');
@@ -124,7 +123,7 @@ trait YandexLogin
             }
         } else {
             //$errors[] = 'State is invalid (csrf not valid)';
-            $errors[] = 'Ошибка! Перезагрузите страницу и попробуйте снова';
+            $errors[] = 'Ошибка! Закройте страницу, откройте снова и попробуйте еще раз';
         }
 
         return [

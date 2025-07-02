@@ -15,10 +15,19 @@ menu | breadcrumb
 authorize logging and users actions logging
 
 ==============================================================
-
+ 
 HOME
 
-trait oauth login php from accesories rewrite
+geolocation: hide modal after city choice need to fix!!!
+
+restore password by email rewrite to webmaster@jobaround.ru
+
+vk выдает телефон только бизнес vkid... 
+telegram выдает скорее всего только имя пользователя, может еще телефон...
+Переписать аутентификацию на имя пользователя + пароль? А телефон указывать вручную?
+Или просто не исполльзовать vk + tg для аутентификации
+
+
 
 
 сделать среди объявлений вставку рекламы?
