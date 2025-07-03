@@ -7,10 +7,9 @@
 	</div>
 
 	<div class="right-align">
-		<a class="pseudo button " n:if="!$user->isLoggedIn()" n:href=":Home:Sign:in, backlink: $backlink"
-			aria-label="Кнопка входа">Войти</a>
-		<button n:if="$user->isLoggedIn()" onclick="Chat.getOffersWithNewMessage()" aria-label="Кнопка новые сообщения"
-			title="Новые сообщения" class="pseudo px0">
+		{if $user->isLoggedIn()}
+		<button onclick="Chat.getOffersWithNewMessage()" aria-label="Кнопка новые сообщения" title="Новые сообщения"
+			class="pseudo px0">
 			<span class="label" id="countChatMessagesClient" data-count="{$count_client_chat}">
 				{$count_client_chat}
 			</span>
@@ -23,7 +22,7 @@
 				aria-label="Кнопка меню профиля" title="Меню профиля">
 				{$user->getIdentity()->username}
 			</label>
-			<input id="profile_input" type="checkbox" style="display: none">
+			<input id="profile_input" type="checkbox">
 			<div class="dropdown_menu round shadow left-align mt0">
 				<a n:href=":Home:Client:Offer:default" aria-label="Кнопка ">Объявления</a>
 
@@ -34,8 +33,13 @@
 		{*<a class="pseudo button" n:if="$user->isLoggedIn()" n:href=":Home:Sign:out">
 			Выйти
 		</a> *}
-		<a class="button " n:if="$user->isLoggedIn() && !$presenter->isLinkCurrent(':Home:Client:Offer:add')"
-			n:href=":Home:Client:Offer:add" aria-label="Кнопка Разместить объявление">Разместить объявление</a>
+		<a class="button " n:if="!$presenter->isLinkCurrent(':Home:Client:Offer:add')" n:href=":Home:Client:Offer:add"
+			aria-label="Кнопка Разместить объявление">
+			Разместить объявление
+		</a>
+		{else}
+		<a class="pseudo button" n:href=":Home:Sign:in, backlink: $backlink" aria-label="Кнопка входа">Войти</a>
+		{/if}
 	</div>
 </header>
 

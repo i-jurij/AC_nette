@@ -213,17 +213,18 @@ span.error {
     position: relative;
 }
 
+#profile_input {
+    display: none;
+}
+
 #profile_input+.dropdown_menu {
     position: absolute;
     left: 0;
     z-index: 1;
     width: auto;
     padding: 0;
-    /*
     opacity: 0;
     visibility: hidden;
-    */
-    display: none;
     background: transparent;
     overflow: hidden;
     transform-origin: 50% 0%;
@@ -231,9 +232,8 @@ span.error {
 
 #profile_input:checked+.dropdown_menu {
     background-color: var(--bgcolor-content, rgb(44, 46, 43));
-    /* opacity: 1;
-    visibility: visible; */
-    display: block;
+    opacity: 1;
+    visibility: visible;
     animation-name: swingdown;
     animation-duration: 100ms;
     animation-timing-function: ease;
