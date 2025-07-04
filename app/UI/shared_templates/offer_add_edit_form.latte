@@ -227,9 +227,11 @@
                     <label class="button tab-label-serv">
                         {if isset($offers['services'][$category_id]) && array_key_exists($service['id'],
                         $offers['services'][$category_id]['services'])}
-                        <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}" checked>
+                        <input class="tab-check" id="{$category_id}_{$service['id']}" name="service[]" type="checkbox"
+                            value="{$service['id']}" checked>
                         {else}
-                        <input class="tab-check" name="service[]" type="checkbox" value="{$service['id']}">
+                        <input class="tab-check" id="{$category_id}_{$service['id']}" name="service[]" type="checkbox"
+                            value="{$service['id']}">
                         {/if}
 
                         <span class="checkable">{$service['name']}</span>
@@ -325,19 +327,47 @@
     document.addEventListener("DOMContentLoaded", function() {
         imageLabels();
 
-        let categories = document.querySelectorAll('input[name="category"]');
+        let cat_labels = document.querySelectorAll('.tab-nav');
         let services = document.querySelectorAll('input[name="service[]"]');
-        if (categories) {
-            categories.forEach(
-                elem => { 
-                    elem.addEventListener('change', function () {
-                        services.forEach(function (el) {
-                            el.checked = false;
-                        });
-                        scrollIntoViewIfOutOfView(this.nextElementSibling);
+        if (cat_labels) {
+            cat_labels.forEach(function(e) {
+                e.removeAttribute('for');
+
+                e.addEventListener('pointerdown', function (event) {
+                    if (event.isPrimary) {
+                        window.topPosition = event.target.getBoundingClientRect().top + window.pageYOffset;
+                    }
+                });
+
+                e.addEventListener('pointerup', function (event) {
+                    let catservdiv = document.querySelector('#' + event.target.id.slice(0, -6) + '-inner');
+                    if (catservdiv) {
+                        if (catservdiv.style.display == 'block') {
+                            catservdiv.style.display = '';
+                        } else {
+                            catservdiv.style.display = 'block';
+                        }
+                    }
+                });
+            });
+        }
+
+        if (services) {
+            services.forEach(function (el) {
+                el.addEventListener('change', function(ev) {
+                    services.forEach(function (inp) {
+                        if (inp.id.split('_')[0] != ev.target.id.split('_')[0] && inp.checked) {
+                            inp.checked = false;
+                        }
                     });
-                }
-            );
+
+                    cat_labels.forEach(function (cl) {
+                        cl.style.backgroundColor = '';
+                    });
+                    let lab = document.querySelector('#tab-' + ev.target.id.split('_')[0] + '-label');
+                    if (lab) { lab.style.backgroundColor = '#666500'; }
+                });
+            });
         }
     });
 </script>

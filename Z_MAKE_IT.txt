@@ -19,9 +19,9 @@ authorize logging and users actions logging
 HOME
 
 создание объявлений:
-1 сделать основным не просто первое фото, 
+2 сделать основным не просто первое фото, 
 а первое по порядку (если пользователь пропустил первый инпут)
-2 toggle show/hide category if click
+1 toggle show/hide category if click
 
 
 vk выдает телефон только бизнес vkid... 
