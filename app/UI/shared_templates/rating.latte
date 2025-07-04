@@ -17,6 +17,8 @@
         </span>
 
         &emsp;
+
+        {if $user->getId() !== $offers[0]['client_id']}
         <label for="offer_client_rating" class="button">Оценить</label>
         <div class="modal">
             <input id="offer_client_rating" type="checkbox" />
@@ -59,6 +61,7 @@
                 {/if}
             </article>
         </div>
+        {/if}
 
     </dd>
 </dl>
