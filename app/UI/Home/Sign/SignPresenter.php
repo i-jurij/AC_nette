@@ -77,6 +77,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
     }
 
+    /*
     public function actionYLTest(): void
     {
         $user_data['data'] = [
@@ -87,6 +88,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->restoreRequest($this->backlink);
         $this->redirect(':Home:');
     }
+*/
 
     public function actionVklogin(): void
     {
@@ -175,7 +177,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         $form->addEmail('email', '')
             ->setHtmlAttribute('placeholder', '📧 Email:')
             ->setRequired('Введите адрес электронной почты.')
-            ->addRule(Form::Email, 'Введите правильный адрес электронной почты.');
+            ->addRule($form::Email, 'Введите правильный адрес электронной почты.');
 
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
@@ -200,16 +202,21 @@ final class SignPresenter extends \App\UI\BasePresenter
                 $redirect_url = $this->link(':Home:Sign:restorelink') . '?token=' . $res->auth_token . '&' . Csrf::$token_name . '=' . Csrf::getToken();
 
                 $mail = new Email();
-                $mail->from = 'admin@' . SITE_NAME;
+                $mail->from = 'webmaster@' . SITE_NAME;
                 $mail->to = $email;
                 $mail->subject = 'Restore password';
                 $mail->body = $redirect_url;
-                $mail->sendEmail();
+                try {
+                    $mail->sendEmail();
 
-                $this->flashMessage('На указанный вами адрес электронной почты отправлено письмо.', 'success');
+                    $this->flashMessage('На указанный вами адрес электронной почты отправлено письмо.', 'success');
+
+                } catch (\Throwable $th) {
+                    // $this->flashMessage($th->getMessage() . PHP_EOL . 'Trace: ' . $th->getTraceAsString() . PHP_EOL, 'error');
+                }
                 $this->redirect(':Home:Sign:in');
             } else {
-                $this->flashMessage('Пользователь с таким адресом электронной почты не зарегистрирован. Зарегистрируйтесь или войдите с помощью других сервисов.', 'info');
+                $this->flashMessage('Пользователь с таким адресом электронной почты не зарегистрирован.', 'info');
                 $this->redirect(':Home:Sign:up');
             }
         } else {

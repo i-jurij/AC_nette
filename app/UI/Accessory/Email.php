@@ -28,10 +28,6 @@ class Email
     public function sendEmail(): void
     {
         $mailer = new \Nette\Mail\SendmailMailer();
-        try {
-            $mailer->send($this->setEmail());
-        } catch (\Nette\Mail\SendException $s) {
-            // exception to log
-        }
+        $mailer->send($this->setEmail());
     }
 }
