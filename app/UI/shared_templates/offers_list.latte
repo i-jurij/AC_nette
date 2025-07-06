@@ -21,7 +21,7 @@
                             Предлагаю работу
                             {/if}
                         </p>
-                        <p n:if="!empty($offer['services']) && is_array($offer['services'])">
+                        <p n:if="!empty($offer['services']) && is_array($offer['services'])" class="py2">
                             {foreach $offer['services'] as $ca}
                             {if $iterator->first}
                             {\Nette\Utils\Strings::firstUpper($ca['category_name'])}:
@@ -35,7 +35,7 @@
                             {if !$iterator->last}и {/if}
                             {/foreach}
                         </p>
-                        <p> ⚲ {$offer['city_name']}</p>
+                        <p class=""> ⚲ {$offer['city_name']}</p>
                         {* <p> Region: {$offer['region_name']}</p> *}
                         <p>{number_format($offer['price'], 0, ",", " ")} руб.</p>
                         {* <p> Message: {$offer['message']}</p> *}
