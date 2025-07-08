@@ -35,7 +35,7 @@ final class HomePresenter extends BasePresenter
         $this->form_data->order_type = 'DESC';
         $this->form_data->moderated = 1;
         if (Session::has('form_data')) {
-            $newFD = \unserialize(Session::get('form_data'));
+            $newFD = \json_decode(Session::get('form_data'), true);
             foreach ($newFD as $key => $value) {
                 $this->form_data->{$key} = $value;
             }
@@ -94,8 +94,7 @@ final class HomePresenter extends BasePresenter
     {
         if (Csrf::isValid() && Csrf::isRecent()) {
             $httpRequest = $this->getHttpRequest();
-            Session::set('form_data', \serialize($httpRequest->getPost()));
-
+            Session::set('form_data', \json_encode($httpRequest->getPost()));
             $this->redirect('this');
         } else {
             $this->error();

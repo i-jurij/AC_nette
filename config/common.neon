@@ -11,9 +11,6 @@ latte:
 	strictTypes: yes
 	extensions: 
 
-session:
-	expiration: 14 days
-
 di:
 	export:
 		parameters: no

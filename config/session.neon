@@ -1,0 +1,7 @@
+session:
+	expiration: 14 days
+    # домены, которые принимают cookie
+	cookieDomain: 'acnette.local'   # (string|domain)
+
+	# ограничение при доступе с другого домена
+	cookieSamesite: Lax          # (Strict|Lax|None) по умолчанию Lax

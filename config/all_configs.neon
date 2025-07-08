@@ -5,6 +5,7 @@ includes:
     - db.neon
     - own.neon
     - php.neon
+    - session.neon
     - services.neon
     - webpack.neon
     - security.neon

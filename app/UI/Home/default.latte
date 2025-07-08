@@ -9,11 +9,6 @@
 
 {include filter_form from $shared_templates.'home_filter_form.latte'}
 
-<div n:if="empty($offers)" class="bgcontent round p2 center">
-    <p>Объявления не найдены.</p>
-    <p class="h5">Попробуйте поискать в соседнем городе, для выбора нажмите на название города слева вверху.</p>
-</div>
-
 <div id="data_by_location">
     {include $shared_templates.'offers_list.latte'}
 </div>

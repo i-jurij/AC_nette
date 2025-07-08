@@ -183,7 +183,7 @@
         Фильтрация работает после входа на сайт
     </p>
 
-    <form name="offersfilterform" id="offersfilterform" action="{link filterphp!}" method="post">
+    <form name="offersfilterform" id="offersfilterform" action="{link filterphp!}" method="post" class="inline-block">
         <input type="hidden" name="{$csrf_name}" required value="{$csrf}" />
         <div class="form_radio_group filter_form_mobile">
             <div class="form_radio_group clearfix" aria-labelledby="filter_form_type_p">
@@ -319,15 +319,14 @@
                 <div class="inline-block">
                     <p class="filter_form_submit_p">Цена от:</p>
                     <input type="range" list="pricemarksmin" value="{$price_min}" min="{$price['price_min']}"
-                        max="{$price['price_max']}" step="10" id="pricefiltermin" name="price_min"
+                        max="{$price['price_max']}" id="pricefiltermin" name="price_min"
                         oninput="pricevaluemin.value=value" class="block" />
                     <output id="pricevaluemin" class="block">{$price_min}</output>
                 </div>
                 <div class="inline-block">
                     <p class="filter_form_submit_p">Цена до:</p>
                     <input type="range" value="{$price_max}" min="{$price['price_min']}" max="{$price['price_max']}"
-                        step="10" id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value"
-                        class="block" />
+                        id="pricefiltermax" name="price_max" oninput="pricevaluemax.value=value" class="block" />
                     <output id="pricevaluemax" class="block">{$price_max}</output>
                 </div>
             </div>
@@ -336,4 +335,18 @@
             <input type="submit" name="apply" class="" value="Применить">
         </div>
     </form>
+    <form name="offersfilterform_reset" id="offersfilterform_reset" action="{link filterphp!}" method="post"
+        n:if="$user->isLoggedIn()" class="inline-block ">
+        <div class="form_radio_group">
+            <input type="hidden" name="{$csrf_name}" required value="{$csrf}" />
+            <input type="hidden" name="offertype" required value="all" />
+            <input type="hidden" name="order_by" required value="end_time" />
+            <input type="hidden" name="order_type" required value="DESC" />
+            <input type="hidden" name="service" required value="" />
+            <input type="hidden" name="price_min" required value="{$price['price_min']}" />
+            <input type="hidden" name="price_max" required value="{$price['price_max']}" />
+            <input type="submit" name="offersfilterform_reset_button" class="" value="Сбросить">
+        </div>
+    </form>
+
 </div>

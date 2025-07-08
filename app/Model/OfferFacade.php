@@ -121,19 +121,26 @@ class OfferFacade
         }
 
         if (!empty($form_data->offertype) && in_array($form_data->offertype, ['work', 'service'], true)) {
-            $this->sql_params[] = "offers_type = '{$form_data->offertype}offer'";
+            //$this->sql_params[] = "offers_type = '{$form_data->offertype}offer'";
+            //$this->sql_params[] = "`{$this->table}`.`offers_type` = '{$form_data->offertype}offer'";
+            if ($form_data->offertype === 'work') {
+                $this->sql_params[] = "`{$this->table}`.`offers_type` = 'workoffer'";
+            }
+            if ($form_data->offertype === 'service') {
+                $this->sql_params[] = "`{$this->table}`.`offers_type` = 'serviceoffer'";
+            }
         }
 
         if (!empty($form_data->price_min) && ctype_digit(strval($form_data->price_min))) {
-            $this->sql_params[] = "price >= {$form_data->price_min}";
+            $this->sql_params[] = "price >= $form_data->price_min";
         }
 
         if (!empty($form_data->price_max) && ctype_digit(strval($form_data->price_max))) {
-            $this->sql_params[] = "price <= {$form_data->price_max}";
+            $this->sql_params[] = "price <= $form_data->price_max";
         }
 
-        if (!empty($form_data->moderated) && ($form_data->moderated === 0 || $form_data->moderated === 1)) {
-            $this->sql_params[] = "moderated = {$form_data->moderated}";
+        if (!empty($form_data->moderated) && in_array($form_data->moderated, [0, 1], true)) {
+            $this->sql_params[] = "moderated = $form_data->moderated";
         }
 
         if (!empty($limit) && !empty($offset)) {
@@ -154,6 +161,7 @@ class OfferFacade
 
     public function offersCount(array $location = [], ?object $form_data = null): int
     {
+        unset($this->sql_params);
         $this->setSqlParams(location: $location, form_data: $form_data);
         $sql = "SELECT COUNT(*) FROM {$this->table} WHERE";
         $numItems = count($this->sql_params);
@@ -220,6 +228,7 @@ class OfferFacade
                 FROM {$this->table} 
                 INNER JOIN `client` ON {$this->table}.client_id = `client`.id
                 WHERE";
+        unset($this->sql_params);
         $this->setSqlParams(location: $location, limit: $limit, offset: $offset, form_data: $form_data);
 
         $numItems = count($this->sql_params);
