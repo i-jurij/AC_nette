@@ -77,7 +77,7 @@
     }
 
     .tab-nav::after {
-        content: " ›";
+        content: var(--content, " ›")
     }
 
     .tab-inner {
@@ -234,7 +234,7 @@
                             value="{$service['id']}">
                         {/if}
 
-                        <span class="checkable">{$service['name']}</span>
+                        <span class="">{$service['name']}</span>
                     </label>
                     {/foreach}
                 </div>
@@ -310,22 +310,19 @@
             cat_labels.forEach(function(e) {
                 e.removeAttribute('for');
 
-                e.addEventListener('pointerdown', function (event) {
-                    if (event.isPrimary) {
-                        window.topPosition = event.target.getBoundingClientRect().top + window.pageYOffset;
-                    }
-                });
-
                 e.addEventListener('pointerup', function (event) {
                     let catservdiv = document.querySelector('#' + event.target.id.slice(0, -6) + '-inner');
                     if (catservdiv) {
                         if (catservdiv.style.display == 'block') {
                             catservdiv.style.display = '';
+                            event.target.style.setProperty("--content", "' ›'");
                         } else {
                             catservdiv.style.display = 'block';
+                            event.target.style.setProperty("--content", "' ‹'");
                         }
                     }
                 });
+                
             });
         }
 
