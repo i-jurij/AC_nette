@@ -4,6 +4,7 @@ http:
 		X-Powered-By: jobaround
 		#X-Content-Type-Options: nosniff
 		#X-XSS-Protection: '1; mode=block'
+		Content-Language: ru
 
 	# affects the X-Frame-Options header
 	#frames: ...      # (string|bool) defaults to 'SAMEORIGIN'

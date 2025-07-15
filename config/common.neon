@@ -7,10 +7,6 @@ application:
 	mapping: 
 		App\UI\*\**Presenter
 
-latte:
-	strictTypes: yes
-	extensions: 
-
 di:
 	export:
 		parameters: no

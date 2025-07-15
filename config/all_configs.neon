@@ -3,6 +3,7 @@ includes:
     - captcha.neon
     - common.neon
     - db.neon
+    - latte.neon
     - own.neon
     - php.neon
     - session.neon

@@ -1,0 +1,4 @@
+latte:
+    strictTypes: yes
+    locale: ru
+    extensions: 
