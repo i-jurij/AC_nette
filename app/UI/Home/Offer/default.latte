@@ -5,9 +5,18 @@
 {var $short = 'Предлагаю работу'}
 {/if}
 
-{var $title = (!empty($short)) ? $short : "Offer"}
-{var $description = "Offer"}
-{var $keywords = "Keywords of Offer"}
+{var $title = (!empty($short)) ? $short : "Объявление"}
+{var $description = (!empty($short)) ? $short : "Объявление о работе, услуге"}
+{var $keywords = $description}
+{if !empty($offers[0]['services']) && is_array($offers[0]['services'])}
+{foreach $offers[0]['services'] as $ca}
+{php $keywords .= ', ' . $ca['category_name'] . ', '}
+{foreach $ca['services'] as $se}
+{php $keywords .= $se['name']. ', '}
+{/foreach}
+{/foreach}
+{/if}
+
 {var $robots = "INDEX,FOLLOW"}
 
 {default $rating = '☆☆☆☆☆'}
