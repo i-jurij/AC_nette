@@ -136,7 +136,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     public function createComponentOfferCommentForm()
     {
         $form = new Form();
-        $form->addProtection('Csrf error');
+        $form->addProtection('Попробуйте закрыть страницу и открыть снова');
         // $form->setTranslator($this->translator);
         $renderer = $form->getRenderer();
         $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';

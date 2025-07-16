@@ -1,4 +1,6 @@
 {*layout '../@layout.latte'*}
+
+{block content}
 {if !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'serviceoffer'}
 {var $short = 'Ищу работу'}
 {elseif !empty($offers[0]['offers_type']) && $offers[0]['offers_type'] === 'workoffer'}
@@ -19,9 +21,6 @@
 
 {var $robots = "INDEX,FOLLOW"}
 
-{default $rating = '☆☆☆☆☆'}
-
-{block content}
 <style>
     .thumb {
         text-align: center;
