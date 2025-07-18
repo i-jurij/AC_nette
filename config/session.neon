@@ -1,5 +1,6 @@
 session:
 	expiration: 14 days
+	autoStart: always       # (smart|always|never) по умолчанию 'smart'
     # домены, которые принимают cookie
 	cookieDomain: 'acnette.local'   # (string|domain)
 

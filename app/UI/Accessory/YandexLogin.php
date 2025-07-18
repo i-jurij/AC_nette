@@ -30,7 +30,7 @@ trait YandexLogin
         $data = [];
 
         // check csrf and then execute code
-        if (hash_equals(Session::get(Csrf::$token_name), $_GET['state'])) {
+        if (Session::has(Csrf::$token_name) !== false && hash_equals(Session::get(Csrf::$token_name), $_GET['state'])) {
             if (!empty($_GET['code'])) {
                 // Отправляем код для получения токена (POST-запрос).
                 $params = [

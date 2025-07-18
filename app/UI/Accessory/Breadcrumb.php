@@ -23,7 +23,7 @@ trait Breadcrumb
             $res .= Strings::firstUpper($value);
         }
 
-        return $first.$res;
+        return $first . $res;
     }
 
     public function getBC(): array
@@ -41,23 +41,34 @@ trait Breadcrumb
             $site_root = SITE_NAME;
             $url_path_relative = $url_path;
         } else {
-            $site_root = SITE_NAME.Strings::after(\trim(WWWDIR, " \/"), SITE_NAME, 1);
+            $site_root = SITE_NAME . Strings::after(\trim(WWWDIR, " \/"), SITE_NAME, 1);
             // request path without site root path
             $url_path_relative = Strings::after($url_path, $site_root, 1);
         }
 
-        $controls_method_param = explode('/', $url_path_relative);
+        if (!empty($url_path_relative)) {
+            $controls_method_param = explode('/', $url_path_relative);
+        } else {
+            $controls_method_param = [];
+        }
 
-        $pre_controls = explode('.', array_shift($controls_method_param));
+        $as = array_shift($controls_method_param);
+        if (!empty($as)) {
+            $pre_controls = explode('.', $as);
+        } else {
+            $pre_controls = [];
+        }
+
         $count_pre_controls = count($pre_controls);
+
         for ($i = 0; $i < $count_pre_controls; ++$i) {
             $ic = Strings::firstUpper($this->upperAfterDash($pre_controls[$i]));
             if ($i != 0) {
                 $short = $ic;
-                $full = $controls[$i - 1]['full'].$ic.':';
+                $full = $controls[$i - 1]['full'] . $ic . ':';
             } else {
                 $short = $ic;
-                $full = ':'.$ic.':';
+                $full = ':' . $ic . ':';
             }
             $controls[$i] = [
                 'short' => $short,
@@ -70,7 +81,7 @@ trait Breadcrumb
             $count_controls = count($controls);
             $controls[$count_controls] = [
                 'short' => $method,
-                'full' => $controls[$count_controls - 1]['full'].$method,
+                'full' => $controls[$count_controls - 1]['full'] . $method,
             ];
         }
         /*
@@ -83,6 +94,6 @@ trait Breadcrumb
         }
         */
 
-        return $controls;
+        return $controls ?? [];
     }
 }
