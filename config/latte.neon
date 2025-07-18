@@ -1,4 +1,4 @@
 latte:
-    strictTypes: yes
+    # strictTypes: yes
     locale: ru
     extensions: 

@@ -22,7 +22,6 @@ class Bootstrap
         $configurator->createRobotLoader()
             ->addDirectory(__DIR__)
             ->register();
-        // $configurator->setTimeZone('Europe/Moscow');
 
         $configurator->addConfig($rootDir . '/config/all_configs.neon');
         /*
