@@ -46,7 +46,10 @@
 <script n:syntax="double">
 	let url_js_fetch = {{link :Home:Geo:jsFetch}};
 	let url_location_to_server_js = {{link :Home:saveToBackend}};
+</script>
 
+{if $user->isLoggedIn()}
+<script n:syntax="double">
 	let url_chat = {{link :Home:Client:Chat:default}}
 
 	Chat = {
@@ -236,7 +239,6 @@
 			}
 		},
 		getOffersWithNewMessage: function(){
-			console.log('clic chat')
 			let cA = document.querySelector('#countChatMessagesClient');
 			if (cA.dataset.count > 0) {
 				let formData = new FormData();
@@ -263,9 +265,7 @@
 			}
 		}
 	}
-	
-	window.addEventListener("load", (event) => {
-		
-	});
 </script>
+{/if}
+
 {/block}
