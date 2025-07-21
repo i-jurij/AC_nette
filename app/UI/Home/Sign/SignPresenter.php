@@ -77,7 +77,15 @@ final class SignPresenter extends \App\UI\BasePresenter
         }
     }
 
-    /*
+    public function actionVklogin(): void
+    {
+        $user_data = $this->getUserDataVK();
+        $this->oauthLogin($user_data);
+        $this->restoreRequest($this->backlink);
+        $this->redirect(':Home:');
+    }
+
+
     public function actionYLTest(): void
     {
         $user_data['data'] = [
@@ -88,16 +96,6 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->restoreRequest($this->backlink);
         $this->redirect(':Home:');
     }
-*/
-
-    public function actionVklogin(): void
-    {
-        $user_data = $this->getUserDataVK();
-        $this->oauthLogin($user_data);
-        $this->restoreRequest($this->backlink);
-        $this->redirect(':Home:');
-    }
-
     public function actionYandexLogin(): void
     {
         $user_data = $this->getUserDataYandex();
