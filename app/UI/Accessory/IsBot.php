@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 class IsBot
@@ -10,11 +8,21 @@ class IsBot
      * function for bots check.
      */
     public const BOTS = [
-        'bot', 'crawler', 'curl', 'parser', 'spider', 'python-requests', 'Monitoring',
-        'Accoona', 'Analyzer', 'Ask Jeeves', 'a.pr-cy.ru',
+        'bot',
+        'crawler',
+        'curl',
+        'parser',
+        'spider',
+        'python-requests',
+        'Monitoring',
+        'Accoona',
+        'Analyzer',
+        'Ask Jeeves',
+        'a.pr-cy.ru',
         'Baiduspider',
         'DomainVader',
-        'facebookexternalhit', 'findlinks',
+        'facebookexternalhit',
+        'findlinks',
         'google',
         'heritrix',
         'Ezooms',
@@ -22,12 +30,23 @@ class IsBot
         'ltx71',
         'Nigma.ru',
         'OpenindexSpider',
-        'proximic', 'PEAR',
+        'proximic',
+        'PEAR',
         'Riddler',
-        'SiteStatus', 'SISTRIX', 'StackRambler', 'statdom.ru', 'Spider', 'Snoopy', 'slurp',
+        'SiteStatus',
+        'SISTRIX',
+        'StackRambler',
+        'statdom.ru',
+        'Spider',
+        'Snoopy',
+        'slurp',
         'vkShare',
-        'W3C_Validator', 'WebAlta',
-        'YahooFeedSeeker', 'Yahoo!', 'yandex', 'Yeti',
+        'W3C_Validator',
+        'WebAlta',
+        'YahooFeedSeeker',
+        'Yahoo!',
+        'yandex',
+        'Yeti',
     ];
 
     /**

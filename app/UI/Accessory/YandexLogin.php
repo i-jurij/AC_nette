@@ -69,24 +69,23 @@ trait YandexLogin
             // $username = 
             $phone = $data['default_phone']['number'] ?? '';
             $email = $data['default_email'] ?? '';
-
-            if (empty($phone) && empty($email)) {
-                $errors[] = 'Ошибка! Не получены данные пользователя';
-                return ['error' => $errors, 'data' => []];
-            } else {
-
-                return [
-                    'error' => $errors,
-                    'data' => [
-                        // 'username' => $data['login'] . '_id_' . $data['id'],
-                        'email' => $data['default_email'] ?? '',
-                        'phone' => $data['default_phone']['number'] ?? '',
-                    ],
-                ];
-            }
         } else {
             $errors[] = 'Ошибка! Попробуйте позже';
             return ['error' => $errors, 'data' => []];
+        }
+
+        if (empty($phone) && empty($email)) {
+            $errors[] = 'Ошибка! Не получены данные пользователя';
+            return ['error' => $errors, 'data' => []];
+        } else {
+            return [
+                'error' => $errors,
+                'data' => [
+                    // 'username' => $data['login'] . '_id_' . $data['id'],
+                    'email' => $email,
+                    'phone' => $phone,
+                ],
+            ];
         }
     }
 

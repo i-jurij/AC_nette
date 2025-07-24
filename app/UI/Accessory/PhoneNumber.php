@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 final class PhoneNumber
@@ -35,7 +33,7 @@ final class PhoneNumber
             $sNumber2 = mb_substr($number_pre, 7, 2);
             $sNumber3 = mb_substr($number_pre, 9, 2);
 
-            $number = '+'.$sArea.' ('.$sPrefix.') '.$sNumber1.' '.$sNumber2.' '.$sNumber3;
+            $number = '+' . $sArea . ' (' . $sPrefix . ') ' . $sNumber1 . ' ' . $sNumber2 . ' ' . $sNumber3;
 
             return $number;
         } else {
@@ -45,7 +43,7 @@ final class PhoneNumber
 
     public static function isValid($sPhone, $regex = self::PHONE_REGEX): bool
     {
-        if (preg_match('/'.$regex.'/', $sPhone)) {
+        if (preg_match('/' . $regex . '/', $sPhone)) {
             return true;
         }
 

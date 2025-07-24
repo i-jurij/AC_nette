@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory\Location;
 
 use Nette\Database\Connection;
@@ -12,20 +10,20 @@ trait Getcityid
     {
         $res_id = false;
         $path_to_geo_db = realpath(APPDIR
-            .DIRECTORY_SEPARATOR
-            .'..'
-            .DIRECTORY_SEPARATOR
-            .'vendor'
-            .DIRECTORY_SEPARATOR
-            .'i-jurij'
-            .DIRECTORY_SEPARATOR
-            .'geolocation'
-            .DIRECTORY_SEPARATOR
-            .'src'
-            .DIRECTORY_SEPARATOR
-            .'sqlite'
-            .DIRECTORY_SEPARATOR
-            .'geolocation.db');
+            . DIRECTORY_SEPARATOR
+            . '..'
+            . DIRECTORY_SEPARATOR
+            . 'vendor'
+            . DIRECTORY_SEPARATOR
+            . 'i-jurij'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation'
+            . DIRECTORY_SEPARATOR
+            . 'src'
+            . DIRECTORY_SEPARATOR
+            . 'sqlite'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation.db');
 
         $dsn = "sqlite:$path_to_geo_db";
 

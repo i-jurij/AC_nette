@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 trait TelegramLogin
@@ -17,7 +15,7 @@ trait TelegramLogin
             unset($auth_data['hash']);
             $data_check_arr = [];
             foreach ($auth_data as $key => $value) {
-                $data_check_arr[] = $key.'='.$value;
+                $data_check_arr[] = $key . '=' . $value;
             }
             sort($data_check_arr);
             $data_check_string = implode("\n", $data_check_arr);
@@ -34,7 +32,7 @@ trait TelegramLogin
         $data = checkTelegramAuthorization($_GET);
         if (!empty($data)) {
             $d = [
-                'username' => $data['username'].'_id_'.$data['id'],
+                'username' => $data['username'] . '_id_' . $data['id'],
                 // 'email' => $data['default_email'] ?? '',
                 // 'phone' => $data['default_phone']['number'] ?? '',
             ];

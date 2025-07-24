@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 trait ScanDirRec
@@ -14,7 +12,7 @@ trait ScanDirRec
         unset($directory_scan[0], $directory_scan[1]);
 
         foreach ($directory_scan as $key => $value) {
-            $path = $directory.DIRECTORY_SEPARATOR.$value;
+            $path = $directory . DIRECTORY_SEPARATOR . $value;
             if (is_dir($path)) {
                 $ar = [
                     'path' => $path,

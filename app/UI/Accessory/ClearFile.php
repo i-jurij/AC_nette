@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 trait ClearFile
@@ -17,13 +15,12 @@ trait ClearFile
             if (is_file($path_to_file)) {
                 $lines = file($path_to_file); // reads the file into an array by line
                 $keep = (!empty($keep_num_lines)) ? array_slice($lines, -$keep_num_lines) : '';
-                if (file_put_contents($path_to_file, $keep) === false) {
-                    return false;
-                } else {
+                if (file_put_contents($path_to_file, $keep) !== false) {
                     return true;
                 }
             }
         }
+        return false;
     }
 
     /**

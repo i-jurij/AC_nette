@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory\Moderating;
 
 /**
@@ -32,104 +30,104 @@ namespace App\UI\Accessory\Moderating;
  */
 class CensureText
 {
-    // запрещаем создание экземпляра класса, вызов методов этого класса только статически!
-    private function __construct()
-    {
-    }
+	// запрещаем создание экземпляра класса, вызов методов этого класса только статически!
+	private function __construct()
+	{
+	}
 
-    /**
-     * @param string      $string        строка для проверки
-     * @param string      $delta    ширина найденного фрагмента в словах
-     *                              (кол-во слов от матного слова слева и справа, максимально 10)
-     * @param string      $continue строка, которая будет вставлена в начале и в конце фрагмента
-     * @param bool        $is_html  расценивать строку как HTML код?
-     *                              в режиме $is_html === TRUE html код игнорируется, а html сущности заменяются в "чистый" UTF-8
-     * @param string|null $replace  строка, на которую заменять матный фрагмент, например: '[ой]' ($replace д.б. в кодировке $charset)
-     *                              опция работает в PHP >= 5.2.0
-     * @param string      $charset  кодировка символов (родная кодировка -- UTF-8, для других будет прозрачное перекодирование)
-     *
-     * @return bool|string|int|null Если $replace === NULL, то возвращает FALSE, если мат не обнаружен, иначе фрагмент текста с матерным словом.
-     *                              Если $replace !== NULL, то возвращает исходную строку, где фрагменты мата заменены на $replace.
-     *                              В случае возникновения ошибки возвращает код ошибки > 0 (integer):
-     *                              * PREG_INTERNAL_ERROR
-     *                              * PREG_BACKTRACK_LIMIT_ERROR (see also pcre.backtrack_limit)
-     *                              * PREG_RECURSION_LIMIT_ERROR (see also pcre.recursion_limit)
-     *                              * PREG_BAD_UTF8_ERROR
-     *                              * PREG_BAD_UTF8_OFFSET_ERROR (since PHP 5.3.0)
-     */
-    public static function parse(
-        $string,
-        $delta = 3,
-        $continue = "\xe2\x80\xa6",
-        $is_html = true,
-        $replace = null,
-        $charset = 'UTF-8')
-    {
+	/**
+	 * @param string      $string        строка для проверки
+	 * @param string      $delta    ширина найденного фрагмента в словах
+	 *                              (кол-во слов от матного слова слева и справа, максимально 10)
+	 * @param string      $continue строка, которая будет вставлена в начале и в конце фрагмента
+	 * @param bool        $is_html  расценивать строку как HTML код?
+	 *                              в режиме $is_html === TRUE html код игнорируется, а html сущности заменяются в "чистый" UTF-8
+	 * @param string|null $replace  строка, на которую заменять матный фрагмент, например: '[ой]' ($replace д.б. в кодировке $charset)
+	 *                              опция работает в PHP >= 5.2.0
+	 * @param string      $charset  кодировка символов (родная кодировка -- UTF-8, для других будет прозрачное перекодирование)
+	 *
+	 * @return bool|string|int|null Если $replace === NULL, то возвращает FALSE, если мат не обнаружен, иначе фрагмент текста с матерным словом.
+	 *                              Если $replace !== NULL, то возвращает исходную строку, где фрагменты мата заменены на $replace.
+	 *                              В случае возникновения ошибки возвращает код ошибки > 0 (integer):
+	 *                              * PREG_INTERNAL_ERROR
+	 *                              * PREG_BACKTRACK_LIMIT_ERROR (see also pcre.backtrack_limit)
+	 *                              * PREG_RECURSION_LIMIT_ERROR (see also pcre.recursion_limit)
+	 *                              * PREG_BAD_UTF8_ERROR
+	 *                              * PREG_BAD_UTF8_OFFSET_ERROR (since PHP 5.3.0)
+	 */
+	public static function parse(
+		$string,
+		$delta = 3,
+		$continue = "\xe2\x80\xa6",
+		$is_html = true,
+		$replace = null,
+		$charset = 'UTF-8'
+	) {
 
-        if ($string === null) {
-            return null;
-        }
+		if ($string === null) {
+			return null;
+		}
 
-        static $re_badwords = null;
+		static $re_badwords = null;
 
-        if ($re_badwords === null) {
-            // предлоги русского языка:
-            // #[всуо]|
-            // по|за|на|об|до|от|вы|вс|вз|из|ис|
-            // под|про|при|над|низ|раз|рас|воз|вос|
-            // пооб|повы|пона|поза|недо|пере|одно|
-            // полуза|произ|пораз|много|
-            $pretext = [
-                // 1
-                '[уyоoаa]_?      (?=[еёeхx])',        // у, о   (уебать, охуеть, ахуеть)
-                '[вvbсc]_?       (?=[хпбмгжxpmgj])',  // в, с   (впиздячить, схуярить)
-                '[вvbсc]_?[ъь]_? (?=[еёe])',          // въ, съ (съебаться, въебать)
-                'ё_?             (?=[бb6])',          // ё      (ёбля)
-                // 2
-                '[вvb]_?[ыi]_?',      // вы
-                '[зz3]_?[аa]_?',      // за
-                '[нnh]_?[аaеeиi]_?',  // на, не, ни
-                '[вvb]_?[сc]_?          (?=[хпбмгжxpmgj])',  // вс (вспизднуть)
-                '[оo]_?[тtбb6]_?        (?=[хпбмгжxpmgj])',  // от, об
-                '[оo]_?[тtбb6]_?[ъь]_?  (?=[еёe])',          // отъ, объ
-                '[иiвvb]_?[зz3]_?       (?=[хпбмгжxpmgj])',  // #[ив]з
-                '[иiвvb]_?[зz3]_?[ъь]_? (?=[еёe])',          // #[ив]зъ
-                '[иi]_?[сc]_?           (?=[хпбмгжxpmgj])',  // ис
-                '[пpдdg]_?[оo]_? (?> [бb6]_?         (?=[хпбмгжxpmgj])
+		if ($re_badwords === null) {
+			// предлоги русского языка:
+			// #[всуо]|
+			// по|за|на|об|до|от|вы|вс|вз|из|ис|
+			// под|про|при|над|низ|раз|рас|воз|вос|
+			// пооб|повы|пона|поза|недо|пере|одно|
+			// полуза|произ|пораз|много|
+			$pretext = [
+				// 1
+				'[уyоoаa]_?      (?=[еёeхx])',        // у, о   (уебать, охуеть, ахуеть)
+				'[вvbсc]_?       (?=[хпбмгжxpmgj])',  // в, с   (впиздячить, схуярить)
+				'[вvbсc]_?[ъь]_? (?=[еёe])',          // въ, съ (съебаться, въебать)
+				'ё_?             (?=[бb6])',          // ё      (ёбля)
+				// 2
+				'[вvb]_?[ыi]_?',      // вы
+				'[зz3]_?[аa]_?',      // за
+				'[нnh]_?[аaеeиi]_?',  // на, не, ни
+				'[вvb]_?[сc]_?          (?=[хпбмгжxpmgj])',  // вс (вспизднуть)
+				'[оo]_?[тtбb6]_?        (?=[хпбмгжxpmgj])',  // от, об
+				'[оo]_?[тtбb6]_?[ъь]_?  (?=[еёe])',          // отъ, объ
+				'[иiвvb]_?[зz3]_?       (?=[хпбмгжxpmgj])',  // #[ив]з
+				'[иiвvb]_?[зz3]_?[ъь]_? (?=[еёe])',          // #[ив]зъ
+				'[иi]_?[сc]_?           (?=[хпбмгжxpmgj])',  // ис
+				'[пpдdg]_?[оo]_? (?> [бb6]_?         (?=[хпбмгжxpmgj])
                                | [бb6]_?  [ъь]_? (?=[еёe])
                                | [зz3]_? [аa] _?
                              )?',  // по, до, пообъ, дообъ, поза, доза (двойные символы вырезаются!)
-                // 3
-                '[пp]_?[рr]_?[оoиi]_?',  // пр[ои]
-                '[зz3]_?[лl]_?[оo]_?',   // зло (злоебучая)
-                '[нnh]_?[аa]_?[дdg]_?         (?=[хпбмгжxpmgj])',  // над
-                '[нnh]_?[аa]_?[дdg]_?[ъь]_?   (?=[еёe])',          // надъ
-                '[пp]_?[оoаa]_?[дdg]_?        (?=[хпбмгжxpmgj])',  // под
-                '[пp]_?[оoаa]_?[дdg]_?[ъь]_?  (?=[еёe])',          // подъ
-                '[рr]_?[аa]_?[зz3сc]_?        (?=[хпбмгжxpmgj])',  // ра[зс]
-                '[рr]_?[аa]_?[зz3сc]_?[ъь]_?  (?=[еёe])',          // ра[зс]ъ
-                '[вvb]_?[оo]_?[зz3сc]_?       (?=[хпбмгжxpmgj])',  // во[зс]
-                '[вvb]_?[оo]_?[зz3сc]_?[ъь]_? (?=[еёe])',          // во[зс]ъ
-                // 4
-                '[нnh]_?[еe]_?[дdg]_?[оo]_?',    // недо
-                '[пp]_?[еe]_?[рr]_?[еe]_?',      // пере
-                '[oо]_?[дdg]_?[нnh]_?[оo]_?',    // одно
-                '[кk]_?[oо]_?[нnh]_?[оo]_?',     // коно    (коноебиться)
-                '[мm]_?[уy]_?[дdg]_?[oоaа]_?',   // муд[оа] (мудаёб)
-                '[oо]_?[сc]_?[тt]_?[оo]_?',      // осто    (остопиздело)
-                '[дdg]_?[уy]_?[рpr]_?[оoаa]_?',  // дур[оа]
-                '[хx]_?[уy]_?[дdg]_?[оoаa]_?',   // худ[оа] (худоебина)
-                // 5
-                '[мm]_?[нnh]_?[оo]_?[гg]_?[оo]_?',    // много
-                '[мm]_?[оo]_?[рpr]_?[дdg]_?[оoаa]_?', // морд[оа]
-                '[мm]_?[оo]_?[зz3]_?[гg]_?[оoаa]_?',  // мозг[оа]
-                '[дdg]_?[оo]_?[лl]_?[бb6]_?[оoаa]_?', // долб[оа]
-                '[оo]_?[сc]_?[тt]_?[рpr]_?[оo]_?',    // остро
-            ];
+				// 3
+				'[пp]_?[рr]_?[оoиi]_?',  // пр[ои]
+				'[зz3]_?[лl]_?[оo]_?',   // зло (злоебучая)
+				'[нnh]_?[аa]_?[дdg]_?         (?=[хпбмгжxpmgj])',  // над
+				'[нnh]_?[аa]_?[дdg]_?[ъь]_?   (?=[еёe])',          // надъ
+				'[пp]_?[оoаa]_?[дdg]_?        (?=[хпбмгжxpmgj])',  // под
+				'[пp]_?[оoаa]_?[дdg]_?[ъь]_?  (?=[еёe])',          // подъ
+				'[рr]_?[аa]_?[зz3сc]_?        (?=[хпбмгжxpmgj])',  // ра[зс]
+				'[рr]_?[аa]_?[зz3сc]_?[ъь]_?  (?=[еёe])',          // ра[зс]ъ
+				'[вvb]_?[оo]_?[зz3сc]_?       (?=[хпбмгжxpmgj])',  // во[зс]
+				'[вvb]_?[оo]_?[зz3сc]_?[ъь]_? (?=[еёe])',          // во[зс]ъ
+				// 4
+				'[нnh]_?[еe]_?[дdg]_?[оo]_?',    // недо
+				'[пp]_?[еe]_?[рr]_?[еe]_?',      // пере
+				'[oо]_?[дdg]_?[нnh]_?[оo]_?',    // одно
+				'[кk]_?[oо]_?[нnh]_?[оo]_?',     // коно    (коноебиться)
+				'[мm]_?[уy]_?[дdg]_?[oоaа]_?',   // муд[оа] (мудаёб)
+				'[oо]_?[сc]_?[тt]_?[оo]_?',      // осто    (остопиздело)
+				'[дdg]_?[уy]_?[рpr]_?[оoаa]_?',  // дур[оа]
+				'[хx]_?[уy]_?[дdg]_?[оoаa]_?',   // худ[оа] (худоебина)
+				// 5
+				'[мm]_?[нnh]_?[оo]_?[гg]_?[оo]_?',    // много
+				'[мm]_?[оo]_?[рpr]_?[дdg]_?[оoаa]_?', // морд[оа]
+				'[мm]_?[оo]_?[зz3]_?[гg]_?[оoаa]_?',  // мозг[оа]
+				'[дdg]_?[оo]_?[лl]_?[бb6]_?[оoаa]_?', // долб[оа]
+				'[оo]_?[сc]_?[тt]_?[рpr]_?[оo]_?',    // остро
+			];
 
-            $badwords = [
-                // Слово на букву Х
-                '(?<=\PL) %RE_PRETEXT%?
+			$badwords = [
+				// Слово на букву Х
+				'(?<=\PL) %RE_PRETEXT%?
                       [hхx]_?[уyu]_?[ийiеeёяюju]     #хуй, хуя, хую, хуем, хуёвый, охуительный
                       #исключения:
                       (?<! _hue(?=_)     #HUE     -- цветовая палитра
@@ -138,12 +136,12 @@ class CensureText
                          | _hyu(?=ndai_) #Hyundai -- марка корейского автомобиля
                       )',
 
-                // Слово на букву П
-                '(?<=\PL) %RE_PRETEXT%?
+				// Слово на букву П
+				'(?<=\PL) %RE_PRETEXT%?
                       [пp]_?[иieеё]_?[зz3]_?[дd](?=_?[:vowel:])',  // п[ие]зда, пизде, пиздёж, пизду, пиздюлина, пиздобол, опиздинеть, пиздых, подпёздывать
 
-                // Слово на букву Е
-                '(?<=\PL) %RE_PRETEXT%?
+				// Слово на букву Е
+				'(?<=\PL) %RE_PRETEXT%?
                       [eеё]_?
 							#исключения
 							(?<!н[eе][её]_|т_е_)    #неё, т.е. большие
@@ -157,227 +155,227 @@ class CensureText
                                 | [сc]_?[тt]                    #ебсти
                                )',
 
-                // Слово на букву Е (c обязательной приставкой от 2-х и более букв!)
-                '(?<=\PL) %RE_PRETEXT%
+				// Слово на букву Е (c обязательной приставкой от 2-х и более букв!)
+				'(?<=\PL) %RE_PRETEXT%
                       (?<= \pL\pL|\pL_\pL_)
                       [eеё]_?[бb6]    #долбоёб, дураёб, изъёб, заёб, заебай, разъебай, мудоёбы
             ',
 
-                // Слово на букву Е
-                '(?<=\PL) ёб (?=\PL)',  // ёб твою мать
+				// Слово на букву Е
+				'(?<=\PL) ёб (?=\PL)',  // ёб твою мать
 
-                // Слово на букву Б
-                '(?<=\PL) %RE_PRETEXT%?
+				// Слово на букву Б
+				'(?<=\PL) %RE_PRETEXT%?
                       [бb6]_?[лl]_?(?:я|ya)(?: _         #бля
                                              | _?[тдtd]  #блять, бляди
                                            )',
 
-                // ПИДОР
-                '(?<=\PL) [пp]_?[иieе]_?[дdg]_?[eеaаoо]_?[rpр]',  // п[ие]д[оеа]р
+				// ПИДОР
+				'(?<=\PL) [пp]_?[иieе]_?[дdg]_?[eеaаoо]_?[rpр]',  // п[ие]д[оеа]р
 
-                // МУДАК
-                '(?<=\PL) [мm]_?[уy]_?[дdg]_?[аa]  #мудак, мудачок
+				// МУДАК
+				'(?<=\PL) [мm]_?[уy]_?[дdg]_?[аa]  #мудак, мудачок
                       #исключения:
                       (?<!_myda(?=s_))  #Chelonia mydas -- морская зеленая (суповая) черепаха
             ',
 
-                // ЖОПА
-                '(?<=\PL) [zж]_?h?_?[оo]_?[pп]_?[aаyуыiеeoо]',  // жоп[ауыео]
+				// ЖОПА
+				'(?<=\PL) [zж]_?h?_?[оo]_?[pп]_?[aаyуыiеeoо]',  // жоп[ауыео]
 
-                // МАНДА
-                // исключения: город Мандалай, округ Мандаль, индейский народ Мандан, фамилия Мандель, мандарин
-                '(?<=\PL) [мm]_?[аa]_?[нnh]_?[дdg]_?[aаyуыiеeoо]  #манд[ауыео]
+				// МАНДА
+				// исключения: город Мандалай, округ Мандаль, индейский народ Мандан, фамилия Мандель, мандарин
+				'(?<=\PL) [мm]_?[аa]_?[нnh]_?[дdg]_?[aаyуыiеeoо]  #манд[ауыео]
                       #исключения:
                       (?<! манда(?=[лн]|рин)
                          | manda(?=[ln]|rin)
                          | манде(?=ль)
                       )',
 
-                // ГОВНО
-                '(?<=\PL) [гg]_?[оo]_?[вvb]_?[нnh]_?[оoаaяеeyу]',  // говн[оаяеу]
+				// ГОВНО
+				'(?<=\PL) [гg]_?[оo]_?[вvb]_?[нnh]_?[оoаaяеeyу]',  // говн[оаяеу]
 
-                // FUCK
-                '(?<=\PL) f_?u_?[cс]_?k',  // fuck, fucking
+				// FUCK
+				'(?<=\PL) f_?u_?[cс]_?k',  // fuck, fucking
 
-                #ЛОХ
-                ' л_?[оo]_?[хx]',
+				#ЛОХ
+				' л_?[оo]_?[хx]',
 
-                #СУКА
-                '[^р]_?[scс]_?[yуu]_?[kк]_?[aаiи]', #сука (кроме слова "барсука" - это животное-грызун)
-                '[^р]_?[scс]_?[yуu]_?[4ч]_?[кk]',   #сучк(и) (кроме слова "барсучка")
+				#СУКА
+				'[^р]_?[scс]_?[yуu]_?[kк]_?[aаiи]', #сука (кроме слова "барсука" - это животное-грызун)
+				'[^р]_?[scс]_?[yуu]_?[4ч]_?[кk]',   #сучк(и) (кроме слова "барсучка")
 
-                #ХЕР
-                ' %RE_PRETEXT%?[хxh]_?[еe]_?[рpr](_?[нnh]_?(я|ya)| )', #%RE_PRETEXT%хер(ня)
+				#ХЕР
+				' %RE_PRETEXT%?[хxh]_?[еe]_?[рpr](_?[нnh]_?(я|ya)| )', #%RE_PRETEXT%хер(ня)
 
-                #ЗАЛУПА
-                ' [зz3]_?[аa]_?[лl]_?[уy]_?[пp]_?[аa]',
+				#ЗАЛУПА
+				' [зz3]_?[аa]_?[лl]_?[уy]_?[пp]_?[аa]',
 
 				' [нтН]_?[аa]_?[рРrR]_?[кkКK]_?[оo]_?[тt]*',
-            ];
+			];
 
-            $trans = [
-                '_' => '\x20',                       // пробел
-                '\pL' => '[^\x20\d]',                  // буква
-                '\PL' => '[\x20\d]',                   // не буква
-                '[:vowel:]' => '[аеиоуыэюяёaeioyu]',         // гласные буквы
-                '[:consonant:]' => '[^аеиоуыэюяёaeioyu\x20\d]',  // согласные буквы
-            ];
+			$trans = [
+				'_' => '\x20',                       // пробел
+				'\pL' => '[^\x20\d]',                  // буква
+				'\PL' => '[\x20\d]',                   // не буква
+				'[:vowel:]' => '[аеиоуыэюяёaeioyu]',         // гласные буквы
+				'[:consonant:]' => '[^аеиоуыэюяёaeioyu\x20\d]',  // согласные буквы
+			];
 
-            $re_badwords = str_replace(
-                '%RE_PRETEXT%',
-                '(?:'.implode('|', $pretext).')',  // однократный шаблон с альтернативами использовать нельзя!
-                '~'.implode('|', $badwords).'~sxuSX'
-            );
-            $re_badwords = strtr($re_badwords, $trans);
-        }
+			$re_badwords = str_replace(
+				'%RE_PRETEXT%',
+				'(?:' . implode('|', $pretext) . ')',  // однократный шаблон с альтернативами использовать нельзя!
+				'~' . implode('|', $badwords) . '~sxuSX'
+			);
+			$re_badwords = strtr($re_badwords, $trans);
+		}
 
-        $string = UTF8::convert_from($string, $charset);
-        $replace = UTF8::convert_from($replace, $charset);
+		$string = UTF8::convert_from($string, $charset);
+		$replace = UTF8::convert_from($replace, $charset);
 
-        $ss = $string;  // saves original string
+		$ss = $string;  // saves original string
 
-        if ($is_html) {
-            // скрипты не вырезаем, т.к. м.б. обходной маневр на с кодом на javascript:
-            // <script>document.write('сло'+'во')</script>
-            // хотя давать пользователю возможность использовать код на javascript нехорошо
-            $string = strip_tags($string);
-            // заменяем html-сущности в "чистый" UTF-8
-            $string = UTF8::html_entity_decode($string, $is_htmlspecialchars = true);
-        }
+		if ($is_html) {
+			// скрипты не вырезаем, т.к. м.б. обходной маневр на с кодом на javascript:
+			// <script>document.write('сло'+'во')</script>
+			// хотя давать пользователю возможность использовать код на javascript нехорошо
+			$string = strip_tags($string);
+			// заменяем html-сущности в "чистый" UTF-8
+			$string = UTF8::html_entity_decode($string, $is_htmlspecialchars = true);
+		}
 
-        if (strtoupper(substr($charset, 0, 3)) === 'UTF') {  // UTF-8, UTF-16, UTF-32
-            // remove combining diactrical marks
-            $additional_chars = [
-                "\xc2\xad",  // "мягкие" переносы строк (&shy;)
-            ];
-            $string = UTF8::diactrical_remove($string, $additional_chars);
-        }
+		if (strtoupper(substr($charset, 0, 3)) === 'UTF') {  // UTF-8, UTF-16, UTF-32
+			// remove combining diactrical marks
+			$additional_chars = [
+				"\xc2\xad",  // "мягкие" переносы строк (&shy;)
+			];
+			$string = UTF8::diactrical_remove($string, $additional_chars);
+		}
 
-        // ВотБ/\яПидорыОхуелиБлятьНахуйПохуйПи3децПолный
-        if (version_compare(PHP_VERSION, '5.2.0', '>=')) {
-            $string = preg_replace('~     [\p{Lu}3] (?>\p{Ll}+|/|[@36]+)++   #Вот
+		// ВотБ/\яПидорыОхуелиБлятьНахуйПохуйПи3децПолный
+		if (version_compare(PHP_VERSION, '5.2.0', '>=')) {
+			$string = preg_replace('~     [\p{Lu}3] (?>\p{Ll}+|/|[@36]+)++   #Вот
 								 (?= [\p{Lu}3] (?:\p{Ll} |/|[@36] ) )   #Бля
 							   ~sxuSX', '$0 ', $string);
-        }
+		}
 
-        $string = UTF8::lowercase($string);
+		$string = UTF8::lowercase($string);
 
-        // получаем в массив только буквы и цифры
-        // "с_л@о#во,с\xc2\xa7лово.Слово" -> "с л о во с лово слово слово слово слово"
-        preg_match_all('~(?> \xd0[\xb0-\xbf]|\xd1[\x80-\x8f\x91]  #[а-я]
+		// получаем в массив только буквы и цифры
+		// "с_л@о#во,с\xc2\xa7лово.Слово" -> "с л о во с лово слово слово слово слово"
+		preg_match_all('~(?> \xd0[\xb0-\xbf]|\xd1[\x80-\x8f\x91]  #[а-я]
 						  |  /     #л
 						  |  @         #а
 						  |  [a-z\d]+
 						  )+
 						~sxSX', $string, $m);
-        $string = ' '.implode(' ', $m[0]).' ';
+		$string = ' ' . implode(' ', $m[0]) . ' ';
 
-        $trans = [
-            '/\\' => 'л',  // Б/\ЯТЬ --> БЛЯТЬ
-            '@' => 'а',  // пизд@  --> пизда
-        ];
-        $string = strtr($string, $trans);
+		$trans = [
+			'/\\' => 'л',  // Б/\ЯТЬ --> БЛЯТЬ
+			'@' => 'а',  // пизд@  --> пизда
+		];
+		$string = strtr($string, $trans);
 
-        // цифровые подделки под буквы
-        $trans = [
-            '~ [3з]++ [3з\x20]*+ ~sxuSX' => 'з',
-            '~ [6б]++ [6б\x20]*+ ~sxuSX' => 'б',
-        ];
-        $string = preg_replace(array_keys($trans), array_values($trans), $string);
+		// цифровые подделки под буквы
+		$trans = [
+			'~ [3з]++ [3з\x20]*+ ~sxuSX' => 'з',
+			'~ [6б]++ [6б\x20]*+ ~sxuSX' => 'б',
+		];
+		$string = preg_replace(array_keys($trans), array_values($trans), $string);
 
-        // убираем все повторяющиеся символы, ловим обман типа "х-у-у-й"
-        // "сллоооовоо   слово  х у у й" --> "слово слово х у й"
-        $string = preg_replace('/(  [\xd0\xd1][\x80-\xbf] \x20?  #optimized [а-я]
+		// убираем все повторяющиеся символы, ловим обман типа "х-у-у-й"
+		// "сллоооовоо   слово  х у у й" --> "слово слово х у й"
+		$string = preg_replace('/(  [\xd0\xd1][\x80-\xbf] \x20?  #optimized [а-я]
                              | [a-z\d] \x20?
                              ) \\1+
                            /sxSX', '$1', $string);
 
-        if ($replace === null || version_compare(PHP_VERSION, '5.2.0', '<')) {
-            $result = preg_match($re_badwords, $string, $m, PREG_OFFSET_CAPTURE);
-            if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
-                return preg_last_error();
-            }
-            if ($result === false) {
-                return 1;
-            }  // PREG_INTERNAL_ERROR = 1
-            if ($result && $replace === null) {
-                list($word, $offset) = $m[0];
-                $s1 = substr($string, 0, $offset);
-                $s2 = substr($string, $offset + strlen($word));
-                $delta = intval($delta);
-                if ($delta === 0) {
-                    $fragment = '['.trim($word).']';
-                } else {
-                    if ($delta < 1 || $delta > 10) {
-                        $delta = 3;
-                    }
-                    preg_match('/  (?> \x20 (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)++ ){1,'.$delta.'}+
+		if ($replace === null || version_compare(PHP_VERSION, '5.2.0', '<')) {
+			$result = preg_match($re_badwords, $string, $m, PREG_OFFSET_CAPTURE);
+			if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
+				return preg_last_error();
+			}
+			if ($result === false) {
+				return 1;
+			}  // PREG_INTERNAL_ERROR = 1
+			if ($result && $replace === null) {
+				list($word, $offset) = $m[0];
+				$s1 = substr($string, 0, $offset);
+				$s2 = substr($string, $offset + strlen($word));
+				$delta = intval($delta);
+				if ($delta === 0) {
+					$fragment = '[' . trim($word) . ']';
+				} else {
+					if ($delta < 1 || $delta > 10) {
+						$delta = 3;
+					}
+					preg_match('/  (?> \x20 (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)++ ){1,' . $delta . '}+
                                    \x20?+
                                 $/sxSX', $s1, $m1);
-                    preg_match('/^ (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)*+  #ending
+					preg_match('/^ (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)*+  #ending
                                    \x20?+
-                                   (?> (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)++ \x20 ){0,'.$delta.'}+
+                                   (?> (?>[\xd0\xd1][\x80-\xbf]|[a-z\d]+)++ \x20 ){0,' . $delta . '}+
                                 /sxSX', $s2, $m2);
-								if (!empty($m1[0]) && !empty($s1)) {
-									$fragment = (ltrim(@$m1[0]) !== ltrim($s1) ? $continue : '').
-                        			trim((isset($m1[0]) ? $m1[0] : '').'['.trim($word).']'.(isset($m2[0]) ? $m2[0] : '')).
-                        			(rtrim(@$m2[0]) !== rtrim($s2) ? $continue : '');
-								}
+					if (!empty($m1[0]) && !empty($s1)) {
+						$fragment = (ltrim(@$m1[0]) !== ltrim($s1) ? $continue : '') .
+							trim((isset($m1[0]) ? $m1[0] : '') . '[' . trim($word) . ']' . (isset($m2[0]) ? $m2[0] : '')) .
+							(rtrim(@$m2[0]) !== rtrim($s2) ? $continue : '');
+					}
 
-                }
+				}
 				$fragment = (isset($fragment)) ? $fragment : '';
-                return UTF8::convert_to($fragment, $charset);
-            }
+				return UTF8::convert_to($fragment, $charset);
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        $result = preg_match_all($re_badwords, $string, $m);
-        if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
-            return preg_last_error();
-        }
-        if ($result === false) {
-            return 1;
-        }  // PREG_INTERNAL_ERROR = 1
-        if ($result > 0) {
-            // d($string, $m[0]);
-            $string = $ss;
-            // замена матного фрагмента на $replace
-            foreach ($m[0] as $w) {
-                $re_w = '~'.preg_replace_callback('~(?:/|[^\x20])~suSX', fn($w) => self::class::_make_regexp_callback($w), $w).'~sxuiSX';
-                $ss = preg_replace($re_w, $replace, $ss);
-                // d($re_w);
-            }
-            while ($ss !== $string) {
-                $ss = self::class::parse($string = $ss, $delta, $continue, $is_html, $replace, 'UTF-8');
-            }
-        }
+		$result = preg_match_all($re_badwords, $string, $m);
+		if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) {
+			return preg_last_error();
+		}
+		if ($result === false) {
+			return 1;
+		}  // PREG_INTERNAL_ERROR = 1
+		if ($result > 0) {
+			// d($string, $m[0]);
+			$string = $ss;
+			// замена матного фрагмента на $replace
+			foreach ($m[0] as $w) {
+				$re_w = '~' . preg_replace_callback('~(?:/|[^\x20])~suSX', fn($w) => self::class::_make_regexp_callback($w), $w) . '~sxuiSX';
+				$ss = preg_replace($re_w, $replace, $ss);
+				// d($re_w);
+			}
+			while ($ss !== $string) {
+				$ss = self::class::parse($string = $ss, $delta, $continue, $is_html, $replace, 'UTF-8');
+			}
+		}
 
-        return UTF8::convert_to($ss, $charset);
-    }
+		return UTF8::convert_to($ss, $charset);
+	}
 
-    private static function _make_regexp_callback(array $m)
-    {
-        // $re_holes = '[\x00-\x20\-_\*\~\.\'"\^=`:]';
-        // $re_holes = '[\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]';
-        $re_holes = '(?!/\\\\)[^\p{L}\d]';  // non letter, non digit, non '/\'
-        if ($m[0] === 'а') {
-            $re = '[@аА]++           (?>[:holes:]|[@аА]+)*+';
-        } elseif ($m[0] === 'з') {
-            $re = '[3зЗ]++           (?>[:holes:]|[3зЗ]+)*+';
-        } elseif ($m[0] === 'б') {
-            $re = '[6бБ]++           (?>[:holes:]|[6бБ]+)*+';
-        } elseif ($m[0] === 'л') {
-            $re = '(?>[лЛ]+|/\\\\)++ (?>[:holes:]|[лЛ]+|/\\\\)*+';
-        } else {
-            // в PCRE-7.2 флаг /i в комбинации с /u в регулярном выражении почему-то не работает (BUG?)
-            // поэтому делаем класс символов с буквами в обоих регистрах
-            $char = '['.preg_quote($m[0].UTF8::uppercase($m[0]), '~').']';
-            $re = str_replace('$0', $char, '$0++ (?>[:holes:]|$0+)*+');
-        }
+	private static function _make_regexp_callback(array $m)
+	{
+		// $re_holes = '[\x00-\x20\-_\*\~\.\'"\^=`:]';
+		// $re_holes = '[\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]';
+		$re_holes = '(?!/\\\\)[^\p{L}\d]';  // non letter, non digit, non '/\'
+		if ($m[0] === 'а') {
+			$re = '[@аА]++           (?>[:holes:]|[@аА]+)*+';
+		} elseif ($m[0] === 'з') {
+			$re = '[3зЗ]++           (?>[:holes:]|[3зЗ]+)*+';
+		} elseif ($m[0] === 'б') {
+			$re = '[6бБ]++           (?>[:holes:]|[6бБ]+)*+';
+		} elseif ($m[0] === 'л') {
+			$re = '(?>[лЛ]+|/\\\\)++ (?>[:holes:]|[лЛ]+|/\\\\)*+';
+		} else {
+			// в PCRE-7.2 флаг /i в комбинации с /u в регулярном выражении почему-то не работает (BUG?)
+			// поэтому делаем класс символов с буквами в обоих регистрах
+			$char = '[' . preg_quote($m[0] . UTF8::uppercase($m[0]), '~') . ']';
+			$re = str_replace('$0', $char, '$0++ (?>[:holes:]|$0+)*+');
+		}
 
-        return str_replace('[:holes:]', $re_holes, $re."\r\n");
-    }
+		return str_replace('[:holes:]', $re_holes, $re . "\r\n");
+	}
 }
 
 /**
@@ -484,9 +482,9 @@ class UTF8
 	 */
 	public static $html_special_chars_table = array(
 		'&quot;' => "\x22",  #U+0022 ["] &#34; quotation mark = APL quote
-		'&amp;'  => "\x26",  #U+0026 [&] &#38; ampersand
-		'&lt;'   => "\x3c",  #U+003C [<] &#60; less-than sign
-		'&gt;'   => "\x3e",  #U+003E [>] &#62; greater-than sign
+		'&amp;' => "\x26",  #U+0026 [&] &#38; ampersand
+		'&lt;' => "\x3c",  #U+003C [<] &#60; less-than sign
+		'&gt;' => "\x3e",  #U+003E [>] &#62; greater-than sign
 	);
 
 	/**
@@ -495,34 +493,34 @@ class UTF8
 	 */
 	public static $html_entity_table = array(
 		#Latin-1 Entities:
-		'&nbsp;'   => "\xc2\xa0",  #U+00A0 [ ] no-break space = non-breaking space
-		'&iexcl;'  => "\xc2\xa1",  #U+00A1 [¡] inverted exclamation mark
-		'&cent;'   => "\xc2\xa2",  #U+00A2 [¢] cent sign
-		'&pound;'  => "\xc2\xa3",  #U+00A3 [£] pound sign
+		'&nbsp;' => "\xc2\xa0",  #U+00A0 [ ] no-break space = non-breaking space
+		'&iexcl;' => "\xc2\xa1",  #U+00A1 [¡] inverted exclamation mark
+		'&cent;' => "\xc2\xa2",  #U+00A2 [¢] cent sign
+		'&pound;' => "\xc2\xa3",  #U+00A3 [£] pound sign
 		'&curren;' => "\xc2\xa4",  #U+00A4 [¤] currency sign
-		'&yen;'    => "\xc2\xa5",  #U+00A5 [¥] yen sign = yuan sign
+		'&yen;' => "\xc2\xa5",  #U+00A5 [¥] yen sign = yuan sign
 		'&brvbar;' => "\xc2\xa6",  #U+00A6 [¦] broken bar = broken vertical bar
-		'&sect;'   => "\xc2\xa7",  #U+00A7 [§] section sign
-		'&uml;'    => "\xc2\xa8",  #U+00A8 [¨] diaeresis = spacing diaeresis
-		'&copy;'   => "\xc2\xa9",  #U+00A9 [©] copyright sign
-		'&ordf;'   => "\xc2\xaa",  #U+00AA [ª] feminine ordinal indicator
-		'&laquo;'  => "\xc2\xab",  #U+00AB [«] left-pointing double angle quotation mark = left pointing guillemet
-		'&not;'    => "\xc2\xac",  #U+00AC [¬] not sign
-		'&shy;'    => "\xc2\xad",  #U+00AD [ ] soft hyphen = discretionary hyphen
-		'&reg;'    => "\xc2\xae",  #U+00AE [®] registered sign = registered trade mark sign
-		'&macr;'   => "\xc2\xaf",  #U+00AF [¯] macron = spacing macron = overline = APL overbar
-		'&deg;'    => "\xc2\xb0",  #U+00B0 [°] degree sign
+		'&sect;' => "\xc2\xa7",  #U+00A7 [§] section sign
+		'&uml;' => "\xc2\xa8",  #U+00A8 [¨] diaeresis = spacing diaeresis
+		'&copy;' => "\xc2\xa9",  #U+00A9 [©] copyright sign
+		'&ordf;' => "\xc2\xaa",  #U+00AA [ª] feminine ordinal indicator
+		'&laquo;' => "\xc2\xab",  #U+00AB [«] left-pointing double angle quotation mark = left pointing guillemet
+		'&not;' => "\xc2\xac",  #U+00AC [¬] not sign
+		'&shy;' => "\xc2\xad",  #U+00AD [ ] soft hyphen = discretionary hyphen
+		'&reg;' => "\xc2\xae",  #U+00AE [®] registered sign = registered trade mark sign
+		'&macr;' => "\xc2\xaf",  #U+00AF [¯] macron = spacing macron = overline = APL overbar
+		'&deg;' => "\xc2\xb0",  #U+00B0 [°] degree sign
 		'&plusmn;' => "\xc2\xb1",  #U+00B1 [±] plus-minus sign = plus-or-minus sign
-		'&sup2;'   => "\xc2\xb2",  #U+00B2 [²] superscript two = superscript digit two = squared
-		'&sup3;'   => "\xc2\xb3",  #U+00B3 [³] superscript three = superscript digit three = cubed
-		'&acute;'  => "\xc2\xb4",  #U+00B4 [´] acute accent = spacing acute
-		'&micro;'  => "\xc2\xb5",  #U+00B5 [µ] micro sign
-		'&para;'   => "\xc2\xb6",  #U+00B6 [¶] pilcrow sign = paragraph sign
+		'&sup2;' => "\xc2\xb2",  #U+00B2 [²] superscript two = superscript digit two = squared
+		'&sup3;' => "\xc2\xb3",  #U+00B3 [³] superscript three = superscript digit three = cubed
+		'&acute;' => "\xc2\xb4",  #U+00B4 [´] acute accent = spacing acute
+		'&micro;' => "\xc2\xb5",  #U+00B5 [µ] micro sign
+		'&para;' => "\xc2\xb6",  #U+00B6 [¶] pilcrow sign = paragraph sign
 		'&middot;' => "\xc2\xb7",  #U+00B7 [·] middle dot = Georgian comma = Greek middle dot
-		'&cedil;'  => "\xc2\xb8",  #U+00B8 [¸] cedilla = spacing cedilla
-		'&sup1;'   => "\xc2\xb9",  #U+00B9 [¹] superscript one = superscript digit one
-		'&ordm;'   => "\xc2\xba",  #U+00BA [º] masculine ordinal indicator
-		'&raquo;'  => "\xc2\xbb",  #U+00BB [»] right-pointing double angle quotation mark = right pointing guillemet
+		'&cedil;' => "\xc2\xb8",  #U+00B8 [¸] cedilla = spacing cedilla
+		'&sup1;' => "\xc2\xb9",  #U+00B9 [¹] superscript one = superscript digit one
+		'&ordm;' => "\xc2\xba",  #U+00BA [º] masculine ordinal indicator
+		'&raquo;' => "\xc2\xbb",  #U+00BB [»] right-pointing double angle quotation mark = right pointing guillemet
 		'&frac14;' => "\xc2\xbc",  #U+00BC [¼] vulgar fraction one quarter = fraction one quarter
 		'&frac12;' => "\xc2\xbd",  #U+00BD [½] vulgar fraction one half = fraction one half
 		'&frac34;' => "\xc2\xbe",  #U+00BE [¾] vulgar fraction three quarters = fraction three quarters
@@ -530,224 +528,224 @@ class UTF8
 		#Latin capital letter
 		'&Agrave;' => "\xc3\x80",  #Latin capital letter A with grave = Latin capital letter A grave
 		'&Aacute;' => "\xc3\x81",  #Latin capital letter A with acute
-		'&Acirc;'  => "\xc3\x82",  #Latin capital letter A with circumflex
+		'&Acirc;' => "\xc3\x82",  #Latin capital letter A with circumflex
 		'&Atilde;' => "\xc3\x83",  #Latin capital letter A with tilde
-		'&Auml;'   => "\xc3\x84",  #Latin capital letter A with diaeresis
-		'&Aring;'  => "\xc3\x85",  #Latin capital letter A with ring above = Latin capital letter A ring
-		'&AElig;'  => "\xc3\x86",  #Latin capital letter AE = Latin capital ligature AE
+		'&Auml;' => "\xc3\x84",  #Latin capital letter A with diaeresis
+		'&Aring;' => "\xc3\x85",  #Latin capital letter A with ring above = Latin capital letter A ring
+		'&AElig;' => "\xc3\x86",  #Latin capital letter AE = Latin capital ligature AE
 		'&Ccedil;' => "\xc3\x87",  #Latin capital letter C with cedilla
 		'&Egrave;' => "\xc3\x88",  #Latin capital letter E with grave
 		'&Eacute;' => "\xc3\x89",  #Latin capital letter E with acute
-		'&Ecirc;'  => "\xc3\x8a",  #Latin capital letter E with circumflex
-		'&Euml;'   => "\xc3\x8b",  #Latin capital letter E with diaeresis
+		'&Ecirc;' => "\xc3\x8a",  #Latin capital letter E with circumflex
+		'&Euml;' => "\xc3\x8b",  #Latin capital letter E with diaeresis
 		'&Igrave;' => "\xc3\x8c",  #Latin capital letter I with grave
 		'&Iacute;' => "\xc3\x8d",  #Latin capital letter I with acute
-		'&Icirc;'  => "\xc3\x8e",  #Latin capital letter I with circumflex
-		'&Iuml;'   => "\xc3\x8f",  #Latin capital letter I with diaeresis
-		'&ETH;'    => "\xc3\x90",  #Latin capital letter ETH
+		'&Icirc;' => "\xc3\x8e",  #Latin capital letter I with circumflex
+		'&Iuml;' => "\xc3\x8f",  #Latin capital letter I with diaeresis
+		'&ETH;' => "\xc3\x90",  #Latin capital letter ETH
 		'&Ntilde;' => "\xc3\x91",  #Latin capital letter N with tilde
 		'&Ograve;' => "\xc3\x92",  #Latin capital letter O with grave
 		'&Oacute;' => "\xc3\x93",  #Latin capital letter O with acute
-		'&Ocirc;'  => "\xc3\x94",  #Latin capital letter O with circumflex
+		'&Ocirc;' => "\xc3\x94",  #Latin capital letter O with circumflex
 		'&Otilde;' => "\xc3\x95",  #Latin capital letter O with tilde
-		'&Ouml;'   => "\xc3\x96",  #Latin capital letter O with diaeresis
-		'&times;'  => "\xc3\x97",  #U+00D7 [×] multiplication sign
+		'&Ouml;' => "\xc3\x96",  #Latin capital letter O with diaeresis
+		'&times;' => "\xc3\x97",  #U+00D7 [×] multiplication sign
 		'&Oslash;' => "\xc3\x98",  #Latin capital letter O with stroke = Latin capital letter O slash
 		'&Ugrave;' => "\xc3\x99",  #Latin capital letter U with grave
 		'&Uacute;' => "\xc3\x9a",  #Latin capital letter U with acute
-		'&Ucirc;'  => "\xc3\x9b",  #Latin capital letter U with circumflex
-		'&Uuml;'   => "\xc3\x9c",  #Latin capital letter U with diaeresis
+		'&Ucirc;' => "\xc3\x9b",  #Latin capital letter U with circumflex
+		'&Uuml;' => "\xc3\x9c",  #Latin capital letter U with diaeresis
 		'&Yacute;' => "\xc3\x9d",  #Latin capital letter Y with acute
-		'&THORN;'  => "\xc3\x9e",  #Latin capital letter THORN
+		'&THORN;' => "\xc3\x9e",  #Latin capital letter THORN
 		#Latin small letter
-		'&szlig;'  => "\xc3\x9f",  #Latin small letter sharp s = ess-zed
+		'&szlig;' => "\xc3\x9f",  #Latin small letter sharp s = ess-zed
 		'&agrave;' => "\xc3\xa0",  #Latin small letter a with grave = Latin small letter a grave
 		'&aacute;' => "\xc3\xa1",  #Latin small letter a with acute
-		'&acirc;'  => "\xc3\xa2",  #Latin small letter a with circumflex
+		'&acirc;' => "\xc3\xa2",  #Latin small letter a with circumflex
 		'&atilde;' => "\xc3\xa3",  #Latin small letter a with tilde
-		'&auml;'   => "\xc3\xa4",  #Latin small letter a with diaeresis
-		'&aring;'  => "\xc3\xa5",  #Latin small letter a with ring above = Latin small letter a ring
-		'&aelig;'  => "\xc3\xa6",  #Latin small letter ae = Latin small ligature ae
+		'&auml;' => "\xc3\xa4",  #Latin small letter a with diaeresis
+		'&aring;' => "\xc3\xa5",  #Latin small letter a with ring above = Latin small letter a ring
+		'&aelig;' => "\xc3\xa6",  #Latin small letter ae = Latin small ligature ae
 		'&ccedil;' => "\xc3\xa7",  #Latin small letter c with cedilla
 		'&egrave;' => "\xc3\xa8",  #Latin small letter e with grave
 		'&eacute;' => "\xc3\xa9",  #Latin small letter e with acute
-		'&ecirc;'  => "\xc3\xaa",  #Latin small letter e with circumflex
-		'&euml;'   => "\xc3\xab",  #Latin small letter e with diaeresis
+		'&ecirc;' => "\xc3\xaa",  #Latin small letter e with circumflex
+		'&euml;' => "\xc3\xab",  #Latin small letter e with diaeresis
 		'&igrave;' => "\xc3\xac",  #Latin small letter i with grave
 		'&iacute;' => "\xc3\xad",  #Latin small letter i with acute
-		'&icirc;'  => "\xc3\xae",  #Latin small letter i with circumflex
-		'&iuml;'   => "\xc3\xaf",  #Latin small letter i with diaeresis
-		'&eth;'    => "\xc3\xb0",  #Latin small letter eth
+		'&icirc;' => "\xc3\xae",  #Latin small letter i with circumflex
+		'&iuml;' => "\xc3\xaf",  #Latin small letter i with diaeresis
+		'&eth;' => "\xc3\xb0",  #Latin small letter eth
 		'&ntilde;' => "\xc3\xb1",  #Latin small letter n with tilde
 		'&ograve;' => "\xc3\xb2",  #Latin small letter o with grave
 		'&oacute;' => "\xc3\xb3",  #Latin small letter o with acute
-		'&ocirc;'  => "\xc3\xb4",  #Latin small letter o with circumflex
+		'&ocirc;' => "\xc3\xb4",  #Latin small letter o with circumflex
 		'&otilde;' => "\xc3\xb5",  #Latin small letter o with tilde
-		'&ouml;'   => "\xc3\xb6",  #Latin small letter o with diaeresis
+		'&ouml;' => "\xc3\xb6",  #Latin small letter o with diaeresis
 		'&divide;' => "\xc3\xb7",  #U+00F7 [÷] division sign
 		'&oslash;' => "\xc3\xb8",  #Latin small letter o with stroke = Latin small letter o slash
 		'&ugrave;' => "\xc3\xb9",  #Latin small letter u with grave
 		'&uacute;' => "\xc3\xba",  #Latin small letter u with acute
-		'&ucirc;'  => "\xc3\xbb",  #Latin small letter u with circumflex
-		'&uuml;'   => "\xc3\xbc",  #Latin small letter u with diaeresis
+		'&ucirc;' => "\xc3\xbb",  #Latin small letter u with circumflex
+		'&uuml;' => "\xc3\xbc",  #Latin small letter u with diaeresis
 		'&yacute;' => "\xc3\xbd",  #Latin small letter y with acute
-		'&thorn;'  => "\xc3\xbe",  #Latin small letter thorn
-		'&yuml;'   => "\xc3\xbf",  #Latin small letter y with diaeresis
+		'&thorn;' => "\xc3\xbe",  #Latin small letter thorn
+		'&yuml;' => "\xc3\xbf",  #Latin small letter y with diaeresis
 		#Symbols and Greek Letters:
-		'&fnof;'    => "\xc6\x92",  #U+0192 [ƒ] Latin small f with hook = function = florin
-		'&Alpha;'   => "\xce\x91",  #Greek capital letter alpha
-		'&Beta;'    => "\xce\x92",  #Greek capital letter beta
-		'&Gamma;'   => "\xce\x93",  #Greek capital letter gamma
-		'&Delta;'   => "\xce\x94",  #Greek capital letter delta
+		'&fnof;' => "\xc6\x92",  #U+0192 [ƒ] Latin small f with hook = function = florin
+		'&Alpha;' => "\xce\x91",  #Greek capital letter alpha
+		'&Beta;' => "\xce\x92",  #Greek capital letter beta
+		'&Gamma;' => "\xce\x93",  #Greek capital letter gamma
+		'&Delta;' => "\xce\x94",  #Greek capital letter delta
 		'&Epsilon;' => "\xce\x95",  #Greek capital letter epsilon
-		'&Zeta;'    => "\xce\x96",  #Greek capital letter zeta
-		'&Eta;'     => "\xce\x97",  #Greek capital letter eta
-		'&Theta;'   => "\xce\x98",  #Greek capital letter theta
-		'&Iota;'    => "\xce\x99",  #Greek capital letter iota
-		'&Kappa;'   => "\xce\x9a",  #Greek capital letter kappa
-		'&Lambda;'  => "\xce\x9b",  #Greek capital letter lambda
-		'&Mu;'      => "\xce\x9c",  #Greek capital letter mu
-		'&Nu;'      => "\xce\x9d",  #Greek capital letter nu
-		'&Xi;'      => "\xce\x9e",  #Greek capital letter xi
+		'&Zeta;' => "\xce\x96",  #Greek capital letter zeta
+		'&Eta;' => "\xce\x97",  #Greek capital letter eta
+		'&Theta;' => "\xce\x98",  #Greek capital letter theta
+		'&Iota;' => "\xce\x99",  #Greek capital letter iota
+		'&Kappa;' => "\xce\x9a",  #Greek capital letter kappa
+		'&Lambda;' => "\xce\x9b",  #Greek capital letter lambda
+		'&Mu;' => "\xce\x9c",  #Greek capital letter mu
+		'&Nu;' => "\xce\x9d",  #Greek capital letter nu
+		'&Xi;' => "\xce\x9e",  #Greek capital letter xi
 		'&Omicron;' => "\xce\x9f",  #Greek capital letter omicron
-		'&Pi;'      => "\xce\xa0",  #Greek capital letter pi
-		'&Rho;'     => "\xce\xa1",  #Greek capital letter rho
-		'&Sigma;'   => "\xce\xa3",  #Greek capital letter sigma
-		'&Tau;'     => "\xce\xa4",  #Greek capital letter tau
+		'&Pi;' => "\xce\xa0",  #Greek capital letter pi
+		'&Rho;' => "\xce\xa1",  #Greek capital letter rho
+		'&Sigma;' => "\xce\xa3",  #Greek capital letter sigma
+		'&Tau;' => "\xce\xa4",  #Greek capital letter tau
 		'&Upsilon;' => "\xce\xa5",  #Greek capital letter upsilon
-		'&Phi;'     => "\xce\xa6",  #Greek capital letter phi
-		'&Chi;'     => "\xce\xa7",  #Greek capital letter chi
-		'&Psi;'     => "\xce\xa8",  #Greek capital letter psi
-		'&Omega;'   => "\xce\xa9",  #Greek capital letter omega
-		'&alpha;'   => "\xce\xb1",  #Greek small letter alpha
-		'&beta;'    => "\xce\xb2",  #Greek small letter beta
-		'&gamma;'   => "\xce\xb3",  #Greek small letter gamma
-		'&delta;'   => "\xce\xb4",  #Greek small letter delta
+		'&Phi;' => "\xce\xa6",  #Greek capital letter phi
+		'&Chi;' => "\xce\xa7",  #Greek capital letter chi
+		'&Psi;' => "\xce\xa8",  #Greek capital letter psi
+		'&Omega;' => "\xce\xa9",  #Greek capital letter omega
+		'&alpha;' => "\xce\xb1",  #Greek small letter alpha
+		'&beta;' => "\xce\xb2",  #Greek small letter beta
+		'&gamma;' => "\xce\xb3",  #Greek small letter gamma
+		'&delta;' => "\xce\xb4",  #Greek small letter delta
 		'&epsilon;' => "\xce\xb5",  #Greek small letter epsilon
-		'&zeta;'    => "\xce\xb6",  #Greek small letter zeta
-		'&eta;'     => "\xce\xb7",  #Greek small letter eta
-		'&theta;'   => "\xce\xb8",  #Greek small letter theta
-		'&iota;'    => "\xce\xb9",  #Greek small letter iota
-		'&kappa;'   => "\xce\xba",  #Greek small letter kappa
-		'&lambda;'  => "\xce\xbb",  #Greek small letter lambda
-		'&mu;'      => "\xce\xbc",  #Greek small letter mu
-		'&nu;'      => "\xce\xbd",  #Greek small letter nu
-		'&xi;'      => "\xce\xbe",  #Greek small letter xi
+		'&zeta;' => "\xce\xb6",  #Greek small letter zeta
+		'&eta;' => "\xce\xb7",  #Greek small letter eta
+		'&theta;' => "\xce\xb8",  #Greek small letter theta
+		'&iota;' => "\xce\xb9",  #Greek small letter iota
+		'&kappa;' => "\xce\xba",  #Greek small letter kappa
+		'&lambda;' => "\xce\xbb",  #Greek small letter lambda
+		'&mu;' => "\xce\xbc",  #Greek small letter mu
+		'&nu;' => "\xce\xbd",  #Greek small letter nu
+		'&xi;' => "\xce\xbe",  #Greek small letter xi
 		'&omicron;' => "\xce\xbf",  #Greek small letter omicron
-		'&pi;'      => "\xcf\x80",  #Greek small letter pi
-		'&rho;'     => "\xcf\x81",  #Greek small letter rho
-		'&sigmaf;'  => "\xcf\x82",  #Greek small letter final sigma
-		'&sigma;'   => "\xcf\x83",  #Greek small letter sigma
-		'&tau;'     => "\xcf\x84",  #Greek small letter tau
+		'&pi;' => "\xcf\x80",  #Greek small letter pi
+		'&rho;' => "\xcf\x81",  #Greek small letter rho
+		'&sigmaf;' => "\xcf\x82",  #Greek small letter final sigma
+		'&sigma;' => "\xcf\x83",  #Greek small letter sigma
+		'&tau;' => "\xcf\x84",  #Greek small letter tau
 		'&upsilon;' => "\xcf\x85",  #Greek small letter upsilon
-		'&phi;'     => "\xcf\x86",  #Greek small letter phi
-		'&chi;'     => "\xcf\x87",  #Greek small letter chi
-		'&psi;'     => "\xcf\x88",  #Greek small letter psi
-		'&omega;'   => "\xcf\x89",  #Greek small letter omega
-		'&thetasym;'=> "\xcf\x91",  #Greek small letter theta symbol
-		'&upsih;'   => "\xcf\x92",  #Greek upsilon with hook symbol
-		'&piv;'     => "\xcf\x96",  #U+03D6 [ϖ] Greek pi symbol
+		'&phi;' => "\xcf\x86",  #Greek small letter phi
+		'&chi;' => "\xcf\x87",  #Greek small letter chi
+		'&psi;' => "\xcf\x88",  #Greek small letter psi
+		'&omega;' => "\xcf\x89",  #Greek small letter omega
+		'&thetasym;' => "\xcf\x91",  #Greek small letter theta symbol
+		'&upsih;' => "\xcf\x92",  #Greek upsilon with hook symbol
+		'&piv;' => "\xcf\x96",  #U+03D6 [ϖ] Greek pi symbol
 
-		'&bull;'    => "\xe2\x80\xa2",  #U+2022 [•] bullet = black small circle
-		'&hellip;'  => "\xe2\x80\xa6",  #U+2026 […] horizontal ellipsis = three dot leader
-		'&prime;'   => "\xe2\x80\xb2",  #U+2032 [′] prime = minutes = feet (для обозначения минут и футов)
-		'&Prime;'   => "\xe2\x80\xb3",  #U+2033 [″] double prime = seconds = inches (для обозначения секунд и дюймов).
-		'&oline;'   => "\xe2\x80\xbe",  #U+203E [‾] overline = spacing overscore
-		'&frasl;'   => "\xe2\x81\x84",  #U+2044 [⁄] fraction slash
-		'&weierp;'  => "\xe2\x84\x98",  #U+2118 [℘] script capital P = power set = Weierstrass p
-		'&image;'   => "\xe2\x84\x91",  #U+2111 [ℑ] blackletter capital I = imaginary part
-		'&real;'    => "\xe2\x84\x9c",  #U+211C [ℜ] blackletter capital R = real part symbol
-		'&trade;'   => "\xe2\x84\xa2",  #U+2122 [™] trade mark sign
+		'&bull;' => "\xe2\x80\xa2",  #U+2022 [•] bullet = black small circle
+		'&hellip;' => "\xe2\x80\xa6",  #U+2026 […] horizontal ellipsis = three dot leader
+		'&prime;' => "\xe2\x80\xb2",  #U+2032 [′] prime = minutes = feet (для обозначения минут и футов)
+		'&Prime;' => "\xe2\x80\xb3",  #U+2033 [″] double prime = seconds = inches (для обозначения секунд и дюймов).
+		'&oline;' => "\xe2\x80\xbe",  #U+203E [‾] overline = spacing overscore
+		'&frasl;' => "\xe2\x81\x84",  #U+2044 [⁄] fraction slash
+		'&weierp;' => "\xe2\x84\x98",  #U+2118 [℘] script capital P = power set = Weierstrass p
+		'&image;' => "\xe2\x84\x91",  #U+2111 [ℑ] blackletter capital I = imaginary part
+		'&real;' => "\xe2\x84\x9c",  #U+211C [ℜ] blackletter capital R = real part symbol
+		'&trade;' => "\xe2\x84\xa2",  #U+2122 [™] trade mark sign
 		'&alefsym;' => "\xe2\x84\xb5",  #U+2135 [ℵ] alef symbol = first transfinite cardinal
-		'&larr;'    => "\xe2\x86\x90",  #U+2190 [←] leftwards arrow
-		'&uarr;'    => "\xe2\x86\x91",  #U+2191 [↑] upwards arrow
-		'&rarr;'    => "\xe2\x86\x92",  #U+2192 [→] rightwards arrow
-		'&darr;'    => "\xe2\x86\x93",  #U+2193 [↓] downwards arrow
-		'&harr;'    => "\xe2\x86\x94",  #U+2194 [↔] left right arrow
-		'&crarr;'   => "\xe2\x86\xb5",  #U+21B5 [↵] downwards arrow with corner leftwards = carriage return
-		'&lArr;'    => "\xe2\x87\x90",  #U+21D0 [⇐] leftwards double arrow
-		'&uArr;'    => "\xe2\x87\x91",  #U+21D1 [⇑] upwards double arrow
-		'&rArr;'    => "\xe2\x87\x92",  #U+21D2 [⇒] rightwards double arrow
-		'&dArr;'    => "\xe2\x87\x93",  #U+21D3 [⇓] downwards double arrow
-		'&hArr;'    => "\xe2\x87\x94",  #U+21D4 [⇔] left right double arrow
-		'&forall;'  => "\xe2\x88\x80",  #U+2200 [∀] for all
-		'&part;'    => "\xe2\x88\x82",  #U+2202 [∂] partial differential
-		'&exist;'   => "\xe2\x88\x83",  #U+2203 [∃] there exists
-		'&empty;'   => "\xe2\x88\x85",  #U+2205 [∅] empty set = null set = diameter
-		'&nabla;'   => "\xe2\x88\x87",  #U+2207 [∇] nabla = backward difference
-		'&isin;'    => "\xe2\x88\x88",  #U+2208 [∈] element of
-		'&notin;'   => "\xe2\x88\x89",  #U+2209 [∉] not an element of
-		'&ni;'      => "\xe2\x88\x8b",  #U+220B [∋] contains as member
-		'&prod;'    => "\xe2\x88\x8f",  #U+220F [∏] n-ary product = product sign
-		'&sum;'     => "\xe2\x88\x91",  #U+2211 [∑] n-ary sumation
-		'&minus;'   => "\xe2\x88\x92",  #U+2212 [−] minus sign
-		'&lowast;'  => "\xe2\x88\x97",  #U+2217 [∗] asterisk operator
-		'&radic;'   => "\xe2\x88\x9a",  #U+221A [√] square root = radical sign
-		'&prop;'    => "\xe2\x88\x9d",  #U+221D [∝] proportional to
-		'&infin;'   => "\xe2\x88\x9e",  #U+221E [∞] infinity
-		'&ang;'     => "\xe2\x88\xa0",  #U+2220 [∠] angle
-		'&and;'     => "\xe2\x88\xa7",  #U+2227 [∧] logical and = wedge
-		'&or;'      => "\xe2\x88\xa8",  #U+2228 [∨] logical or = vee
-		'&cap;'     => "\xe2\x88\xa9",  #U+2229 [∩] intersection = cap
-		'&cup;'     => "\xe2\x88\xaa",  #U+222A [∪] union = cup
-		'&int;'     => "\xe2\x88\xab",  #U+222B [∫] integral
-		'&there4;'  => "\xe2\x88\xb4",  #U+2234 [∴] therefore
-		'&sim;'     => "\xe2\x88\xbc",  #U+223C [∼] tilde operator = varies with = similar to
-		'&cong;'    => "\xe2\x89\x85",  #U+2245 [≅] approximately equal to
-		'&asymp;'   => "\xe2\x89\x88",  #U+2248 [≈] almost equal to = asymptotic to
-		'&ne;'      => "\xe2\x89\xa0",  #U+2260 [≠] not equal to
-		'&equiv;'   => "\xe2\x89\xa1",  #U+2261 [≡] identical to
-		'&le;'      => "\xe2\x89\xa4",  #U+2264 [≤] less-than or equal to
-		'&ge;'      => "\xe2\x89\xa5",  #U+2265 [≥] greater-than or equal to
-		'&sub;'     => "\xe2\x8a\x82",  #U+2282 [⊂] subset of
-		'&sup;'     => "\xe2\x8a\x83",  #U+2283 [⊃] superset of
-		'&nsub;'    => "\xe2\x8a\x84",  #U+2284 [⊄] not a subset of
-		'&sube;'    => "\xe2\x8a\x86",  #U+2286 [⊆] subset of or equal to
-		'&supe;'    => "\xe2\x8a\x87",  #U+2287 [⊇] superset of or equal to
-		'&oplus;'   => "\xe2\x8a\x95",  #U+2295 [⊕] circled plus = direct sum
-		'&otimes;'  => "\xe2\x8a\x97",  #U+2297 [⊗] circled times = vector product
-		'&perp;'    => "\xe2\x8a\xa5",  #U+22A5 [⊥] up tack = orthogonal to = perpendicular
-		'&sdot;'    => "\xe2\x8b\x85",  #U+22C5 [⋅] dot operator
-		'&lceil;'   => "\xe2\x8c\x88",  #U+2308 [⌈] left ceiling = APL upstile
-		'&rceil;'   => "\xe2\x8c\x89",  #U+2309 [⌉] right ceiling
-		'&lfloor;'  => "\xe2\x8c\x8a",  #U+230A [⌊] left floor = APL downstile
-		'&rfloor;'  => "\xe2\x8c\x8b",  #U+230B [⌋] right floor
-		'&lang;'    => "\xe2\x8c\xa9",  #U+2329 [〈] left-pointing angle bracket = bra
-		'&rang;'    => "\xe2\x8c\xaa",  #U+232A [〉] right-pointing angle bracket = ket
-		'&loz;'     => "\xe2\x97\x8a",  #U+25CA [◊] lozenge
-		'&spades;'  => "\xe2\x99\xa0",  #U+2660 [♠] black spade suit
-		'&clubs;'   => "\xe2\x99\xa3",  #U+2663 [♣] black club suit = shamrock
-		'&hearts;'  => "\xe2\x99\xa5",  #U+2665 [♥] black heart suit = valentine
-		'&diams;'   => "\xe2\x99\xa6",  #U+2666 [♦] black diamond suit
+		'&larr;' => "\xe2\x86\x90",  #U+2190 [←] leftwards arrow
+		'&uarr;' => "\xe2\x86\x91",  #U+2191 [↑] upwards arrow
+		'&rarr;' => "\xe2\x86\x92",  #U+2192 [→] rightwards arrow
+		'&darr;' => "\xe2\x86\x93",  #U+2193 [↓] downwards arrow
+		'&harr;' => "\xe2\x86\x94",  #U+2194 [↔] left right arrow
+		'&crarr;' => "\xe2\x86\xb5",  #U+21B5 [↵] downwards arrow with corner leftwards = carriage return
+		'&lArr;' => "\xe2\x87\x90",  #U+21D0 [⇐] leftwards double arrow
+		'&uArr;' => "\xe2\x87\x91",  #U+21D1 [⇑] upwards double arrow
+		'&rArr;' => "\xe2\x87\x92",  #U+21D2 [⇒] rightwards double arrow
+		'&dArr;' => "\xe2\x87\x93",  #U+21D3 [⇓] downwards double arrow
+		'&hArr;' => "\xe2\x87\x94",  #U+21D4 [⇔] left right double arrow
+		'&forall;' => "\xe2\x88\x80",  #U+2200 [∀] for all
+		'&part;' => "\xe2\x88\x82",  #U+2202 [∂] partial differential
+		'&exist;' => "\xe2\x88\x83",  #U+2203 [∃] there exists
+		'&empty;' => "\xe2\x88\x85",  #U+2205 [∅] empty set = null set = diameter
+		'&nabla;' => "\xe2\x88\x87",  #U+2207 [∇] nabla = backward difference
+		'&isin;' => "\xe2\x88\x88",  #U+2208 [∈] element of
+		'&notin;' => "\xe2\x88\x89",  #U+2209 [∉] not an element of
+		'&ni;' => "\xe2\x88\x8b",  #U+220B [∋] contains as member
+		'&prod;' => "\xe2\x88\x8f",  #U+220F [∏] n-ary product = product sign
+		'&sum;' => "\xe2\x88\x91",  #U+2211 [∑] n-ary sumation
+		'&minus;' => "\xe2\x88\x92",  #U+2212 [−] minus sign
+		'&lowast;' => "\xe2\x88\x97",  #U+2217 [∗] asterisk operator
+		'&radic;' => "\xe2\x88\x9a",  #U+221A [√] square root = radical sign
+		'&prop;' => "\xe2\x88\x9d",  #U+221D [∝] proportional to
+		'&infin;' => "\xe2\x88\x9e",  #U+221E [∞] infinity
+		'&ang;' => "\xe2\x88\xa0",  #U+2220 [∠] angle
+		'&and;' => "\xe2\x88\xa7",  #U+2227 [∧] logical and = wedge
+		'&or;' => "\xe2\x88\xa8",  #U+2228 [∨] logical or = vee
+		'&cap;' => "\xe2\x88\xa9",  #U+2229 [∩] intersection = cap
+		'&cup;' => "\xe2\x88\xaa",  #U+222A [∪] union = cup
+		'&int;' => "\xe2\x88\xab",  #U+222B [∫] integral
+		'&there4;' => "\xe2\x88\xb4",  #U+2234 [∴] therefore
+		'&sim;' => "\xe2\x88\xbc",  #U+223C [∼] tilde operator = varies with = similar to
+		'&cong;' => "\xe2\x89\x85",  #U+2245 [≅] approximately equal to
+		'&asymp;' => "\xe2\x89\x88",  #U+2248 [≈] almost equal to = asymptotic to
+		'&ne;' => "\xe2\x89\xa0",  #U+2260 [≠] not equal to
+		'&equiv;' => "\xe2\x89\xa1",  #U+2261 [≡] identical to
+		'&le;' => "\xe2\x89\xa4",  #U+2264 [≤] less-than or equal to
+		'&ge;' => "\xe2\x89\xa5",  #U+2265 [≥] greater-than or equal to
+		'&sub;' => "\xe2\x8a\x82",  #U+2282 [⊂] subset of
+		'&sup;' => "\xe2\x8a\x83",  #U+2283 [⊃] superset of
+		'&nsub;' => "\xe2\x8a\x84",  #U+2284 [⊄] not a subset of
+		'&sube;' => "\xe2\x8a\x86",  #U+2286 [⊆] subset of or equal to
+		'&supe;' => "\xe2\x8a\x87",  #U+2287 [⊇] superset of or equal to
+		'&oplus;' => "\xe2\x8a\x95",  #U+2295 [⊕] circled plus = direct sum
+		'&otimes;' => "\xe2\x8a\x97",  #U+2297 [⊗] circled times = vector product
+		'&perp;' => "\xe2\x8a\xa5",  #U+22A5 [⊥] up tack = orthogonal to = perpendicular
+		'&sdot;' => "\xe2\x8b\x85",  #U+22C5 [⋅] dot operator
+		'&lceil;' => "\xe2\x8c\x88",  #U+2308 [⌈] left ceiling = APL upstile
+		'&rceil;' => "\xe2\x8c\x89",  #U+2309 [⌉] right ceiling
+		'&lfloor;' => "\xe2\x8c\x8a",  #U+230A [⌊] left floor = APL downstile
+		'&rfloor;' => "\xe2\x8c\x8b",  #U+230B [⌋] right floor
+		'&lang;' => "\xe2\x8c\xa9",  #U+2329 [〈] left-pointing angle bracket = bra
+		'&rang;' => "\xe2\x8c\xaa",  #U+232A [〉] right-pointing angle bracket = ket
+		'&loz;' => "\xe2\x97\x8a",  #U+25CA [◊] lozenge
+		'&spades;' => "\xe2\x99\xa0",  #U+2660 [♠] black spade suit
+		'&clubs;' => "\xe2\x99\xa3",  #U+2663 [♣] black club suit = shamrock
+		'&hearts;' => "\xe2\x99\xa5",  #U+2665 [♥] black heart suit = valentine
+		'&diams;' => "\xe2\x99\xa6",  #U+2666 [♦] black diamond suit
 		#Other Special Characters:
-		'&OElig;'  => "\xc5\x92",  #U+0152 [Œ] Latin capital ligature OE
-		'&oelig;'  => "\xc5\x93",  #U+0153 [œ] Latin small ligature oe
+		'&OElig;' => "\xc5\x92",  #U+0152 [Œ] Latin capital ligature OE
+		'&oelig;' => "\xc5\x93",  #U+0153 [œ] Latin small ligature oe
 		'&Scaron;' => "\xc5\xa0",  #U+0160 [Š] Latin capital letter S with caron
 		'&scaron;' => "\xc5\xa1",  #U+0161 [š] Latin small letter s with caron
-		'&Yuml;'   => "\xc5\xb8",  #U+0178 [Ÿ] Latin capital letter Y with diaeresis
-		'&circ;'   => "\xcb\x86",  #U+02C6 [ˆ] modifier letter circumflex accent
-		'&tilde;'  => "\xcb\x9c",  #U+02DC [˜] small tilde
-		'&ensp;'   => "\xe2\x80\x82",  #U+2002 [ ] en space
-		'&emsp;'   => "\xe2\x80\x83",  #U+2003 [ ] em space
+		'&Yuml;' => "\xc5\xb8",  #U+0178 [Ÿ] Latin capital letter Y with diaeresis
+		'&circ;' => "\xcb\x86",  #U+02C6 [ˆ] modifier letter circumflex accent
+		'&tilde;' => "\xcb\x9c",  #U+02DC [˜] small tilde
+		'&ensp;' => "\xe2\x80\x82",  #U+2002 [ ] en space
+		'&emsp;' => "\xe2\x80\x83",  #U+2003 [ ] em space
 		'&thinsp;' => "\xe2\x80\x89",  #U+2009 [ ] thin space
-		'&zwnj;'   => "\xe2\x80\x8c",  #U+200C [‌] zero width non-joiner
-		'&zwj;'    => "\xe2\x80\x8d",  #U+200D [‍] zero width joiner
-		'&lrm;'    => "\xe2\x80\x8e",  #U+200E [‎] left-to-right mark
-		'&rlm;'    => "\xe2\x80\x8f",  #U+200F [‏] right-to-left mark
-		'&ndash;'  => "\xe2\x80\x93",  #U+2013 [–] en dash
-		'&mdash;'  => "\xe2\x80\x94",  #U+2014 [—] em dash
-		'&lsquo;'  => "\xe2\x80\x98",  #U+2018 [‘] left single quotation mark
-		'&rsquo;'  => "\xe2\x80\x99",  #U+2019 [’] right single quotation mark (and apostrophe!)
-		'&sbquo;'  => "\xe2\x80\x9a",  #U+201A [‚] single low-9 quotation mark
-		'&ldquo;'  => "\xe2\x80\x9c",  #U+201C [“] left double quotation mark
-		'&rdquo;'  => "\xe2\x80\x9d",  #U+201D [”] right double quotation mark
-		'&bdquo;'  => "\xe2\x80\x9e",  #U+201E [„] double low-9 quotation mark
+		'&zwnj;' => "\xe2\x80\x8c",  #U+200C [‌] zero width non-joiner
+		'&zwj;' => "\xe2\x80\x8d",  #U+200D [‍] zero width joiner
+		'&lrm;' => "\xe2\x80\x8e",  #U+200E [‎] left-to-right mark
+		'&rlm;' => "\xe2\x80\x8f",  #U+200F [‏] right-to-left mark
+		'&ndash;' => "\xe2\x80\x93",  #U+2013 [–] en dash
+		'&mdash;' => "\xe2\x80\x94",  #U+2014 [—] em dash
+		'&lsquo;' => "\xe2\x80\x98",  #U+2018 [‘] left single quotation mark
+		'&rsquo;' => "\xe2\x80\x99",  #U+2019 [’] right single quotation mark (and apostrophe!)
+		'&sbquo;' => "\xe2\x80\x9a",  #U+201A [‚] single low-9 quotation mark
+		'&ldquo;' => "\xe2\x80\x9c",  #U+201C [“] left double quotation mark
+		'&rdquo;' => "\xe2\x80\x9d",  #U+201D [”] right double quotation mark
+		'&bdquo;' => "\xe2\x80\x9e",  #U+201E [„] double low-9 quotation mark
 		'&dagger;' => "\xe2\x80\xa0",  #U+2020 [†] dagger
 		'&Dagger;' => "\xe2\x80\xa1",  #U+2021 [‡] double dagger
 		'&permil;' => "\xe2\x80\xb0",  #U+2030 [‰] per mille sign
 		'&lsaquo;' => "\xe2\x80\xb9",  #U+2039 [‹] single left-pointing angle quotation mark
 		'&rsaquo;' => "\xe2\x80\xba",  #U+203A [›] single right-pointing angle quotation mark
-		'&euro;'   => "\xe2\x82\xac",  #U+20AC [€] euro sign
+		'&euro;' => "\xe2\x82\xac",  #U+20AC [€] euro sign
 	);
 
 	/**
@@ -2609,7 +2607,9 @@ class UTF8
 	);
 
 	#calling the methods of this class only statically!
-	private function __construct() {}
+	private function __construct()
+	{
+	}
 
 	/**
 	 * Remove combining diactrical marks, with possibility of the restore
@@ -2623,25 +2623,27 @@ class UTF8
 	 */
 	public static function diactrical_remove($string, $additional_chars = null, $is_can_restored = false, &$restore_table = null)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if ($additional_chars)
-		{
-			foreach ($additional_chars as $k => &$v) $v = preg_quote($v, '/');
+		if (is_null($string))
+			return $string;
+
+		if ($additional_chars) {
+			foreach ($additional_chars as $k => &$v)
+				$v = preg_quote($v, '/');
 			$re = '/((?>' . self::class::$diactrical_re . '|' . implode('|', $additional_chars) . ')+)/sxSX';
-		}
-		else $re = '/((?>' . self::class::$diactrical_re . ')+)/sxSX';
-		if (! $is_can_restored) return preg_replace($re, '', $string);
+		} else
+			$re = '/((?>' . self::class::$diactrical_re . ')+)/sxSX';
+		if (!$is_can_restored)
+			return preg_replace($re, '', $string);
 
 		$restore_table = array();
 		$a = preg_split($re, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$c = count($a);
-		if ($c === 1) return $string;
+		if ($c === 1)
+			return $string;
 		$pos = 0;
 		$s2 = '';
-		for ($i = 0; $i < $c - 1; $i += 2)
-		{
+		for ($i = 0; $i < $c - 1; $i += 2) {
 			$s2 .= $a[$i];
 			#запоминаем символьные (не байтовые!) позиции
 			$pos += self::class::strlen($a[$i]);
@@ -2663,18 +2665,22 @@ class UTF8
 	 */
 	public static function diactrical_restore($string, array $restore_table)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if (! $restore_table) return $string;
-		if (! is_int(@$restore_table['length']) ||
-			! is_array(@$restore_table['offsets']) ||
-			$restore_table['length'] !== self::class::strlen($string)) return false;
+		if (is_null($string))
+			return $string;
+
+		if (!$restore_table)
+			return $string;
+		if (
+			!is_int(@$restore_table['length']) ||
+			!is_array(@$restore_table['offsets']) ||
+			$restore_table['length'] !== self::class::strlen($string)
+		)
+			return false;
 		$a = array();
 		$length = $offset = 0;
 		$s2 = '';
-		foreach ($restore_table['offsets'] as $pos => $diactricals)
-		{
+		foreach ($restore_table['offsets'] as $pos => $diactricals) {
 			$length = $pos - $offset;
 			$s2 .= self::class::substr($string, $offset, $length) . $diactricals;
 			$offset = $pos;
@@ -2691,7 +2697,7 @@ class UTF8
 	 */
 	public static function convert_from($data, $charset = 'cp1251')
 	{
-		
+
 		return self::class::_convert($data, $charset, 'UTF-8');
 	}
 
@@ -2704,7 +2710,7 @@ class UTF8
 	 */
 	public static function convert_to($data, $charset = 'cp1251')
 	{
-		
+
 		return self::class::_convert($data, 'UTF-8', $charset);
 	}
 
@@ -2720,46 +2726,57 @@ class UTF8
 	 */
 	private static function _convert($data, $charset_from, $charset_to)
 	{
-		  #for recursive calls
-		if ($charset_from === $charset_to) return $data;
-		if (is_array($data))
-		{
+		#for recursive calls
+		if ($charset_from === $charset_to)
+			return $data;
+		if (is_array($data)) {
 			$d = array();
-			foreach ($data as $k => &$v)
-			{
+			foreach ($data as $k => &$v) {
 				$k = self::class::_convert($k, $charset_from, $charset_to);
-				if ($k === false) return false;
+				if ($k === false)
+					return false;
 				$d[$k] = self::class::_convert($v, $charset_from, $charset_to);
-				if ($d[$k] === false && ! is_bool($v)) return false;
+				if ($d[$k] === false && !is_bool($v))
+					return false;
 			}
 			return $d;
 		}
-		if (is_string($data))
-		{
+		if (is_string($data)) {
 			#smart behaviour for errors protected + speed improve
-			if ($charset_from === 'UTF-8' && ! self::class::is_utf8($data)) return $data;
-			if ($charset_to === 'UTF-8' && self::class::is_utf8($data)) return $data;
+			if ($charset_from === 'UTF-8' && !self::class::is_utf8($data))
+				return $data;
+			if ($charset_to === 'UTF-8' && self::class::is_utf8($data))
+				return $data;
 
 			#since PHP-5.3.x iconv() faster then mb_convert_encoding()
-			if (function_exists('iconv')) return iconv($charset_from, $charset_to . '//IGNORE//TRANSLIT', $data);
-			if (function_exists('mb_convert_encoding')) return mb_convert_encoding($data, $charset_to, $charset_from);
+			if (function_exists('iconv'))
+				return iconv($charset_from, $charset_to . '//IGNORE//TRANSLIT', $data);
+			if (function_exists('mb_convert_encoding'))
+				return mb_convert_encoding($data, $charset_to, $charset_from);
 
 			#charset_from
-			if ($charset_from === 'UTF-16' || $charset_from === 'UCS-2')  return self::class::_convert_from_utf16($data);
-			if ($charset_from === 'cp1251' || $charset_from === 'cp1259') return strtr($data, self::class::$cp1259_table);
-			if ($charset_from === 'koi8-r' || $charset_from === 'KOI8-R') return strtr(mb_convert_encoding($data, 'koi8-r', 'windows-1251'), self::class::$cp1259_table);
-			if ($charset_from === 'iso8859-5') return strtr(mb_convert_encoding($data, 'iso8859-5', 'windows-1251'), self::class::$cp1259_table);
-			if ($charset_from === 'cp866') return strtr(mb_convert_encoding($data, 'x-cp866', 'windows-1251'), self::class::$cp1259_table);
-			if ($charset_from === 'mac-cyrillic') return strtr(mb_convert_encoding($data, 'x-mac-cyrillic', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'UTF-16' || $charset_from === 'UCS-2')
+				return self::class::_convert_from_utf16($data);
+			if ($charset_from === 'cp1251' || $charset_from === 'cp1259')
+				return strtr($data, self::class::$cp1259_table);
+			if ($charset_from === 'koi8-r' || $charset_from === 'KOI8-R')
+				return strtr(mb_convert_encoding($data, 'koi8-r', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'iso8859-5')
+				return strtr(mb_convert_encoding($data, 'iso8859-5', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'cp866')
+				return strtr(mb_convert_encoding($data, 'x-cp866', 'windows-1251'), self::class::$cp1259_table);
+			if ($charset_from === 'mac-cyrillic')
+				return strtr(mb_convert_encoding($data, 'x-mac-cyrillic', 'windows-1251'), self::class::$cp1259_table);
 
 			#charset_to
-			if ($charset_to === 'cp1251' || $charset_to === 'cp1259') return strtr($data, array_flip(self::class::$cp1259_table));
+			if ($charset_to === 'cp1251' || $charset_to === 'cp1259')
+				return strtr($data, array_flip(self::class::$cp1259_table));
 
 			#last trying
-			if (function_exists('recode_string'))
-			{
+			if (function_exists('recode_string')) {
 				$string = @recode_string($charset_from . '..' . $charset_to, $data);
-				if (is_string($string)) return $string;
+				if (is_string($string))
+					return $string;
 			}
 
 			trigger_error('Convert "' . $charset_from . '" --> "' . $charset_to . '" is not supported native, "iconv" or "mbstring" extension required', E_USER_WARNING);
@@ -2785,71 +2802,71 @@ class UTF8
 	private static function _convert_from_utf16($string, $type = 'BE', $to_array = false)
 	{
 		static $types = array(
-			'BE' => 'n',  #unsigned short (always 16 bit, big endian byte order)
-			'LE' => 'v',  #unsigned short (always 16 bit, little endian byte order)
+		'BE' => 'n',  #unsigned short (always 16 bit, big endian byte order)
+		'LE' => 'v',  #unsigned short (always 16 bit, little endian byte order)
 		);
-		if (! array_key_exists($type, $types))
-		{
+		if (!array_key_exists($type, $types)) {
 			trigger_error('Unexpected value in 2-nd parameter, "' . $type . '" given!', E_USER_WARNING);
 			return false;
 		}
 		#the fastest way:
-		if (function_exists('iconv') || function_exists('mb_convert_encoding'))
-		{
-			if (function_exists('iconv'))                   $string = iconv('UTF-16' . $type, 'UTF-8', $string);
-			elseif (function_exists('mb_convert_encoding')) $string = mb_convert_encoding($string, 'UTF-8', 'UTF-16' . $type);
-			if (! $to_array) return $string;
+		if (function_exists('iconv') || function_exists('mb_convert_encoding')) {
+			if (function_exists('iconv'))
+				$string = iconv('UTF-16' . $type, 'UTF-8', $string);
+			elseif (function_exists('mb_convert_encoding'))
+				$string = mb_convert_encoding($string, 'UTF-8', 'UTF-16' . $type);
+			if (!$to_array)
+				return $string;
 			return self::class::str_split($string);
 		}
 
 		/*
-        http://en.wikipedia.org/wiki/UTF-16
+		http://en.wikipedia.org/wiki/UTF-16
 
-        The improvement that UTF-16 made over UCS-2 is its ability to encode
-        characters in planes 1-16, not just those in plane 0 (BMP).
+		The improvement that UTF-16 made over UCS-2 is its ability to encode
+		characters in planes 1-16, not just those in plane 0 (BMP).
 
-        UTF-16 represents non-BMP characters (those from U+10000 through U+10FFFF)
-        using a pair of 16-bit words, known as a surrogate pair.
-        First 1000016 is subtracted from the code point to give a 20-bit value.
-        This is then split into two separate 10-bit values each of which is represented
-        as a surrogate with the most significant half placed in the first surrogate.
-        To allow safe use of simple word-oriented string processing, separate ranges
-        of values are used for the two surrogates: 0xD800-0xDBFF for the first, most
-        significant surrogate and 0xDC00-0xDFFF for the second, least significant surrogate.
+		UTF-16 represents non-BMP characters (those from U+10000 through U+10FFFF)
+		using a pair of 16-bit words, known as a surrogate pair.
+		First 1000016 is subtracted from the code point to give a 20-bit value.
+		This is then split into two separate 10-bit values each of which is represented
+		as a surrogate with the most significant half placed in the first surrogate.
+		To allow safe use of simple word-oriented string processing, separate ranges
+		of values are used for the two surrogates: 0xD800-0xDBFF for the first, most
+		significant surrogate and 0xDC00-0xDFFF for the second, least significant surrogate.
 
-        For example, the character at code point U+10000 becomes the code unit sequence 0xD800 0xDC00,
-        and the character at U+10FFFD, the upper limit of Unicode, becomes the sequence 0xDBFF 0xDFFD.
-        Unicode and ISO/IEC 10646 do not, and will never, assign characters to any of the code points
-        in the U+D800-U+DFFF range, so an individual code value from a surrogate pair does not ever
-        represent a character.
+		For example, the character at code point U+10000 becomes the code unit sequence 0xD800 0xDC00,
+		and the character at U+10FFFD, the upper limit of Unicode, becomes the sequence 0xDBFF 0xDFFD.
+		Unicode and ISO/IEC 10646 do not, and will never, assign characters to any of the code points
+		in the U+D800-U+DFFF range, so an individual code value from a surrogate pair does not ever
+		represent a character.
 
-        http://www.russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm
-        http://www.russellcottrell.com/greek/utilities/UnicodeRanges.htm
+		http://www.russellcottrell.com/greek/utilities/SurrogatePairCalculator.htm
+		http://www.russellcottrell.com/greek/utilities/UnicodeRanges.htm
 
-        Conversion of a Unicode scalar value S to a surrogate pair <H, L>:
-          H = Math.floor((S - 0x10000) / 0x400) + 0xD800;
-          L = ((S - 0x10000) % 0x400) + 0xDC00;
-        The conversion of a surrogate pair <H, L> to a scalar value:
-          N = ((H - 0xD800) * 0x400) + (L - 0xDC00) + 0x10000;
+		Conversion of a Unicode scalar value S to a surrogate pair <H, L>:
+		  H = Math.floor((S - 0x10000) / 0x400) + 0xD800;
+		  L = ((S - 0x10000) % 0x400) + 0xDC00;
+		The conversion of a surrogate pair <H, L> to a scalar value:
+		  N = ((H - 0xD800) * 0x400) + (L - 0xDC00) + 0x10000;
 		*/
 		$a = array();
 		$hi = false;
-		foreach (unpack($types[$type] . '*', $string) as $codepoint)
-		{
+		foreach (unpack($types[$type] . '*', $string) as $codepoint) {
 			#surrogate process
-			if ($hi !== false)
-			{
+			if ($hi !== false) {
 				$lo = $codepoint;
-				if ($lo < 0xDC00 || $lo > 0xDFFF) $a[] = "\xEF\xBF\xBD"; #U+FFFD REPLACEMENT CHARACTER (for broken char)
-				else
-				{
+				if ($lo < 0xDC00 || $lo > 0xDFFF)
+					$a[] = "\xEF\xBF\xBD"; #U+FFFD REPLACEMENT CHARACTER (for broken char)
+				else {
 					$codepoint = (($hi - 0xD800) * 0x400) + ($lo - 0xDC00) + 0x10000;
 					$a[] = self::class::chr($codepoint);
 				}
 				$hi = false;
-			}
-			elseif ($codepoint < 0xD800 || $codepoint > 0xDBFF) $a[] = self::class::chr($codepoint); #not surrogate
-			else $hi = $codepoint; #surrogate was found
+			} elseif ($codepoint < 0xD800 || $codepoint > 0xDBFF)
+				$a[] = self::class::chr($codepoint); #not surrogate
+			else
+				$hi = $codepoint; #surrogate was found
 		}
 		return $to_array ? $a : implode('', $a);
 	}
@@ -2862,8 +2879,9 @@ class UTF8
 	 */
 	public static function strict($string)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 		return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]+/sSX', '', $string);
 	}
 
@@ -2879,19 +2897,20 @@ class UTF8
 	 */
 	public static function is_ascii($data)
 	{
-		
-		if (is_array($data))
-		{
-			foreach ($data as $k => &$v)
-			{
-				if (! self::class::is_ascii($k) || ! self::class::is_ascii($v)) return false;
+
+		if (is_array($data)) {
+			foreach ($data as $k => &$v) {
+				if (!self::class::is_ascii($k) || !self::class::is_ascii($v))
+					return false;
 			}
 			return true;
 		}
 		#ltrim() little faster then preg_match()
 		#if (is_string($data)) return preg_match('/^[\x00-\x7f]*$/sSX', $data); #deprecated
-		if (is_string($data)) return ltrim($data, "\x00..\x7f") === '';
-		if (is_scalar($data) || is_null($data)) return true;  #~ null, integer, float, boolean
+		if (is_string($data))
+			return ltrim($data, "\x00..\x7f") === '';
+		if (is_scalar($data) || is_null($data))
+			return true;  #~ null, integer, float, boolean
 		return false; #object or resource
 	}
 
@@ -2912,25 +2931,27 @@ class UTF8
 	 */
 	public static function is_utf8($data, $is_strict = true)
 	{
-		
-		if (is_array($data))
-		{
-			foreach ($data as $k => &$v)
-			{
-				if (! self::class::is_utf8($k, $is_strict) || ! self::class::is_utf8($v, $is_strict)) return false;
+
+		if (is_array($data)) {
+			foreach ($data as $k => &$v) {
+				if (!self::class::is_utf8($k, $is_strict) || !self::class::is_utf8($v, $is_strict))
+					return false;
 			}
 			return true;
 		}
-		if (is_string($data))
-		{
-			if (! preg_match('~~suSX', $data)) return false;
-			if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) return false;
+		if (is_string($data)) {
+			if (!preg_match('~~suSX', $data))
+				return false;
+			if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR)
+				return false;
 			#preg_match('~~suSX') much faster (up to 4 times), then mb_check_encoding($data, 'UTF-8')!
 			#if (function_exists('mb_check_encoding') && ! mb_check_encoding($data, 'UTF-8')) return false; #DEPRECATED
-			if ($is_strict && preg_match('/[^\x09\x0A\x0D\x20-\xBF\xC2-\xF7]/sSX', $data)) return false;
+			if ($is_strict && preg_match('/[^\x09\x0A\x0D\x20-\xBF\xC2-\xF7]/sSX', $data))
+				return false;
 			return true;
 		}
-		if (is_scalar($data) || is_null($data)) return true;  #~ null, integer, float, boolean
+		if (is_scalar($data) || is_null($data))
+			return true;  #~ null, integer, float, boolean
 		return false; #object or resource
 	}
 
@@ -2945,25 +2966,31 @@ class UTF8
 	 */
 	public static function check($string, $is_strict = true)
 	{
-		
-		for ($i = 0, $len = strlen($string); $i < $len; $i++)
-		{
+
+		for ($i = 0, $len = strlen($string); $i < $len; $i++) {
 			$c = ord($string[$i]);
 			if ($c < 0x80) #1 byte  0bbbbbbb
 			{
-				if ($is_strict === false || ($c > 0x1F && $c < 0x7F) || $c == 0x09 || $c == 0x0A || $c == 0x0D) continue;
+				if ($is_strict === false || ($c > 0x1F && $c < 0x7F) || $c == 0x09 || $c == 0x0A || $c == 0x0D)
+					continue;
 			}
-			if (($c & 0xE0) == 0xC0) $n = 1; #2 bytes 110bbbbb 10bbbbbb
-			elseif (($c & 0xF0) == 0xE0) $n = 2; #3 bytes 1110bbbb 10bbbbbb 10bbbbbb
-			elseif (($c & 0xF8) == 0xF0) $n = 3; #4 bytes 11110bbb 10bbbbbb 10bbbbbb 10bbbbbb
-			elseif (($c & 0xFC) == 0xF8) $n = 4; #5 bytes 111110bb 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb
-			elseif (($c & 0xFE) == 0xFC) $n = 5; #6 bytes 1111110b 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb
-			else return false; #does not match any model
+			if (($c & 0xE0) == 0xC0)
+				$n = 1; #2 bytes 110bbbbb 10bbbbbb
+			elseif (($c & 0xF0) == 0xE0)
+				$n = 2; #3 bytes 1110bbbb 10bbbbbb 10bbbbbb
+			elseif (($c & 0xF8) == 0xF0)
+				$n = 3; #4 bytes 11110bbb 10bbbbbb 10bbbbbb 10bbbbbb
+			elseif (($c & 0xFC) == 0xF8)
+				$n = 4; #5 bytes 111110bb 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb
+			elseif (($c & 0xFE) == 0xFC)
+				$n = 5; #6 bytes 1111110b 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb 10bbbbbb
+			else
+				return false; #does not match any model
 			#n bytes matching 10bbbbbb follow ?
-			for ($j = 0; $j < $n; $j++)
-			{
+			for ($j = 0; $j < $n; $j++) {
 				$i++;
-				if ($i == $len || ((ord($string[$i]) & 0xC0) != 0x80) ) return false;
+				if ($i == $len || ((ord($string[$i]) & 0xC0) != 0x80))
+					return false;
 			}
 		}
 		return true;
@@ -2997,56 +3024,56 @@ class UTF8
 	 */
 	public static function blocks_check($data, $blocks)
 	{
-		
 
-		if (is_array($data))
-		{
-			foreach ($data as $k => &$v)
-			{
-				if (! self::class::blocks_check($k, $blocks) || ! self::class::blocks_check($v, $blocks)) return false;
+
+		if (is_array($data)) {
+			foreach ($data as $k => &$v) {
+				if (!self::class::blocks_check($k, $blocks) || !self::class::blocks_check($v, $blocks))
+					return false;
 			}
 			return true;
 		}
 
-		if (is_string($data))
-		{
+		if (is_string($data)) {
 			$chars = self::class::str_split($data);
-			if ($chars === false) return false; #broken UTF-8
+			if ($chars === false)
+				return false; #broken UTF-8
 			unset($data); #memory free
 			$skip = array(); #save to cache already checked symbols
-			foreach ($chars as $i => $char)
-			{
-				if (array_key_exists($char, $skip)) continue; #speed improve
+			foreach ($chars as $i => $char) {
+				if (array_key_exists($char, $skip))
+					continue; #speed improve
 				$codepoint = self::class::ord($char);
-				if ($codepoint === false) return false; #broken UTF-8
+				if ($codepoint === false)
+					return false; #broken UTF-8
 				$is_valid = false;
-				$blocks = (array)$blocks;
-				foreach ($blocks as $j => $block)
-				{
-					if (is_string($block))
-					{
-						if (! array_key_exists($block, self::class::$unicode_blocks))
-						{
+				$blocks = (array) $blocks;
+				foreach ($blocks as $j => $block) {
+					if (is_string($block)) {
+						if (!array_key_exists($block, self::class::$unicode_blocks)) {
 							trigger_error('Unknown block "' . $block . '"!', E_USER_WARNING);
 							return false;
 						}
-						list ($min, $max) = self::class::$unicode_blocks[$block];
-					}
-					elseif (is_array($block)) list ($min, $max) = $block;
-					elseif (is_int($block)) $min = $max = $block;
-					else trigger_error('A string/array/int type expected for block[' . $j . ']!', E_USER_ERROR);
-					if ($codepoint >= $min && $codepoint <= $max)
-					{
+						list($min, $max) = self::class::$unicode_blocks[$block];
+					} elseif (is_array($block))
+						list($min, $max) = $block;
+					elseif (is_int($block))
+						$min = $max = $block;
+					else
+						trigger_error('A string/array/int type expected for block[' . $j . ']!', E_USER_ERROR);
+					if ($codepoint >= $min && $codepoint <= $max) {
 						$is_valid = true;
 						break;
 					}
 				}#foreach
-				if (! $is_valid) return false;
+				if (!$is_valid)
+					return false;
 				$skip[$char] = null;
 			}#foreach
 			return true;
 		}
-		if (is_scalar($data) || is_null($data)) return true;  #~ null, integer, float, boolean
+		if (is_scalar($data) || is_null($data))
+			return true;  #~ null, integer, float, boolean
 		return false; #object or resource
 	}
 
@@ -3079,23 +3106,21 @@ class UTF8
 	 */
 	public static function autoconvert_request($is_hex2bin = false, $charset = 'cp1251')
 	{
-		
+
 		$is_converted = false;
 		$is_broken = false;
-		foreach (array('_GET', '_POST', '_COOKIE', '_FILES') as $k => $v)
-		{
-			if (! array_key_exists($v, $GLOBALS)) continue;
+		foreach (array('_GET', '_POST', '_COOKIE', '_FILES') as $k => $v) {
+			if (!array_key_exists($v, $GLOBALS))
+				continue;
 			#использовать array_walk_recursive() не предоставляется возможным,
 			#т.к. его callback функция не поддерживает передачу ключа по ссылке
 			$GLOBALS[$v] = self::class::_autoconvert_request_recursive($GLOBALS[$v], $is_converted, $is_broken, $is_hex2bin, $charset);
-			if ($is_broken)
-			{
+			if ($is_broken) {
 				trigger_error('Array $' . $v . ' does not have keys/values in UTF-8 charset!', E_USER_WARNING);
 				return false;
 			}
 		}
-		if ($is_converted)
-		{
+		if ($is_converted) {
 			$_REQUEST =
 				(isset($_COOKIE) ? $_COOKIE : array()) +
 				(isset($_POST) ? $_POST : array()) +
@@ -3106,16 +3131,17 @@ class UTF8
 
 	private static function _autoconvert_request_recursive(&$data, &$is_converted, &$is_broken, $is_hex2bin, $charset)
 	{
-		if ($is_broken) return $data;  #speed improve
-		if (is_array($data))
-		{
+		if ($is_broken)
+			return $data;  #speed improve
+		if (is_array($data)) {
 			$d = array();
-			foreach ($data as $k => &$v)
-			{
+			foreach ($data as $k => &$v) {
 				$k = self::class::_autoconvert_request($k, $is_converted, $is_broken, $is_hex2bin, $charset);
-				if ($is_broken) return $data;  #speed improve
+				if ($is_broken)
+					return $data;  #speed improve
 				$d[$k] = self::class::_autoconvert_request_recursive($v, $is_converted, $is_broken, $is_hex2bin, $charset);
-				if ($is_broken) return $data;  #speed improve
+				if ($is_broken)
+					return $data;  #speed improve
 			}
 			return $d;
 		}
@@ -3125,21 +3151,19 @@ class UTF8
 	private static function _autoconvert_request(&$string, &$is_converted, &$is_broken, $is_hex2bin, $charset)
 	{
 		#regexp speed improve by using strpos()
-		if ($is_hex2bin && strpos($string, '0x') === 0 && preg_match('/^0x((?:[\da-fA-F]{2})+)$/sSX', $string, $m))
-		{
+		if ($is_hex2bin && strpos($string, '0x') === 0 && preg_match('/^0x((?:[\da-fA-F]{2})+)$/sSX', $string, $m)) {
 			$string = pack('H' . strlen($m[1]), $m[1]); #hex2bin()
 			$is_converted = true;
 		}
-		if (! self::class::is_utf8($string))
-		{
+		if (!self::class::is_utf8($string)) {
 			$string = self::class::convert_from($string, $charset);
-			if ($string === false) $is_broken = true;
-			elseif (! self::class::is_utf8($string))
-			{
+			if ($string === false)
+				$is_broken = true;
+			elseif (!self::class::is_utf8($string)) {
 				trigger_error('String 0x ' . substr(bin2hex($string), 0, 100) . '... is not UTF-8!', E_USER_WARNING);
 				$is_broken = true;
-			}
-			else $is_converted = true;
+			} else
+				$is_converted = true;
 		}
 		return $string;
 	}
@@ -3157,14 +3181,15 @@ class UTF8
 	 */
 	public static function strcmp($s1, $s2, $locale = '')
 	{
-		
-		if ($s1 === null || $s2  === null) return null;
-		if (! function_exists('collator_create')) return strcmp($s1, $s2);
+
+		if ($s1 === null || $s2 === null)
+			return null;
+		if (!function_exists('collator_create'))
+			return strcmp($s1, $s2);
 		# PHP 5 >= 5.3.0, PECL intl >= 1.0.0
 		# If empty string ("") or "root" are passed, UCA rules will be used.
 		$c = new \Collator($locale);
-		if (! $c)
-		{
+		if (!$c) {
 			# Returns an "empty" object on error. You can use intl_get_error_code() and/or intl_get_error_message() to know what happened.
 			trigger_error(intl_get_error_message(), E_USER_WARNING);
 			return false;
@@ -3185,8 +3210,9 @@ class UTF8
 	 */
 	public static function strncmp($s1, $s2, $length)
 	{
-		
-		if (is_null($s1) || is_null($s2)) return null;
+
+		if (is_null($s1) || is_null($s2))
+			return null;
 		return self::class::strcmp(self::class::substr($s1, 0, $length), self::class::substr($s2, 0, $length));
 	}
 
@@ -3202,8 +3228,9 @@ class UTF8
 	 */
 	public static function strcasecmp($s1, $s2)
 	{
-		
-		if (is_null($s1) || is_null($s2)) return null;
+
+		if (is_null($s1) || is_null($s2))
+			return null;
 		return self::class::strcmp(self::class::lowercase($s1), self::class::lowercase($s2));
 	}
 
@@ -3216,18 +3243,24 @@ class UTF8
 	 */
 	public static function to_unicode($string)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$s2 = null;
 		#since PHP-5.3.x iconv() little faster then mb_convert_encoding()
-		if (function_exists('iconv')) $s2 = @iconv('UTF-8', 'UCS-4BE', $string);
-		elseif (function_exists('mb_convert_encoding')) $s2 = @mb_convert_encoding($string, 'UCS-4BE', 'UTF-8');
-		if (is_string($s2)) return array_values(unpack('N*', $s2));
-		if ($s2 !== null) return false;
+		if (function_exists('iconv'))
+			$s2 = @iconv('UTF-8', 'UCS-4BE', $string);
+		elseif (function_exists('mb_convert_encoding'))
+			$s2 = @mb_convert_encoding($string, 'UCS-4BE', 'UTF-8');
+		if (is_string($s2))
+			return array_values(unpack('N*', $s2));
+		if ($s2 !== null)
+			return false;
 
 		$a = self::class::str_split($string);
-		if ($a === false) return false;
+		if ($a === false)
+			return false;
 		return array_map(array(__CLASS__, 'ord'), $a);
 	}
 
@@ -3240,22 +3273,25 @@ class UTF8
 	 */
 	public static function from_unicode($a)
 	{
-		
-		if (is_null($a)) return $a;
+
+		if (is_null($a))
+			return $a;
 
 		#since PHP-5.3.x iconv() little faster then mb_convert_encoding()
-		if (function_exists('iconv'))
-		{
-			array_walk($a, function(&$cp) { $cp = pack('N', $cp); });
+		if (function_exists('iconv')) {
+			array_walk($a, function (&$cp) {
+				$cp = pack('N', $cp); });
 			$string = @iconv('UCS-4BE', 'UTF-8', implode('', $a));
-			if (! is_string($string)) return false;
+			if (!is_string($string))
+				return false;
 			return $string;
 		}
-		if (function_exists('mb_convert_encoding'))
-		{
-			array_walk($a, function(&$cp) { $cp = pack('N', $cp); });
+		if (function_exists('mb_convert_encoding')) {
+			array_walk($a, function (&$cp) {
+				$cp = pack('N', $cp); });
 			$string = mb_convert_encoding(implode('', $a), 'UTF-8', 'UCS-4BE');
-			if (! is_string($string)) return false;
+			if (!is_string($string))
+				return false;
 			return $string;
 		}
 
@@ -3271,25 +3307,30 @@ class UTF8
 	 */
 	public static function ord($char)
 	{
-		
-		if (is_null($char)) return $char;
+
+		if (is_null($char))
+			return $char;
 
 		static $cache = array();
-		if (array_key_exists($char, $cache)) return $cache[$char]; #speed improve
+		if (array_key_exists($char, $cache))
+			return $cache[$char]; #speed improve
 
-		switch (strlen($char))
-		{
-			case 1 : return $cache[$char] = ord($char);
-			case 2 : return $cache[$char] = (ord($char[1]) & 63) |
-											((ord($char[0]) & 31) << 6);
-			case 3 : return $cache[$char] = (ord($char[2]) & 63) |
-											((ord($char[1]) & 63) << 6) |
-											((ord($char[0]) & 15) << 12);
-			case 4 : return $cache[$char] = (ord($char[3]) & 63) |
-											((ord($char[2]) & 63) << 6) |
-											((ord($char[1]) & 63) << 12) |
-											((ord($char[0]) & 7)  << 18);
-			default :
+		switch (strlen($char)) {
+			case 1:
+				return $cache[$char] = ord($char);
+			case 2:
+				return $cache[$char] = (ord($char[1]) & 63) |
+					((ord($char[0]) & 31) << 6);
+			case 3:
+				return $cache[$char] = (ord($char[2]) & 63) |
+					((ord($char[1]) & 63) << 6) |
+					((ord($char[0]) & 15) << 12);
+			case 4:
+				return $cache[$char] = (ord($char[3]) & 63) |
+					((ord($char[2]) & 63) << 6) |
+					((ord($char[1]) & 63) << 12) |
+					((ord($char[0]) & 7) << 18);
+			default:
 				trigger_error('Character 0x' . bin2hex($char) . ' is not UTF-8!', E_USER_WARNING);
 				return false;
 		}
@@ -3304,22 +3345,28 @@ class UTF8
 	 */
 	public static function chr($cp)
 	{
-		
-		if (is_null($cp)) return $cp;
+
+		if (is_null($cp))
+			return $cp;
 
 		static $cache = array();
-		if (array_key_exists($cp, $cache)) return $cache[$cp]; #speed improve
+		if (array_key_exists($cp, $cache))
+			return $cache[$cp]; #speed improve
 
-		if ($cp <= 0x7f)     return $cache[$cp] = chr($cp);
-		if ($cp <= 0x7ff)    return $cache[$cp] = chr(0xc0 | ($cp >> 6))  .
-												  chr(0x80 | ($cp & 0x3f));
-		if ($cp <= 0xffff)   return $cache[$cp] = chr(0xe0 | ($cp >> 12)) .
-												  chr(0x80 | (($cp >> 6) & 0x3f)) .
-												  chr(0x80 | ($cp & 0x3f));
-		if ($cp <= 0x10ffff) return $cache[$cp] = chr(0xf0 | ($cp >> 18)) .
-												  chr(0x80 | (($cp >> 12) & 0x3f)) .
-												  chr(0x80 | (($cp >> 6) & 0x3f)) .
-												  chr(0x80 | ($cp & 0x3f));
+		if ($cp <= 0x7f)
+			return $cache[$cp] = chr($cp);
+		if ($cp <= 0x7ff)
+			return $cache[$cp] = chr(0xc0 | ($cp >> 6)) .
+				chr(0x80 | ($cp & 0x3f));
+		if ($cp <= 0xffff)
+			return $cache[$cp] = chr(0xe0 | ($cp >> 12)) .
+				chr(0x80 | (($cp >> 6) & 0x3f)) .
+				chr(0x80 | ($cp & 0x3f));
+		if ($cp <= 0x10ffff)
+			return $cache[$cp] = chr(0xf0 | ($cp >> 18)) .
+				chr(0x80 | (($cp >> 12) & 0x3f)) .
+				chr(0x80 | (($cp >> 6) & 0x3f)) .
+				chr(0x80 | ($cp & 0x3f));
 		#U+FFFD REPLACEMENT CHARACTER
 		return $cache[$cp] = "\xEF\xBF\xBD";
 	}
@@ -3334,14 +3381,18 @@ class UTF8
 	 */
 	public static function chunk_split($string, $length = null, $glue = null)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$length = intval($length);
-		$glue   = strval($glue);
-		if ($length < 1) $length = 76;
-		if ($glue === '') $glue = "\r\n";
-		if (! is_array($a = self::class::str_split($string, $length))) return false;
+		$glue = strval($glue);
+		if ($length < 1)
+			$length = 76;
+		if ($glue === '')
+			$glue = "\r\n";
+		if (!is_array($a = self::class::str_split($string, $length)))
+			return false;
 		return implode($glue, $a);
 	}
 
@@ -3354,15 +3405,15 @@ class UTF8
 	 */
 	public static function array_change_key_case($a, $mode)
 	{
-		
-		if (! is_array($a)) return $a;
+
+		if (!is_array($a))
+			return $a;
 		$a2 = array();
-		foreach ($a as $k => $v)
-		{
-			if (is_string($k))
-			{
+		foreach ($a as $k => $v) {
+			if (is_string($k)) {
 				$k = self::class::convert_case($k, $mode);
-				if ($k === false) return false;
+				if ($k === false)
+					return false;
 			}
 			$a2[$k] = $v;
 		}
@@ -3386,25 +3437,26 @@ class UTF8
 	 */
 	public static function convert_case($data, $mode, $is_ascii_optimization = true): array|bool|float|int|string|null
 	{
-		
 
-		if (is_array($data))
-		{
-			foreach ($data as $k => &$v) $v = self::class::convert_case($v, $mode);
+
+		if (is_array($data)) {
+			foreach ($data as $k => &$v)
+				$v = self::class::convert_case($v, $mode);
 			return $data;
 		}
-		if (! is_string($data) || ! $data) return $data;
+		if (!is_string($data) || !$data)
+			return $data;
 
-		if ($mode === CASE_UPPER)
-		{
-			if ($is_ascii_optimization && self::class::is_ascii($data)) return strtoupper($data); #speed improve!
+		if ($mode === CASE_UPPER) {
+			if ($is_ascii_optimization && self::class::is_ascii($data))
+				return strtoupper($data); #speed improve!
 			#deprecated, since PHP-5.3.x strtr() 2-3 times faster then mb_strtolower()
 			#if (function_exists('mb_strtoupper')) return mb_strtoupper($data, 'utf-8');
 			return strtr($data, array_flip(self::class::$convert_case_table));
 		}
-		if ($mode === CASE_LOWER)
-		{
-			if ($is_ascii_optimization && self::class::is_ascii($data)) return strtolower($data); #speed improve!
+		if ($mode === CASE_LOWER) {
+			if ($is_ascii_optimization && self::class::is_ascii($data))
+				return strtolower($data); #speed improve!
 			#deprecated, since PHP-5.3.x strtr() 2-3 times faster then mb_strtolower()
 			#if (function_exists('mb_strtolower')) return mb_strtolower($data, 'utf-8');
 			return strtr($data, self::class::$convert_case_table);
@@ -3420,7 +3472,7 @@ class UTF8
 	 * @return  scalar|bool|null   Returns FALSE if error occurred	 */
 	public static function lowercase($data)
 	{
-		
+
 		return self::class::convert_case($data, CASE_LOWER);
 	}
 
@@ -3432,7 +3484,7 @@ class UTF8
 	 */
 	public static function uppercase($data)
 	{
-		
+
 		return self::class::convert_case($data, CASE_UPPER);
 	}
 
@@ -3444,7 +3496,7 @@ class UTF8
 	 */
 	public static function strtolower($data)
 	{
-		
+
 		return self::class::convert_case($data, CASE_LOWER);
 	}
 
@@ -3456,7 +3508,7 @@ class UTF8
 	 */
 	public static function strtoupper($data)
 	{
-		
+
 		return self::class::convert_case($data, CASE_UPPER);
 	}
 
@@ -3481,27 +3533,31 @@ class UTF8
 	 */
 	public static function html_entity_decode($string, $is_special_chars = false): array|bool|float|int|string|null
 	{
-		
-		if (! is_string($string)) return $string;
+
+		if (!is_string($string))
+			return $string;
 
 		#speed improve
 		$amp = strpos($string, '&');
 		$pos = ($amp === false) ? null : $amp;
 
-		if (strlen($string) < 4  #по минимальной длине сущности - 4 байта: &#d; &xx;
-			|| ($amp === false) || strpos($string, ';', $pos) === false) return $string;
+		if (
+			strlen($string) < 4  #по минимальной длине сущности - 4 байта: &#d; &xx;
+			|| ($amp === false) || strpos($string, ';', $pos) === false
+		)
+			return $string;
 
 		$table = self::class::$html_entity_table;
-		if ($is_special_chars) $table += self::class::$html_special_chars_table;
+		if ($is_special_chars)
+			$table += self::class::$html_special_chars_table;
 
 		#replace named entities
 		$string = strtr($string, $table);
 		#block below deprecated, since PHP-5.3.x strtr() 1.5 times faster
-		if (0 && preg_match_all(pattern: '/&[a-zA-Z]++\d*+;/sSX', subject: $string, matches: $m, flags: 0, offset: $pos))
-		{
-			foreach (array_unique($m[0]) as $entity)
-			{
-				if (array_key_exists($entity, $table)) $string = str_replace($entity, $table[$entity], $string);
+		if (0 && preg_match_all(pattern: '/&[a-zA-Z]++\d*+;/sSX', subject: $string, matches: $m, flags: 0, offset: $pos)) {
+			foreach (array_unique($m[0]) as $entity) {
+				if (array_key_exists($entity, $table))
+					$string = str_replace($entity, $table[$entity], $string);
 			}
 		}
 
@@ -3510,17 +3566,19 @@ class UTF8
 		{
 			$class = __CLASS__;
 			$html_special_chars_table_flipped = array_flip(self::class::$html_special_chars_table);
-			$string = preg_replace_callback('/&#((x)[\da-fA-F]{1,6}+|\d{1,7}+);/sSX',
-										function (array $m) use ($class, $html_special_chars_table_flipped, $is_special_chars)
-										{
-											$codepoint = isset($m[2]) && $m[2] === 'x' ? hexdec($m[1]) : $m[1];
-											if (! $is_special_chars)
-											{
-												$char = pack('C', $codepoint);
-												if (array_key_exists($char, $html_special_chars_table_flipped)) return $html_special_chars_table_flipped[$char];
-											}
-											return $class::chr($codepoint);
-										}, $string);
+			$string = preg_replace_callback(
+				'/&#((x)[\da-fA-F]{1,6}+|\d{1,7}+);/sSX',
+				function (array $m) use ($class, $html_special_chars_table_flipped, $is_special_chars) {
+					$codepoint = isset($m[2]) && $m[2] === 'x' ? hexdec($m[1]) : $m[1];
+					if (!$is_special_chars) {
+						$char = pack('C', $codepoint);
+						if (array_key_exists($char, $html_special_chars_table_flipped))
+							return $html_special_chars_table_flipped[$char];
+					}
+					return $class::chr($codepoint);
+				},
+				$string
+			);
 		}
 		return $string;
 	}
@@ -3541,24 +3599,27 @@ class UTF8
 	 */
 	public static function html_entity_encode($string, $is_special_chars_only = false)
 	{
-		
-		if (! is_string($string)) return $string;
+
+		if (!is_string($string))
+			return $string;
 
 		#if ($is_special_chars_only) return strtr($string, array_flip(self::class::$html_special_chars_table));
-		if ($is_special_chars_only) return htmlspecialchars($string);
+		if ($is_special_chars_only)
+			return htmlspecialchars($string);
 
 		#replace UTF-8 chars to named entities:
 		$string = strtr($string, array_flip(self::class::$html_entity_table));
 		#block below deprecated, since PHP-5.3.x strtr() 3 times faster
-		if (0 && preg_match_all('~(?>	[\xc2\xc3\xc5\xc6\xcb\xce\xcf][\x80-\xbf]  #2 bytes
+		if (
+			0 && preg_match_all('~(?>	[\xc2\xc3\xc5\xc6\xcb\xce\xcf][\x80-\xbf]  #2 bytes
 									|	\xe2[\x80-\x99][\x82-\xac]                 #3 bytes
 								  )
-								~sxSX', $string, $m))
-		{
+								~sxSX', $string, $m)
+		) {
 			$table = array_flip(self::class::$html_entity_table);
-			foreach (array_unique($m[0]) as $char)
-			{
-				if (array_key_exists($char, $table)) $string = str_replace($char, $table[$char], $string);
+			foreach (array_unique($m[0]) as $char) {
+				if (array_key_exists($char, $table))
+					$string = str_replace($char, $table[$char], $string);
 			}
 		}
 
@@ -3578,27 +3639,36 @@ class UTF8
 	 */
 	public static function preg_quote_case_insensitive($string, $delimiter = null)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if (self::class::is_ascii($string)) return '(?i:' . preg_quote($string, $delimiter) . ')'; #speed improve
+		if (is_null($string))
+			return $string;
+
+		if (self::class::is_ascii($string))
+			return '(?i:' . preg_quote($string, $delimiter) . ')'; #speed improve
 
 		$s_re = '';
-		$s_lc = UTF8::lowercase($string); if ($s_lc === false) return false;
-		$s_uc = UTF8::uppercase($string); if ($s_uc === false) return false;
+		$s_lc = UTF8::lowercase($string);
+		if ($s_lc === false)
+			return false;
+		$s_uc = UTF8::uppercase($string);
+		if ($s_uc === false)
+			return false;
 
-		$chars_lc = UTF8::str_split($s_lc); if ($chars_lc === false) return false;
-		$chars_uc = UTF8::str_split($s_uc); if ($chars_uc === false) return false;
+		$chars_lc = UTF8::str_split($s_lc);
+		if ($chars_lc === false)
+			return false;
+		$chars_uc = UTF8::str_split($s_uc);
+		if ($chars_uc === false)
+			return false;
 
-		foreach ($chars_lc as $i => $char)
-		{
+		foreach ($chars_lc as $i => $char) {
 			if ($chars_lc[$i] === $chars_uc[$i])
 				$s_re .= preg_quote($chars_lc[$i], $delimiter);
 			elseif (self::class::is_ascii($chars_lc[$i]))
 				$s_re .= '[' . preg_quote($chars_lc[$i] . $chars_uc[$i], $delimiter) . ']';
 			else
 				$s_re .= '(' . preg_quote($chars_lc[$i], $delimiter) . '|'
-							 . preg_quote($chars_uc[$i], $delimiter) . ')';
+					. preg_quote($chars_uc[$i], $delimiter) . ')';
 		}
 		return $s_re;
 	}
@@ -3618,19 +3688,20 @@ class UTF8
 	 */
 	public static function preg_match_all($pattern, $subject, &$matches, $flags = PREG_PATTERN_ORDER, $char_offset = 0)
 	{
-		
-		if (is_null($subject)) return null;
+
+		if (is_null($subject))
+			return null;
 
 		$byte_offset = ($char_offset > 0) ? strlen(self::class::substr($subject, 0, $char_offset)) : $char_offset;
 
 		$return = preg_match_all($pattern, $subject, $matches, $flags, $byte_offset);
-		if ($return === false) return false;
+		if ($return === false)
+			return false;
 
-		if ($flags & PREG_OFFSET_CAPTURE)
-		{
-			foreach ($matches as &$match)
-			{
-				foreach ($match as &$a) $a[1] = self::class::strlen(substr($subject, 0, $a[1]));
+		if ($flags & PREG_OFFSET_CAPTURE) {
+			foreach ($matches as &$match) {
+				foreach ($match as &$a)
+					$a[1] = self::class::strlen(substr($subject, 0, $a[1]));
 			}
 		}
 
@@ -3658,16 +3729,20 @@ class UTF8
 	 */
 	public static function str_limit($string, $maxlength = null, $continue = "\xe2\x80\xa6", &$is_cutted = null, $tail_min_length = 20) #"\xe2\x80\xa6" = "&hellip;"
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$is_cutted = false;
-		if ($continue === null) $continue = "\xe2\x80\xa6";
-		if (! $maxlength) $maxlength = 256;
+		if ($continue === null)
+			$continue = "\xe2\x80\xa6";
+		if (!$maxlength)
+			$maxlength = 256;
 
 		#speed improve block
 		#{{{
-		if (strlen($string) <= $maxlength) return $string;
+		if (strlen($string) <= $maxlength)
+			return $string;
 		$s2 = str_replace("\r\n", '?', $string);
 		$s2 = preg_replace('/&(?> [a-zA-Z][a-zA-Z\d]+
                                 | \#(?> \d{1,4}
@@ -3675,7 +3750,8 @@ class UTF8
                                     )
                               );  # html сущности (&lt; &gt; &amp; &quot;)
                             /sxSX', '?', $s2);
-		if (strlen($s2) <= $maxlength || self::class::strlen($s2) <= $maxlength) return $string;
+		if (strlen($s2) <= $maxlength || self::class::strlen($s2) <= $maxlength)
+			return $string;
 		#}}}
 
 		$r = preg_match_all('/(?> \r\n   # переносы строк
@@ -3687,18 +3763,20 @@ class UTF8
 								   | .
 								 )
 								/sxuSX/', $string, $m);
-		if ($r === false) return false;
+		if ($r === false)
+			return false;
 
 		#d($m);
-		if (count($m[0]) <= $maxlength) return $string;
+		if (count($m[0]) <= $maxlength)
+			return $string;
 
 		$left = implode('', array_slice($m[0], 0, $maxlength));
 		#из диапазона ASCII исключаем буквы, цифры, открывающие парные символы [a-zA-Z\d\(\{\[] и некоторые др. символы
 		#нельзя вырезать в конце строки символ ";", т.к. он используются в сущностях &xxx;
 		$left2 = rtrim($left, "\x00..\x28\x2A..\x2F\x3A\x3C..\x3E\x40\x5B\x5C\x5E..\x60\x7B\x7C\x7E\x7F");
-		if (strlen($left) !== strlen($left2)) $return = $left2 . $continue;
-		else
-		{
+		if (strlen($left) !== strlen($left2))
+			$return = $left2 . $continue;
+		else {
 			#добавляем остаток к обрезанному слову
 			$right = implode('', array_slice($m[0], $maxlength));
 			preg_match('/^(?> [\d\)\]\}\-\.:]+  #цифры, закрывающие парные символы, дефис для составных слов, дата, время, IP-адреса, URL типа www.ya.ru:80!
@@ -3712,9 +3790,11 @@ class UTF8
 			#d($m);
 			$right = isset($m[0]) ? rtrim($m[0], '.-') : '';
 			$return = $left . $right;
-			if (strlen($return) !== strlen($string)) $return .= $continue;
+			if (strlen($return) !== strlen($string))
+				$return .= $continue;
 		}
-		if (self::class::strlen($string) - self::class::strlen($return) < $tail_min_length) return $string;
+		if (self::class::strlen($string) - self::class::strlen($return) < $tail_min_length)
+			return $string;
 
 		$is_cutted = true;
 		return $return;
@@ -3729,19 +3809,24 @@ class UTF8
 	 */
 	public static function str_split($string, $length = null)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$length = ($length === null) ? 1 : intval($length);
-		if ($length < 1) return false;
+		if ($length < 1)
+			return false;
 		#there are limits in regexp for {min,max}!
-		if (preg_match_all('~.~suSX', $string, $m) === false) return false;
-		if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR) return false;
-		if ($length === 1) $a = $m[0];
-		else
-		{
+		if (preg_match_all('~.~suSX', $string, $m) === false)
+			return false;
+		if (function_exists('preg_last_error') && preg_last_error() !== PREG_NO_ERROR)
+			return false;
+		if ($length === 1)
+			$a = $m[0];
+		else {
 			$a = array();
-			for ($i = 0, $c = count($m[0]); $i < $c; $i += $length) $a[] = implode('', array_slice($m[0], $i, $length));
+			for ($i = 0, $c = count($m[0]); $i < $c; $i += $length)
+				$a[] = implode('', array_slice($m[0], $i, $length));
 		}
 		return $a;
 	}
@@ -3754,40 +3839,42 @@ class UTF8
 	 */
 	public static function strlen($string)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		//since PHP-5.3.x mb_strlen() faster then strlen(utf8_decode())
-		if (function_exists('mb_strlen')) return mb_strlen($string, 'utf-8');
+		if (function_exists('mb_strlen'))
+			return mb_strlen($string, 'utf-8');
 
 		/*
-          utf8_decode() converts characters that are not in ISO-8859-1 to '?', which, for the purpose of counting, is quite alright.
-          It's much faster than iconv_strlen()
-          Note: this function does not count bad UTF-8 bytes in the string - these are simply ignored
+		  utf8_decode() converts characters that are not in ISO-8859-1 to '?', which, for the purpose of counting, is quite alright.
+		  It's much faster than iconv_strlen()
+		  Note: this function does not count bad UTF-8 bytes in the string - these are simply ignored
 		*/
-		return strlen(mb_convert_encoding( $string, 'UTF-8', 'ISO-8859-1' ));
+		return strlen(mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1'));
 
 
 		/*
-        #slowly then strlen(utf8_decode())
-        if (function_exists('iconv_strlen')) return iconv_strlen($string, 'utf-8');
+		#slowly then strlen(utf8_decode())
+		if (function_exists('iconv_strlen')) return iconv_strlen($string, 'utf-8');
 
-        #Do not count UTF-8 continuation bytes
-        #return strlen(preg_replace('/[\x80-\xBF]/sSX', '', $string));
+		#Do not count UTF-8 continuation bytes
+		#return strlen(preg_replace('/[\x80-\xBF]/sSX', '', $string));
 
-        #slowly then strlen(utf8_decode())
-        preg_match_all('~.~suSX', $str, $m);
-        return count($m[0]);
+		#slowly then strlen(utf8_decode())
+		preg_match_all('~.~suSX', $str, $m);
+		return count($m[0]);
 
-        #slowly then preg_match_all() + count()
-        $n = 0;
-        for ($i = 0, $len = strlen($string); $i < $len; $i++)
-        {
-            $c = ord(substr($string, $i, 1));
-            if ($c < 0x80) $n++;                 #single-byte (0xxxxxx)
-            elseif (($c & 0xC0) == 0xC0) $n++;   #multi-byte starting byte (11xxxxxx)
-        }
-        return $n;
+		#slowly then preg_match_all() + count()
+		$n = 0;
+		for ($i = 0, $len = strlen($string); $i < $len; $i++)
+		{
+			$c = ord(substr($string, $i, 1));
+			if ($c < 0x80) $n++;                 #single-byte (0xxxxxx)
+			elseif (($c & 0xC0) == 0xC0) $n++;   #multi-byte starting byte (11xxxxxx)
+		}
+		return $n;
 		*/
 	}
 
@@ -3802,15 +3889,20 @@ class UTF8
 	 */
 	public static function strpos($string, $needle, $offset = null)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if ($offset === null || $offset < 0) $offset = 0;
-		if (function_exists('mb_strpos')) return mb_strpos($string, $needle, $offset, 'utf-8');
+		if (is_null($string))
+			return $string;
+
+		if ($offset === null || $offset < 0)
+			$offset = 0;
+		if (function_exists('mb_strpos'))
+			return mb_strpos($string, $needle, $offset, 'utf-8');
 		#iconv_strpos() deprecated, because slowly than self::class::strlen(substr())
 		#if (function_exists('iconv_strpos')) return iconv_strpos($string, $needle, $offset, 'utf-8');
 		$byte_pos = $offset;
-		do if (($byte_pos = strpos($string, $needle, $byte_pos)) === false) return false;
+		do
+			if (($byte_pos = strpos($string, $needle, $byte_pos)) === false)
+				return false;
 		while (($char_pos = self::class::strlen(substr($string, 0, $byte_pos++))) < $offset);
 		return $char_pos;
 	}
@@ -3826,23 +3918,30 @@ class UTF8
 	 */
 	public static function stripos($string, $needle, $offset = null)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if ($offset === null || $offset < 0) $offset = 0;
-		if (function_exists('mb_stripos')) return mb_stripos($string, $needle, $offset, 'utf-8');
+		if (is_null($string))
+			return $string;
+
+		if ($offset === null || $offset < 0)
+			$offset = 0;
+		if (function_exists('mb_stripos'))
+			return mb_stripos($string, $needle, $offset, 'utf-8');
 
 		#optimization block (speed improve)
 		#{{{
 		$ascii_int = intval(self::class::is_ascii($string)) + intval(self::class::is_ascii($needle));
-		if ($ascii_int === 1) return false;
-		if ($ascii_int === 2) return stripos($string, $needle, $offset);
+		if ($ascii_int === 1)
+			return false;
+		if ($ascii_int === 2)
+			return stripos($string, $needle, $offset);
 		#}}}
 
 		$string = self::class::convert_case($string, CASE_LOWER, false);
-		if ($string === false) return false;
+		if ($string === false)
+			return false;
 		$needle = self::class::convert_case($needle, CASE_LOWER, false);
-		if ($needle === false) return false;
+		if ($needle === false)
+			return false;
 		return self::class::strpos($string, $needle, $offset);
 	}
 
@@ -3854,18 +3953,21 @@ class UTF8
 	 */
 	public static function strrev($string)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		if (0) #TODO test speed
 		{
 			$string = self::class::_convert($string, 'UTF-8', 'UTF-32');
-			if (! is_string($string)) return false;
+			if (!is_string($string))
+				return false;
 			$string = implode('', array_reverse(str_split($string, 4)));
 			return self::class::_convert($string, 'UTF-32', 'UTF-8');
 		}
 
-		if (! is_array($a = self::class::str_split($string))) return false;
+		if (!is_array($a = self::class::str_split($string)))
+			return false;
 		return implode('', array_reverse($a));
 	}
 
@@ -3880,28 +3982,33 @@ class UTF8
 	 */
 	public static function substr($string, $offset, $length = null)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		#since PHP-5.3.x mb_substr() faster then iconv_substr()
-		if (function_exists('mb_substr'))
-		{
-			if ($length === null) $length = self::class::strlen($string);
+		if (function_exists('mb_substr')) {
+			if ($length === null)
+				$length = self::class::strlen($string);
 			return mb_substr($string, $offset, $length, 'utf-8');
 		}
-		if (function_exists('iconv_substr'))
-		{
-			if ($length === null) $length = self::class::strlen($string);
+		if (function_exists('iconv_substr')) {
+			if ($length === null)
+				$length = self::class::strlen($string);
 			return iconv_substr($string, $offset, $length, 'utf-8');
 		}
 
 		static $_s = null;
 		static $_a = null;
 
-		if ($_s !== $string) $_a = self::class::str_split($_s = $string);
-		if (! is_array($_a)) return false;
-		if ($length !== null) $a = array_slice($_a, $offset, $length);
-		else                  $a = array_slice($_a, $offset);
+		if ($_s !== $string)
+			$_a = self::class::str_split($_s = $string);
+		if (!is_array($_a))
+			return false;
+		if ($length !== null)
+			$a = array_slice($_a, $offset, $length);
+		else
+			$a = array_slice($_a, $offset);
 		return implode('', $a);
 	}
 
@@ -3916,10 +4023,12 @@ class UTF8
 	 */
 	public static function substr_replace($string, $replacement, $start, $length = null)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if (! is_array($a = self::class::str_split($string))) return false;
+		if (is_null($string))
+			return $string;
+
+		if (!is_array($a = self::class::str_split($string)))
+			return false;
 		array_splice($a, $start, $length, $replacement);
 		return implode('', $a);
 	}
@@ -3934,11 +4043,14 @@ class UTF8
 	 */
 	public static function ucfirst($string, $is_other_to_lowercase = true)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if ($string === '' || ! is_string($string)) return $string;
-		if (! preg_match('/^(.)(.*)$/suSX', $string, $m)) return false;
+		if (is_null($string))
+			return $string;
+
+		if ($string === '' || !is_string($string))
+			return $string;
+		if (!preg_match('/^(.)(.*)$/suSX', $string, $m))
+			return false;
 		return self::class::uppercase($m[1]) . ($is_other_to_lowercase ? self::class::lowercase($m[2]) : $m[2]);
 	}
 
@@ -3954,14 +4066,15 @@ class UTF8
 	 */
 	public static function ucwords($string, $is_other_to_lowercase = true, $spaces_re = '~([\pZ\s]+)~suSX') #\pXps is POSIX space: property Z or tab, NL, VT, FF, CR
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$words = preg_split($spaces_re, $string, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-		foreach ($words as $k => $word)
-		{
+		foreach ($words as $k => $word) {
 			$words[$k] = self::class::ucfirst($word, $is_other_to_lowercase = true);
-			if ($words[$k] === false) return false;
+			if ($words[$k] === false)
+				return false;
 		}
 		return implode('', $words);
 	}
@@ -3982,35 +4095,36 @@ class UTF8
 	 */
 	public static function unescape($data, $is_rawurlencode = false)
 	{
-		
-		if (is_array($data))
-		{
+
+		if (is_array($data)) {
 			$d = array();
-			foreach ($data as $k => &$v)
-			{
+			foreach ($data as $k => &$v) {
 				$k = self::class::unescape($k, $is_rawurlencode);
-				if ($k === false) return false;
+				if ($k === false)
+					return false;
 				$d[$k] = self::class::unescape($v, $is_rawurlencode);
-				if ($d[$k] === false && ! is_bool($v)) return false;
+				if ($d[$k] === false && !is_bool($v))
+					return false;
 			}
 			return $d;
 		}
-		if (is_string($data))
-		{
-			if (strpos($data, '%u') === false) return $data; #use strpos() for speed improving
+		if (is_string($data)) {
+			if (strpos($data, '%u') === false)
+				return $data; #use strpos() for speed improving
 			return preg_replace_callback('/%u(  [\da-fA-F]{4}+          #%uXXXX     only UCS-2
                                               | \{ [\da-fA-F]{1,6}+ \}  #%u{XXXXXX} extended form for all UNICODE charts
                                              )
                                           /sxSX',
-											function (array $m) use ($is_rawurlencode)
-											{
-												$codepoint = hexdec(trim($m[1], '{}'));
-												$char = self::class::chr($codepoint);
-												return $is_rawurlencode ? rawurlencode($char) : $char;
-											},
-											$data);
+				function (array $m) use ($is_rawurlencode) {
+					$codepoint = hexdec(trim($m[1], '{}'));
+					$char = self::class::chr($codepoint);
+					return $is_rawurlencode ? rawurlencode($char) : $char;
+				},
+				$data
+			);
 		}
-		if (is_scalar($data) || is_null($data)) return $data;  #~ null, integer, float, boolean
+		if (is_scalar($data) || is_null($data))
+			return $data;  #~ null, integer, float, boolean
 		return false; #object or resource
 	}
 
@@ -4061,32 +4175,32 @@ class UTF8
 	public static function unescape_request()
 	{
 		$fixed = false;
-        #ATTENTION! HTTP_RAW_POST_DATA is only accessible when Content-Type of POST request is NOT default "application/x-www-form-urlencoded"!
+		#ATTENTION! HTTP_RAW_POST_DATA is only accessible when Content-Type of POST request is NOT default "application/x-www-form-urlencoded"!
 		$HTTP_RAW_POST_DATA = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' ? (isset($GLOBALS['HTTP_RAW_POST_DATA']) ? $GLOBALS['HTTP_RAW_POST_DATA'] : @file_get_contents('php://input')) : null;
-		if (ini_get('always_populate_raw_post_data')) $GLOBALS['HTTP_RAW_POST_DATA'] = $HTTP_RAW_POST_DATA;
-		foreach (array( '_GET'    => isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null,
-						'_POST'   => $HTTP_RAW_POST_DATA,
-						'_COOKIE' => isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : null,
-						) as $k => $v)
-		{
-			if (! is_string($v)) continue;
-			if ($k === '_COOKIE')
-			{
+		if (ini_get('always_populate_raw_post_data'))
+			$GLOBALS['HTTP_RAW_POST_DATA'] = $HTTP_RAW_POST_DATA;
+		foreach (array(
+			'_GET' => isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null,
+			'_POST' => $HTTP_RAW_POST_DATA,
+			'_COOKIE' => isset($_SERVER['HTTP_COOKIE']) ? $_SERVER['HTTP_COOKIE'] : null,
+		) as $k => $v) {
+			if (!is_string($v))
+				continue;
+			if ($k === '_COOKIE') {
 				$v = preg_replace('/; *+/sSX', '&', $v);
 				unset($_COOKIE); #будем парсить HTTP_COOKIE сами, чтобы сделать обработку как у QUERY_STRING
 			}
-			if (strpos($v, '%u') !== false)
-			{
+			if (strpos($v, '%u') !== false) {
 				parse_str(self::class::unescape($v, $is_rawurlencode = true), $GLOBALS[$k]);
 				$fixed = true;
 				continue;
 			}
-			if (array_key_exists($k, $GLOBALS)) continue;
+			if (array_key_exists($k, $GLOBALS))
+				continue;
 			parse_str($v, $GLOBALS[$k]);
 			$fixed = true;
 		}
-		if ($fixed)
-		{
+		if ($fixed) {
 			$_REQUEST =
 				(isset($_COOKIE) ? $_COOKIE : array()) +
 				(isset($_POST) ? $_POST : array()) +
@@ -4110,16 +4224,18 @@ class UTF8
 	 */
 	public static function textarea_rows($string, $cols, $min_rows = 3, $max_rows = 32)
 	{
-		
-		if (is_null($string)) return $string;
 
-		if (strlen($string) == 0) return $min_rows;  #speed improve
+		if (is_null($string))
+			return $string;
+
+		if (strlen($string) == 0)
+			return $min_rows;  #speed improve
 		$rows = 0;
 		#utf8_decode() converts characters that are not in ISO-8859-1 to '?'
-		foreach (preg_split('/\r\n|[\r\n]/sSX', mb_convert_encoding( $string, 'UTF-8', 'ISO-8859-1' )) as $line)
-		{
+		foreach (preg_split('/\r\n|[\r\n]/sSX', mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1')) as $line) {
 			$rows += ceil((strlen($line) + 1) / $cols);
-			if ($rows > $max_rows) return $max_rows;
+			if ($rows > $max_rows)
+				return $max_rows;
 		}
 		return ($rows < $min_rows) ? $min_rows : $rows;
 	}
@@ -4131,9 +4247,11 @@ class UTF8
 	 */
 	public static function ltrim($string, $charlist = null)
 	{
-		
-		if (is_null($string)) return $string;
-		if ($charlist === null || self::class::is_ascii($charlist)) return ltrim($string);
+
+		if (is_null($string))
+			return $string;
+		if ($charlist === null || self::class::is_ascii($charlist))
+			return ltrim($string);
 		return preg_replace('~^[' . self::class::_preg_quote_class($charlist, '~') . ']+~suSX', '', $string);
 	}
 
@@ -4144,9 +4262,11 @@ class UTF8
 	 */
 	public static function rtrim($string, $charlist = null)
 	{
-		
-		if (is_null($string)) return $string;
-		if ($charlist === null || self::class::is_ascii($charlist)) return rtrim($string);
+
+		if (is_null($string))
+			return $string;
+		if ($charlist === null || self::class::is_ascii($charlist))
+			return rtrim($string);
 		return preg_replace('~[' . self::class::_preg_quote_class($charlist, '~') . ']+$~suSX', '', $string);
 	}
 
@@ -4157,9 +4277,11 @@ class UTF8
 	 */
 	public static function trim($string, $charlist = null)
 	{
-		
-		if (is_null($string)) return $string;
-		if ($charlist === null || self::class::is_ascii($charlist)) return trim($string);
+
+		if (is_null($string))
+			return $string;
+		if ($charlist === null || self::class::is_ascii($charlist))
+			return trim($string);
 		$charlist_re = self::class::_preg_quote_class($charlist, '~');
 		$string = preg_replace('~^[' . $charlist_re . ']+~suSX', '', $string);
 		return preg_replace('~[' . $charlist_re . ']+$~suSX', '', $string);
@@ -4170,10 +4292,11 @@ class UTF8
 		#return preg_quote($charlist, $delimiter); #DEPRECATED
 		$quote_table = array(
 			'\\' => '\\\\',
-			'-'  => '\-',
-			']'  => '\]',
+			'-' => '\-',
+			']' => '\]',
 		);
-		if (is_string($delimiter)) $quote_table[$delimiter] = '\\' . $delimiter;
+		if (is_string($delimiter))
+			$quote_table[$delimiter] = '\\' . $delimiter;
 		return strtr($charlist, $quote_table);
 	}
 
@@ -4186,36 +4309,35 @@ class UTF8
 	 */
 	public static function str_pad($string, $length, $pad_str = ' ', $type = STR_PAD_RIGHT)
 	{
-		
-		if (is_null($string)) return $string;
+
+		if (is_null($string))
+			return $string;
 
 		$input_len = self::class::strlen($string);
-		if ($length <= $input_len) return $string;
+		if ($length <= $input_len)
+			return $string;
 
 		$pad_str_len = self::class::strlen($pad_str);
 		$pad_len = $length - $input_len;
 
-		if ($type == STR_PAD_RIGHT)
-		{
+		if ($type == STR_PAD_RIGHT) {
 			$repeat_num = (int) ceil($pad_len / $pad_str_len);
 			return self::class::substr($string . str_repeat($pad_str, $repeat_num), 0, $length);
 		}
 
-		if ($type == STR_PAD_LEFT)
-		{
+		if ($type == STR_PAD_LEFT) {
 			$repeat_num = (int) ceil($pad_len / $pad_str_len);
 			return self::class::substr(str_repeat($pad_str, $repeat_num), 0, intval(floor($pad_len))) . $string;
 		}
 
-		if ($type == STR_PAD_BOTH)
-		{
+		if ($type == STR_PAD_BOTH) {
 			$pad_len /= 2;
-			$pad_amount_left  = intval(floor($pad_len));
+			$pad_amount_left = intval(floor($pad_len));
 			$pad_amount_right = intval(ceil($pad_len));
-			$repeat_times_left  = (int) ceil($pad_amount_left  / $pad_str_len);
+			$repeat_times_left = (int) ceil($pad_amount_left / $pad_str_len);
 			$repeat_times_right = (int) ceil($pad_amount_right / $pad_str_len);
 
-			$padding_left  = self::class::substr(str_repeat($pad_str, $repeat_times_left),  0, $pad_amount_left);
+			$padding_left = self::class::substr(str_repeat($pad_str, $repeat_times_left), 0, $pad_amount_left);
 			$padding_right = self::class::substr(str_repeat($pad_str, $repeat_times_right), 0, $pad_amount_right);
 			return $padding_left . $string . $padding_right;
 		}
@@ -4233,10 +4355,12 @@ class UTF8
 	 */
 	public static function strspn($str, $mask, $start = null, $length = null)
 	{
-		
+
 		#if (self::class::is_ascii($str) && self::class::is_ascii($mask)) return strspn($str, $mask, $start, $length);
-		if ($start !== null || $length !== null) $str = self::class::substr($str, $start, $length);
-		if (preg_match('~^[' . preg_quote($mask, '~') . ']+~uSX', $str, $m)) self::class::strlen($m[0]);
+		if ($start !== null || $length !== null)
+			$str = self::class::substr($str, $start, $length);
+		if (preg_match('~^[' . preg_quote($mask, '~') . ']+~uSX', $str, $m))
+			self::class::strlen($m[0]);
 		return 0;
 	}
 
@@ -4265,74 +4389,72 @@ class UTF8
 		$charset = 'cp1251',
 		$dirs_ignore_re = null,
 		$is_echo = false,
-		$is_simulate = false)
-	{
-		
+		$is_simulate = false
+	) {
+
 
 		$dh = opendir($dir);
-		if (! is_resource($dh)) return false;
+		if (!is_resource($dh))
+			return false;
 		$counter = 0;
-		while (($name = readdir($dh)) !== false)
-		{
-			if ($name == '.' || $name == '..') continue;
+		while (($name = readdir($dh)) !== false) {
+			if ($name == '.' || $name == '..')
+				continue;
 			$file = $dir . '/' . $name;
-			if (is_file($file))
-			{
-				if (is_string($files_re) && ! preg_match($files_re, $name)) continue;
-				if ($is_echo) echo $file;
+			if (is_file($file)) {
+				if (is_string($files_re) && !preg_match($files_re, $name))
+					continue;
+				if ($is_echo)
+					echo $file;
 				$string = @file_get_contents($file);
-				if (! is_string($string))
-				{
-					if ($is_echo) echo '  Error to reading' . PHP_EOL;
+				if (!is_string($string)) {
+					if ($is_echo)
+						echo '  Error to reading' . PHP_EOL;
 					return false;
 				}
-				if (self::class::is_utf8($string))
-				{
-					if ($is_echo) echo '  UTF-8' . PHP_EOL;
+				if (self::class::is_utf8($string)) {
+					if ($is_echo)
+						echo '  UTF-8' . PHP_EOL;
 					continue;
 				}
 				$string = self::class::_convert($string, $charset, 'UTF-8');
 				#игнорируем ошибки при попытке перекодировать бинарные файлы
-				if (! is_string($string) || ! self::class::is_utf8($string))
-				{
-					if ($is_echo) echo '  Binary' . PHP_EOL;
+				if (!is_string($string) || !self::class::is_utf8($string)) {
+					if ($is_echo)
+						echo '  Binary' . PHP_EOL;
 					continue;
 				}
 
 				$ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-				if ($ext === 'htm' || $ext === 'html' || $ext === 'xhtml' || $ext === 'phtml' || $ext === 'tpl')
-				{
+				if ($ext === 'htm' || $ext === 'html' || $ext === 'xhtml' || $ext === 'phtml' || $ext === 'tpl') {
 					$string = preg_replace('~(<meta .+? content="text/html; [\x00-\x20]+ charset=) #1
 											[-a-zA-Z\d]+
 											(" [^>]* >)  #2
 										~sixSX', '$1utf-8$2', $string);
 				}
-				if ($ext === 'xml' || $ext === 'xsl' || $ext === 'tpl')
-				{
+				if ($ext === 'xml' || $ext === 'xsl' || $ext === 'tpl') {
 					$string = preg_replace('/~(<\?xml .+? encoding=") #1
 											[-a-zA-Z\d]+
 											(" .*? \?>)         #2
 										~sixSX/', '$1utf-8$2', $string);
 				}
 
-				if (! $is_simulate)
-				{
+				if (!$is_simulate) {
 					$bytes = @file_put_contents($file, $string);
-					if ($bytes === false)
-					{
-						if ($is_echo) echo '  Error to writing' . PHP_EOL;
+					if ($bytes === false) {
+						if ($is_echo)
+							echo '  Error to writing' . PHP_EOL;
 						return false;
 					}
 				}
-				if ($is_echo) echo '  ' . $charset . ' -> UTF-8' . PHP_EOL;
+				if ($is_echo)
+					echo '  ' . $charset . ' -> UTF-8' . PHP_EOL;
 				$counter++;
-			}
-			elseif ($is_recursive && is_dir($file))
-			{
-				if (! is_string($dirs_ignore_re) || ! preg_match($dirs_ignore_re, $name))
-				{
+			} elseif ($is_recursive && is_dir($file)) {
+				if (!is_string($dirs_ignore_re) || !preg_match($dirs_ignore_re, $name)) {
 					$c = self::class::convert_files_from($file, $files_re, $is_recursive, $charset, $dirs_ignore_re, $is_echo, $is_simulate);
-					if ($c === false) return false;
+					if ($c === false)
+						return false;
 					$counter += $c;
 				}
 			}
@@ -4350,11 +4472,13 @@ class UTF8
 	 */
 	public static function range($low, $high, $step = 1)
 	{
-		
-		if (is_int($low) || is_int($high)) return range($low, $high, $step);  #speed improve
-		$low_cp  = self::class::ord($low);
+
+		if (is_int($low) || is_int($high))
+			return range($low, $high, $step);  #speed improve
+		$low_cp = self::class::ord($low);
 		$high_cp = self::class::ord($high);
-		if ($low_cp === false || $high_cp === false) return false;
+		if ($low_cp === false || $high_cp === false)
+			return false;
 		$a = range($low_cp, $high_cp, $step);
 		return array_map(array('self::class', 'chr'), $a);
 	}
@@ -4368,22 +4492,26 @@ class UTF8
 	 */
 	public static function strtr($string, $from, $to = null)
 	{
-		
-		if (is_null($string)) return $string;
-		if (is_array($from)) return strtr($string, $from); #speed improve
-		$keys   = self::class::str_split($from);
+
+		if (is_null($string))
+			return $string;
+		if (is_array($from))
+			return strtr($string, $from); #speed improve
+		$keys = self::class::str_split($from);
 		$values = self::class::str_split($to);
-		if ($keys === false || $values === false) return false;
+		if ($keys === false || $values === false)
+			return false;
 		$table = array_combine($keys, $values);
-		if (! is_array($table)) return false;
+		if (!is_array($table))
+			return false;
 		return strtr($string, $table);
 	}
 
 	public static function tests()
 	{
-		assert_options(ASSERT_ACTIVE,   true);
-		assert_options(ASSERT_BAIL,     true);
-		assert_options(ASSERT_WARNING,  true);
+		assert_options(ASSERT_ACTIVE, true);
+		assert_options(ASSERT_BAIL, true);
+		assert_options(ASSERT_WARNING, true);
 		$a = array(
 			'self::class::html_entity_decode("&quot;&amp;&lt;&gt;", true) === "\"&<>"',
 			'self::class::html_entity_decode("&quot;&amp;&lt;&gt;", false) === "&quot;&amp;&lt;&gt;"',
@@ -4444,7 +4572,9 @@ class UTF8
 
 			//'self::class::strlen(file_get_contents(' . var_export(__FILE__, true) . ', true))'
 		);
-		foreach ($a as $k => $v) if (! assert($v)) return false;
+		foreach ($a as $k => $v)
+			if (!assert($v))
+				return false;
 
 		//$start_time = microtime(true);
 		//$string = file_get_contents(__FILE__);

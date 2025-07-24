@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Accessory;
 
 /**
@@ -15,7 +13,7 @@ trait HumanSize
             $i = floor(log($bytes) / log(1024));
             $sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-            return sprintf('%.02F', round($bytes / pow(1024, $i), $precision)) * 1 .' '.@$sizes[$i];
+            return sprintf('%.02F', round($bytes / pow(1024, $i), $precision)) * 1 . ' ' . @$sizes[$i];
         } else {
             return 0;
         }
