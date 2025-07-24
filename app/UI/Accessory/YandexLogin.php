@@ -155,13 +155,11 @@ trait YandexLogin
 
     protected function reqGfTwo($url2, $d): bool|string
     {
-
-        $params2 = ['format' => 'json'];
         $options2 = [
             'http' => [
                 'header' => 'Authorization: OAuth ' . $d['access_token'],
                 'method' => 'POST',
-                'content' => http_build_query($params2),
+                'content' => http_build_query(['format' => 'json']),
             ],
         ];
         $context2 = stream_context_create($options2);

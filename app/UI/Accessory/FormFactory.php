@@ -52,7 +52,7 @@ final class FormFactory
     private function emailAdd()
     {
         $this->form->addEmail('email', '')
-        ->setHtmlAttribute('placeholder', '📧 Email:');
+            ->setHtmlAttribute('placeholder', '📧 Email:');
     }
 
     private function passwordAdd()
@@ -69,7 +69,6 @@ final class FormFactory
      */
     public function create(): Form
     {
-        $this->form->addProtection('Csrf error');
         // $form->setTranslator($this->translator);
         $renderer = $this->form->getRenderer();
         $renderer->wrappers['group']['container'] = 'div class="my1 mx-auto pb2 px2"';
@@ -84,6 +83,7 @@ final class FormFactory
     public function createLoginForm(): Form
     {
         $form = $this->create();
+        $form->addProtection('Csrf error');
         // $form->addGroup('--- 👥 ---');
         $form->addGroup('');
         $this->nameAdd();
@@ -96,6 +96,7 @@ final class FormFactory
     public function createHomeLoginForm(): Form
     {
         $form = $this->create();
+        $form->addProtection('Ошибка. Попробуйте закрыть вкладку и открыть ее снова');
         $form->addGroup('');
         $this->phoneAdd();
         $this->passwordAdd();
@@ -106,13 +107,14 @@ final class FormFactory
     public function createClientRatingForm()
     {
         $form = $this->create();
+        $form->addProtection('Ошибка. Попробуйте закрыть вкладку и открыть ее снова');
 
         $form->setHtmlAttribute('id', 'client_rating_form')
             ->setHtmlAttribute('class', 'center mb2 mr2');
 
         $form->addGroup('');
         $form->addRadioList('rating_value', null, [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5])
-        ->setRequired('Пожалуйста, выберите оценку');
+            ->setRequired('Пожалуйста, выберите оценку');
 
         $form->addGroup('');
         $form->addHidden('client_id_who', null);
