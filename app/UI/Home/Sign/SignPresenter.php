@@ -96,6 +96,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->restoreRequest($this->backlink);
         $this->redirect(':Home:');
     }
+
     public function actionYandexLogin(): void
     {
         $user_data = $this->getUserDataYandex();

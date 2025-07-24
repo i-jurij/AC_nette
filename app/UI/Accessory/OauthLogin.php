@@ -9,13 +9,17 @@ trait OauthLogin
 {
     public function oauthLogin(array $user_data): void
     {
-        if (!empty($user_data['error'][0])) {
+        if (!empty($user_data['error'])) {
             foreach ($user_data['error'] as $error) {
                 $this->flashMessage($error, 'error');
             }
         }
 
         if (!empty($user_data['data'])) {
+            /*
+                        $this->flashMessage(json_encode($user_data));
+                        return;
+            */
             // check if user not isset in db
             $phone = !empty($user_data['data']['phone']) ? PhoneNumber::toDb($user_data['data']['phone']) : '';
             $email = !empty($user_data['data']['email']) ? $user_data['data']['email'] : '';
@@ -36,6 +40,7 @@ trait OauthLogin
                 $res = $this->cf->add($data);
 
                 $this->flashMessage("Вы можете входить на сайт используя ваш номер телефона и пароль '$data->password' или дальше использовать вход через сторонние сервисы.", 'success');
+
                 if (!empty($data->username)) {
                     $user->login($data->username, $data->password);
                 }
