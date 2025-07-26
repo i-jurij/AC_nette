@@ -96,7 +96,7 @@ final class FormFactory
     public function createHomeLoginForm(): Form
     {
         $form = $this->create();
-        $form->addProtection('Ошибка. Попробуйте закрыть вкладку и открыть ее снова');
+        $form->addProtection('Ошибка. Почистите куки, закройте вкладку и откройте ее снова');
         $form->addGroup('');
         $this->phoneAdd();
         $this->passwordAdd();
@@ -107,7 +107,7 @@ final class FormFactory
     public function createClientRatingForm()
     {
         $form = $this->create();
-        $form->addProtection('Ошибка. Попробуйте закрыть вкладку и открыть ее снова');
+        $form->addProtection('Ошибка. Почистите куки, закройте вкладку и откройте ее снова');
 
         $form->setHtmlAttribute('id', 'client_rating_form')
             ->setHtmlAttribute('class', 'center mb2 mr2');

@@ -66,7 +66,7 @@ trait YandexLogin
 
         if (isset($info) && $info !== false) {
             $data = json_decode($info, true);
-            // $username = 
+            // $username = $data['login'] ?? '';
             $phone = $data['default_phone']['number'] ?? '';
             $email = $data['default_email'] ?? '';
         } else {
