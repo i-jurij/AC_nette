@@ -201,7 +201,7 @@
         <span class="mr2">Тип:</span>
         <div class="inline-block">
             {foreach $form[offers_type]->getItems() as $key => $label}
-            <input n:name="offers_type:$key" class="button type-rad">
+            <input n:name="offers_type:$key" class="button type-rad offer_type_input">
             <label n:name="offers_type:$key" class="button type-rad-label"> {$label}</label>
             {/foreach}
         </div>
@@ -254,9 +254,9 @@
     </div>
 
     <div class="block fit bg-black rounded py1 px2 mb2">
+        <span class=error n:ifcontent>{inputError message}</span>
         <label n:name=message>Сообщение<span class="h6"> (ссылки в тексте запрещены)</span>: <textarea n:name=message
                 type=""></textarea></label>
-        <span class=error n:ifcontent>{inputError message}</span>
     </div>
 
     <div class="block fit bg-black rounded py1 px2 mb2">
@@ -341,6 +341,57 @@
                     let lab = document.querySelector('#tab-' + ev.target.id.split('_')[0] + '-label');
                     if (lab) { lab.style.backgroundColor = '#666500'; }
                 });
+            });
+        }
+
+        const offer_add_edit_form = document.querySelector('form.form_offer_add');
+        if (offer_add_edit_form) {
+            offer_add_edit_form.addEventListener("submit", function(e){
+                let isValid = false;
+                let offer_type_input_check = false;
+                let offer_service_list_check = false;
+                let offer_price_check = false;
+                let offer_message_check = false;
+
+                let offer_type_input = document.querySelectorAll('.offer_type_input');
+                if (offer_type_input.length > 0) {
+                    offer_type_input.forEach(el => {
+                        if (el.checked){
+                           offer_type_input_check = true;
+                        }
+                    });
+                }
+
+                let services = document.querySelectorAll('input[name="service[]"]');
+                if (services && services.length > 0) {
+                    services.forEach(serv => {
+                        if (serv.checked){
+                           offer_service_list_check = true;
+                        }
+                    });
+                }
+
+                let offer_price = document.querySelector('input[name="price"]');
+                if (offer_price && !isNaN(offer_price.value) && offer_price.value !== '') {
+                    offer_price_check = true;
+                }
+
+                let offer_message = document.querySelector('textarea[name="message"]');
+                if (offer_message && (offer_message.value === '' || /^[а-яА-Яa-zA-Z0-9\s ?!,.-_~\"\/:;!Ёё]+$/.test(offer_message.value))) {
+                    offer_message_check = true;
+                }
+                
+                if (offer_type_input_check && offer_service_list_check && offer_price_check && offer_message_check) {
+                    isValid = true;
+                }
+
+                if(!isValid){
+                    e.preventDefault();
+                }
+
+                if (!offer_message_check) {
+                    offer_message.insertAdjacentHTML("beforebegin", "<p class='red'>В сообщении должны быть только буквы, цифры, знаки препинания в количестве до 1024 символов</p>");  
+                }
             });
         }
     });

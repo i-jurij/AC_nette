@@ -33,17 +33,17 @@ final class FormFactory
                 ->addRule($form::Pattern, 'Введен неправильный номер', PhoneNumber::PHONE_REGEX);
         });
         $this->form->addPhone('phone', '')
+            //->setRequired('Телефон обязателен.')
             ->setHtmlType('tel')
             ->setHtmlAttribute('placeholder', '☎ +7 999 333 22 22') // 📱
-            ->setHtmlAttribute('id', 'user_phone_input')
-            ->setRequired('Телефон обязателен.');
+            ->setHtmlAttribute('id', 'user_phone_input');
     }
 
     private function nameAdd()
     {
         $this->form->addText('username', '')
             ->setHtmlAttribute('placeholder', '👤 Имя:')
-            ->setRequired('Имя обязательно.')
+            // ->setRequired('Имя обязательно.')
             ->addRule($this->form::MinLength, 'Имя длиной не менее %d символов', 3)
             ->addRule($this->form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$')
             ->setMaxLength(25);
@@ -87,6 +87,7 @@ final class FormFactory
         // $form->addGroup('--- 👥 ---');
         $form->addGroup('');
         $this->nameAdd();
+        $form['username']->setRequired();
         // $this->phoneAdd();
         $this->passwordAdd();
 
@@ -99,6 +100,8 @@ final class FormFactory
         $form->addProtection('Ошибка. Почистите куки, закройте вкладку и откройте ее снова');
         $form->addGroup('');
         $this->phoneAdd();
+        $this->emailAdd();
+        $this->nameAdd();
         $this->passwordAdd();
 
         return $form;

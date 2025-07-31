@@ -1,5 +1,11 @@
 MAKE  
 
+переписать signup по подобию signin и сделать регистрацию только по телефону 
+(с возможностью указать имейл для восстановления пароля)
+в добавлении объявлений проверять существование номера телефона и выводить поле для его ввода,
+плюс если есть имейл, спросить, указать его как способ связи
+
+
 ADMIN 
 grievance, reqforaddservice count, other info to infoboard on each admins page 
 -------------------------------------------------------------
@@ -17,12 +23,6 @@ authorize logging and users actions logging
 ==============================================================
  
 HOME
-
-исправить  
-
-1 TypeError: explode(): Argument #2 ($string) must be of type string, null given in /var/www/user1270570/data/AC_nette/app/UI/Accessory/Breadcrumb.php:49 
-2  TypeError: hash_equals(): Argument #1 ($known_string) must be of type string, false given in /var/www/user1270570/data/AC_nette/app/UI/Accessory/YandexLogin.php:33
-
 
 создание объявлений:
 2 сделать основным не просто первое фото, 

@@ -5,14 +5,18 @@
 
 {block content}
 <div class="flex flex-column items-center ">
-    <div class="bgcontent m2 p2 round center h6">
-        Войдите с помощью сторонних сервисов 
-        <br>
+    <div class="bgcontent m2 px2 round center h6">
+        <p>
+            Войдите с помощью сторонних сервисов
+            <br>
             или зарегистрируйтесь, отправив данные из формы ниже:
-        <br>
-            номер телефона, так ваши клиенты смогут с вами связаться;
-        <br>
-            адрес электронной почты, с его помощью вы сможете восстановить доступ к учетной записи.
+        </p>
+        <p>
+            номер телефона обязательно, так ваши клиенты смогут с вами связаться;
+        </p>
+        <p>
+            адрес электронной почты не обязательно, но с его помощью вы сможете восстановить доступ к учетной записи.
+        </p>
     </div>
 
     <div class="p2 md-flex items-start justify-center">
@@ -20,7 +24,7 @@
 
         {control signUpForm}
         {*<form n:name=signUpForm class="form mb2 mr2 center">
-            <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent >
+            <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent>
                 <small>{$error}</small><br>
             </span>
 
@@ -44,24 +48,24 @@
             </div>
 
             <div class="mt3">
-                {input send,  style: "width: 100%;"}
+                {input send, style: "width: 100%;"}
             </div>
         </form>
         *}
 
         <div class="form">
             <p class="">
-                <a n:href=':Home:' class="button"  style="width: 100%;">На главную</a>
+                <a n:href=':Home:' class="button" style="width: 100%;">На главную</a>
             </p>
             <a n:href=':Politic:' class="button pseudo">Политика обработки персональных данных&ensp;&#8250;</a>
         </div>
-    </div>  
+    </div>
 
 
 </div>
 
 <script n:syntax="double">
-let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
+    let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
 
 function fetchRequest(phone) {
     const formData = new FormData();

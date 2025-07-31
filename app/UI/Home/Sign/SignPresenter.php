@@ -59,12 +59,16 @@ final class SignPresenter extends \App\UI\BasePresenter
         usleep(200000);
         try {
             $user = $this->getUser();
-            if (!empty($data->username)) {
-                $user->login($data->username, $data->password);
-            }
             if (!empty($data->phone)) {
                 $username = $this->cf->searchBy('phone', PhoneNumber::toDb($data->phone), true)->username;
                 $user->login($username, $data->password);
+            } elseif (!empty($data->email)) {
+                $username = $this->cf->searchBy('email', htmlspecialchars($data->email))->username;
+                $user->login($username, $data->password);
+            } elseif (!empty($data->username)) {
+                $user->login($data->username, $data->password);
+            } else {
+                $form->addError('Необходимо ввести телефон или почту или имя.');
             }
 
             $this->restoreRequest($this->backlink);
@@ -73,7 +77,7 @@ final class SignPresenter extends \App\UI\BasePresenter
         } catch (Nette\Security\AuthenticationException $e) {
             sleep(1);
             // save failed login data to db for processing (name, phone, password, ip, user agent, referer etc, time)
-            $form->addError('Wrong login or password.');
+            $form->addError('Произошла ошибка. Проверьте правильность вводимых данных и попробуйте снова');
         }
     }
 

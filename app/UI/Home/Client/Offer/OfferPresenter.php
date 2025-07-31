@@ -167,9 +167,9 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $form->addTextArea('message', 'Сообщение:')
             ->setHtmlAttribute('rows', '4')
             ->setHtmlAttribute('cols', '100')
-            ->addCondition($form::Length, [8, 500])
-            // ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[а-яА-Яa-zA-Z0-9\s?!,.\'Ёё]+$')
-            ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\":;!]+$');
+            ->addCondition($form::Length, [8, 1024])
+            ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[а-яА-Яa-zA-Z0-9\s ?!,.-_~\"\/:;!Ёё]+$');
+            //->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\"\/:;!]+$');
 
         $form->addHidden('client_id');
         $form->addHidden('id');
@@ -196,7 +196,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $form_data->price = (int) $data['price'];
         $form_data->moderated = 0;
         $text = htmlspecialchars(strip_tags($data['message']));
-        $text = trim(mb_substr($text, 0, 500));
+        $text = trim(mb_substr($text, 0, 1024));
         $isBad = ModeratingText::isTextBad($text);
         if ($isBad === false) {
             $form_data->message = $text;
@@ -221,7 +221,9 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
     {
         $form_data = $this->prepareOfferFormData($form, $data);
 
-        if (!empty($form_data) && $form_data->moderated === 1 && !empty($form_data->city_name)) {
+        $service_array = $form->getHttpData($form::DataText, 'service[]');
+
+        if (!empty($form_data) && $form_data->moderated === 1 && !empty($form_data->city_name) && !empty($service_array)) {
             $new_offer_id = $this->of->add($form_data);
 
             if (!empty($new_offer_id)) {
@@ -239,7 +241,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
                 // add offers services 
                 // $category_id = (int) $form->getHttpData($form::DataText, 'category');
-                $service_array = $form->getHttpData($form::DataText, 'service[]');
+                // $service_array = $form->getHttpData($form::DataText, 'service[]');
                 foreach ($service_array as $service_id) {
                     $services[] = [
                         'offer_id' => $new_offer_id,
@@ -268,6 +270,10 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             }
             if ($form_data->moderated != 1) {
                 $this->flashMessage('Объявление не добавлено. В сообщении не должно быть ссылок или ругательств', 'error');
+            }
+            
+            if (empty($service_array)) {
+                $this->flashMessage('Объявление не добавлено. Не выбраны услуги', 'error');
             }
         }
     }
