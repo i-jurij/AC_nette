@@ -198,7 +198,7 @@
 
 
     <div class="block fit bg-black rounded py1 px2 mb2">
-        <span class="mr2">Тип:</span>
+        <span class="mr2 offer_type_add_span">Тип:</span>
         <div class="inline-block">
             {foreach $form[offers_type]->getItems() as $key => $label}
             <input n:name="offers_type:$key" class="button type-rad offer_type_input">
@@ -387,6 +387,11 @@
 
                 if(!isValid){
                     e.preventDefault();
+                }
+
+                if (!offer_type_input_check) {
+                    let offer_type_add_span = document.querySelector('.offer_type_add_span');
+                    offer_type_add_span.insertAdjacentHTML("beforebegin", "<p class='red'>Выберите тип объявления</p>");
                 }
 
                 if (!offer_service_list_check) {
