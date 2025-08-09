@@ -50,12 +50,20 @@ $rating_delete = 'CREATE TRIGGER IF NOT EXISTS rating_delete
         UPDATE `client` SET `client`.`rating` = (ROUND(sum / row_count)) WHERE `client`.`id` = OLD.`client_id_to_whom`;
     END
 ';
-
+/*
 $trigger_sqls = [
     'offer' => [
         $offer_end_time_insert,
         $offer_end_time_update,
     ],
+    'rating' => [
+        $rating_insert,
+        $rating_update,
+        $rating_delete,
+    ],
+];
+*/
+$trigger_sqls = [
     'rating' => [
         $rating_insert,
         $rating_update,
