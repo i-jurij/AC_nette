@@ -169,7 +169,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             ->setHtmlAttribute('cols', '100')
             ->addCondition($form::Length, [8, 1024])
             ->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[а-яА-Яa-zA-Z0-9\s ?!,.-_~\"\/:;!Ёё]+$');
-            //->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\"\/:;!]+$');
+        //->addRule($form::Pattern, 'Только буквы, цифры и знаки препинания', '^[\p{L}\d ?!,.-_~\"\/:;!]+$');
 
         $form->addHidden('client_id');
         $form->addHidden('id');
@@ -193,6 +193,15 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
         $form_data->region_name = $this->locality['region'] ?: '';
 
         $form_data->offers_type = (in_array($data['offers_type'], ['workoffer', 'serviceoffer'])) ? $data['offers_type'] : false;
+
+        $time = new \DateTime;
+        if ($form_data->offers_type === "workoffer") {
+            $form_data->end_time = $time->modify('+' . OFFER_WORK_LENGTH . ' day');
+        }
+        if ($form_data->offers_type === "serviceoffer") {
+            $form_data->end_time = $time->modify('+' . OFFER_SERVICE_LENGTH . ' year');
+        }
+
         $form_data->price = (int) $data['price'];
         $form_data->moderated = 0;
         $text = htmlspecialchars(strip_tags($data['message']));
@@ -271,7 +280,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
             if ($form_data->moderated != 1) {
                 $this->flashMessage('Объявление не добавлено. В сообщении не должно быть ссылок или ругательств', 'error');
             }
-            
+
             if (empty($service_array)) {
                 $this->flashMessage('Объявление не добавлено. Не выбраны услуги', 'error');
             }

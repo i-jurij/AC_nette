@@ -5,6 +5,8 @@ constants:
 	DEFAULT_IMAGE: 'images/ddd.jpg' # in www folder
 	CACHE_DIR: '../temp/cache'
 	PASSWORD_MIN_LENGTH: 7
+	OFFER_WORK_LENGTH: 90 #day
+	OFFER_SERVICE_LENGTH: 5 #year
 	#PHONE_REGEX: "your regex here"
 routing:
 	# cache: true

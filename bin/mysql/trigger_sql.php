@@ -1,5 +1,5 @@
 <?php
-
+/*
 $offer_end_time_insert = 'CREATE TRIGGER IF NOT EXISTS offer_end_time_insert
     BEFORE INSERT ON `offer`
     FOR EACH ROW
@@ -11,7 +11,7 @@ $offer_end_time_update = 'CREATE TRIGGER IF NOT EXISTS offer_end_time_update
     FOR EACH ROW
     SET NEW.`end_time` =  DATE_ADD(CURRENT_TIMESTAMP,INTERVAL 30 DAY);
 ';
-
+*/
 // make trigger for table 'rating'
 // on ins del upd
 // get client.id by offer_id from offer then upd field 'client.rating' where id=client.id by offer_id
