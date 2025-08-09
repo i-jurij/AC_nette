@@ -28,8 +28,6 @@ class OfferFacade
             $table = $reflection->getTable($this->table);
         }
         $this->allowed_columns = $table->columns;
-
-
     }
 
     private function setSqlParams(array $location = [], ?int $limit = null, ?int $offset = null, ?object $form_data = null)
