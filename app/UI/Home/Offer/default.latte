@@ -10,9 +10,11 @@
 {var $keywords = $description}
 {if !empty($offers[0]['services']) && is_array($offers[0]['services'])}
 {foreach $offers[0]['services'] as $ca}
-{php $keywords .= ', ' . $ca['category_name'] . ', '}
+{var $description = $description . ', ' . $ca['category_name']}
+{var $keywords = $keywords . ', ' . $ca['category_name']}
 {foreach $ca['services'] as $se}
-{php $keywords .= $se['name']. ', '}
+{var $description = $description . ', ' . $se['name']}
+{var $keywords = $keywords . ', ' . $se['name']}
 {/foreach}
 {/foreach}
 {/if}
