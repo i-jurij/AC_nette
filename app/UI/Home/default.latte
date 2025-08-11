@@ -1,8 +1,20 @@
 {*layout '../@layout.latte'*}
 
-{var $title = "AC"}
-{var $description = "AC"}
-{var $keywords = "Keywords of main page"}
+{var $title = "jobaround.ru, сайт объявлений с предложениями работы, подработки и услуг"}
+{var $description = "Сайт бесплатных объявлений с предложениями работы, подработки от частных лиц, а также объявлений о
+предоставляемых услугах мастерами и специалистами"}
+{var $keywords = "дать объявление о работе бесплатно, дать объявление, объявление о работе, объявление об услуге,
+работа, подработка, шабашка, строительство, услуги, сделать ремонт, сделаю ремонт, нужен мастер, нужно сделать, ищу
+мастера, мастер по ремонту, мастер по настройке"}
+{if !empty($service_list) && is_array($service_list)}
+{foreach $service_list as $cat}
+{var $keywords = $keywords . ', ' . $cat['category_name']}
+{foreach $cat['services'] as $serv}
+{var $keywords = $keywords . ', ' . $serv['name']}
+{/foreach}
+{/foreach}
+{/if}
+
 {var $robots = "INDEX,FOLLOW"}
 
 {block content}
