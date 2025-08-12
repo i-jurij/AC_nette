@@ -21,8 +21,35 @@
 
 {var $robots = "INDEX,FOLLOW"}
 
-{block content}
+{default $item = ""}
+{if empty($offers[0]['id'])}
+{var $item = "https://jobaround.ru/home.offer/default/" . $offers[0]["id"]}
 
+{block googlebreadcrumb}
+<script type="application/ld+json" n:syntax="double">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "home.offer",
+        "item": "https://jobaround.ru/home.offer"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": {{$title}},
+        "item": {{$item}}
+      }]
+    }
+</script>
+{/block}
+{/if}
+
+{block content}
+{if empty($offers[0]['id'])}
+<p class="bgcontent p2 rounded center">Страница с объявлением отсутствует или была удалена</p>
+{else}
 <style>
     .thumb {
         text-align: center;
@@ -697,3 +724,5 @@
     }
 //// end similar ////
 </script>
+
+{/if}

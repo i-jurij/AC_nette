@@ -49,15 +49,20 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
             $this->template->offers = $this->offers->getOffers(form_data: $form_data);
 
-            $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
-            $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
+            if (!empty($this->template->offers[0]['id'])) {
+                $regex = '(^' . strval($id) . '_){1}[0-9]+(.jpg|.png|.jpeg|.gif|.bmp|.webp)$';
+                $this->template->offer_images = \App\UI\Accessory\FilesInDir::byRegex(WWWDIR . '/images/offers', "/$regex/");
 
-            $this->template->backlink = $this->storeRequest();
-            $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
-            if ($this->getUser()->isLoggedIn()) {
-                $this->template->count_offer_chat = $this->chat->countChatOffer(client_id: $this->getUser()->getId(), offer_id: $id);
+                $this->template->backlink = $this->storeRequest();
+                $this->template->comments_count = $this->offers->db->query('SELECT count(*) FROM `comment` WHERE `offer_id` = ? AND `moderated` = 1', $id)->fetchField();
+                if ($this->getUser()->isLoggedIn()) {
+                    $this->template->count_offer_chat = $this->chat->countChatOffer(client_id: $this->getUser()->getId(), offer_id: $id);
+                } else {
+                    $this->template->count_offer_chat = 0;
+                }
             } else {
-                $this->template->count_offer_chat = 0;
+                $this->flashMessage('Такой страницы не существует', 'error');
+                $this->redirect(':Home:default');
             }
         } else {
             $this->redirectPermanent(':Home:default');
