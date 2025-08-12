@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
-Disallow: /assets/
-Allow: /assets/images/offers/
+Disallow: /*admin*
+Disallow: /*sign*
+Disallow: /*client*
+Disallow: /*geo*
+Disallow: /*advert*
+Disallow: /images/persons
+Disallow: /assets
 Host: jobaround.ru
