@@ -53,6 +53,7 @@ trait OauthLogin
                 unset($arr[$this->cf::ColumnPasswordHash]);
                 $roles = $this->cf->getRoless($user_isset[$this->cf::ColumnId]);
                 $identity = new SimpleIdentity($user_isset[$this->cf::ColumnId], $roles, $arr);
+                $this->flashMessage('Вы вошли c использованием сторонних служб', 'info');
                 $user->login($identity);
             }
         } else {
