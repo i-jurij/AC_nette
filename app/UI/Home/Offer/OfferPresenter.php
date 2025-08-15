@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI\Home\Offer;
 
 use \App\Model\ChatFacade;
