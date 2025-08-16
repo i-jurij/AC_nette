@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\UI;
 
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
@@ -13,10 +11,10 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
-        $this->template->shared_templates = APPDIR.DIRECTORY_SEPARATOR.'UI'.DIRECTORY_SEPARATOR.'shared_templates'.DIRECTORY_SEPARATOR;
+        $this->template->shared_templates = (string) APPDIR . DIRECTORY_SEPARATOR . 'UI' . DIRECTORY_SEPARATOR . 'shared_templates' . DIRECTORY_SEPARATOR;
         if ($this->isBanned()) {
             // $this->error();
-            $this->template->setFile($this->template->shared_templates.'banned.latte');
+            $this->template->setFile($this->template->shared_templates . 'banned.latte');
             $this->sendTemplate();
         }
         $this->template->breadcrumb = $this->getBC();

@@ -46,6 +46,7 @@ class Location
 
     public function list(): array
     {
+        $res = [];
         $loc_sql = "SELECT  d.id AS district_id, d.name AS district, 
                             r.id AS region_id, r.name AS region,
                             c.id AS city_id, c.name AS city
@@ -64,6 +65,6 @@ class Location
             $res['district'][$row['district_id']]['regions'][$row['region_id']]['cities'][$row['city_id']]['name'] = $row['city'];
         }
 
-        return $res ?: [];
+        return $res;
     }
 }
