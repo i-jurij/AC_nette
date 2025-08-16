@@ -2,16 +2,16 @@
 <div n:if="!empty($flashes)" class="modal" id="flash_message">
 	<input id="modal_flash_message" type="checkbox" checked />
 	<label for="modal_flash_message" class="overlay "></label>
-<article>
-	<header>
-		<span>&nbsp;</span>
-		<label for="modal_flash_message" class="close">&times;</label>
-	</header>
-	<section class="content bgcontent flash_child " n:inner-foreach="$flashes as $flash">
-		<p class="p1 bg-black {$flash->type}">{$flash->message}</p>
-	</section>
-<footer class="bgcontent">
-		<label for="modal_flash_message" class="button">Закрыть</label>
-	</footer>
+	<article>
+		<header>
+			<span>&nbsp;</span>
+			<label for="modal_flash_message" class="close">&times;</label>
+		</header>
+		<section class="content bgcontent flash_child " n:inner-foreach="$flashes as $flash">
+			<p class="p1 bg-black {$flash->type}">{$flash->message}</p>
+		</section>
+		<footer class="bgcontent">
+			<label for="modal_flash_message" class="button">Закрыть</label>
+		</footer>
 	</article>
-	</div>
+</div>

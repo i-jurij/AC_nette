@@ -16,17 +16,11 @@
     {* control signInForm *}
 
     <form n:name=signInForm class="form mb2 mr2 center">
-        <span class="errors" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent>
+        <span class="errors red" n:inner-foreach="$form->getOwnErrors() as $error" n:ifcontent>
             <small>{$error}</small><br>
         </span>
 
-        <noscript>
-            {php $form['phone']->setRequired()}
-            {label phone}Телефон:{input phone}{/label}
-            <span class=error n:ifcontent>{inputError phone}</span>
-        </noscript>
-
-        <div class="tabs three display-none" id="phone_email_name_fields_signin_form">
+        <div class="tabs three" id="phone_email_name_fields_signin_form">
             <input id='phone_tab_signin_form' type='radio' name='signin_form_tab_input' checked />
             <label class="pseudo button toggle my2" for="phone_tab_signin_form">☎</label>
             или
@@ -84,44 +78,43 @@
 </div>
 
 <script n:syntax="double">
-    document.addEventListener('DOMContentLoaded', function() {
-        let phone_elem_noscript = document.querySelector('noscript');
-        if (phone_elem_noscript) {
-            phone_elem_noscript.remove();
+    function del_req() {
+        let phone_email_name_inputs_div = document.querySelector('#phone_email_name_inputs_div');
+        if (phone_email_name_inputs_div) {
+            let inputs = phone_email_name_inputs_div.querySelectorAll('input');
+            inputs.forEach(element => {
+                element.required = false;
+            });
         }
+    }
 
-        let phone_email_name = document.querySelector('#phone_email_name_fields_signin_form');
-        if (phone_email_name) {
-            phone_email_name.classList.remove("display-none");
+    document.addEventListener('DOMContentLoaded', function() {
+        let phone_input = document.querySelector('input[name="phone"]');
+        if (phone_input) {
+            phone_input.required = true;
         }
 
         let labels_for_inputs = document.querySelectorAll("[name='signin_form_tab_input']");
         for (const li_item of labels_for_inputs) {
             li_item.addEventListener('change', function(event) {
-                let phone_email_name_inputs_div = document.querySelector(
-                '#phone_email_name_inputs_div');
-                if (phone_email_name_inputs_div) {
-                    let inputs = phone_email_name_inputs_div.querySelectorAll('input');
-                    inputs.forEach(element => {
-                        element.required = false;
-                    });
-                }
-
                 const inp_name_check = event.target.id.split("_");
                 switch (inp_name_check[0]) {
                     case "phone":
+                        del_req();
                         let phone_input = document.querySelector('input[name="phone"]');
                         if (phone_input) {
                             phone_input.required = true;
                         }
                         break;
                     case "email":
+                        del_req();
                         let email_input = document.querySelector('input[name="email"]');
                         if (email_input) {
                             email_input.required = true;
                         }
                         break;
                     case "name":
+                        del_req();
                         let name_input = document.querySelector('input[name="username"]');
                         if (name_input) {
                             name_input.required = true;
@@ -130,5 +123,28 @@
                 }
             });
         }
+
+        document.querySelector('form').addEventListener('submit', (event) => {        
+            let requiredInputs = this.querySelectorAll('[required]');
+            for (let inp of requiredInputs) {
+                if (!inp.value) {
+                    event.preventDefault();
+
+                    console.log(JSON.parse(inp.dataset.netteRules)[0].msg);
+
+                    let fm = document.getElementById("js_modal_flash_message");
+                    let mfm = document.getElementById("inp_mod_flash");
+                    let nmfm = document.getElementById("js_flash_message_p");
+                    
+                    if (fm && mfm && nmfm && (inp.name == 'username' || inp.name == 'phone' || inp.name == 'email')) {
+                        mfm.checked = true;
+                        nmfm.innerHTML = JSON.parse(inp.dataset.netteRules)[0].msg;
+                    } else {
+                        console.warn('JS modal flash element not isset');
+                    } 
+                }
+            }
+        });
     });
 </script>
+{/block}
