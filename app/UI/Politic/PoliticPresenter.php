@@ -23,19 +23,21 @@ final class PoliticPresenter extends \App\UI\BasePresenter // \Nette\Application
 
     public function renderDefault()
     {
-        $path = APPDIR.'/../www/politic.md';
+        $path = APPDIR . '/../www/politic.md';
         $politic = '';
         if (\is_readable($path)) {
             $my_text = \file_get_contents($path);
             $my_html = MarkdownExtra::defaultTransform($my_text);
 
-            $politic_arr = [Html::el('div')
-                ->setAttribute('class', 'mx-auto mt2 p3 rounded center shadow bgcontent')
-                ->appendAttribute('style', 'columns', 'auto 30em')
-                ->appendAttribute('style', 'column-rule', 'thin inset green')
-                ->appendAttribute('style', 'column-gap', '2em')
-                ->appendAttribute('style', 'text-align', 'justify')
-                ->addHtml($my_html)];
+            $politic_arr = [
+                Html::el('div')
+                    ->setAttribute('class', 'mx-auto mt2 p3 rounded center shadow bgcontent')
+                    ->appendAttribute('style', 'columns', 'auto 30em')
+                    ->appendAttribute('style', 'column-rule', 'thin inset green')
+                    ->appendAttribute('style', 'column-gap', '2em')
+                    ->appendAttribute('style', 'text-align', 'justify')
+                    ->addHtml($my_html)
+            ];
             /*
             foreach ($politic_arr as $key => $value) {
                 $politic .= $value;

@@ -1,6 +1,6 @@
 database:
 	mysql:
-		dsn: 'mysql:host=127.0.0.1;dbname=AC'
+		dsn: 'mysql:host=127.0.0.1;port=3306;dbname=acnette'
 		user: 'acnette'
 		password: 'acnette'
 		autowired: true

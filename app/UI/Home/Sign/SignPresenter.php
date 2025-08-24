@@ -89,18 +89,18 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->redirect(':Home:');
     }
 
-
-    public function actionYLTest(): void
-    {
-        $user_data['data'] = [
-            'email' => 'vvvvv@gmail.com',
-            'phone' => '+7 (944) 509 14 56',
-        ];
-        $this->oauthLogin($user_data);
-        $this->restoreRequest($this->backlink);
-        $this->redirect(':Home:');
-    }
-
+    /*
+        public function actionYLTest(): void
+        {
+            $user_data['data'] = [
+                'email' => 'vvvvv@gmail.com',
+                'phone' => '+7 (944) 509 14 56',
+            ];
+            $this->oauthLogin($user_data);
+            $this->restoreRequest($this->backlink);
+            $this->redirect(':Home:');
+        }
+    */
     public function actionYandexLogin(): void
     {
         $user_data = $this->getUserDataYandex();
