@@ -35,8 +35,13 @@ trait Breadcrumb
         // $url_fragment = $url->getFragment();
         // $method = $httpRequest->getMethod();
 
-        if ($url_host === SITE_NAME) {
+        if ($url_host === SITE_NAME || $url_host === 'www.' . SITE_NAME) {
+            /*
             $site_root = SITE_NAME;
+            if ($url_host === 'www.' . SITE_NAME) {
+                $site_root = 'www.' . SITE_NAME;
+            }
+            */
             $url_path_relative = $url_path;
         } else {
             $site_root = SITE_NAME . Strings::after(\trim(WWWDIR, " \/"), SITE_NAME, 1);
