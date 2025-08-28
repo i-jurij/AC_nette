@@ -83,6 +83,38 @@ trait VKLogin
                     curl_close($ch);
 
                     $data = json_decode($info, true);
+                    /*
+                    {
+                        "user": {
+                            "user_id": "<идентификатор пользователя>",
+                            "first_name": "<имя пользователя>",
+                            "last_name": "<фамилия пользователя>",
+                            "phone": "<телефон пользователя>",
+                            "avatar": "<ссылка на фото профиля>",
+                            "email": "<почта пользователя>",
+                            "sex": <пол>,
+                            "verified": <статус верификации пользователя>,
+                            "birthday": "<дата рождения>"
+                        }
+                    }
+                    */
+
+                    $f = $data['user']['first_name'] ?? '';
+                    $l = $data['user']['last_name'] ?? '';
+                    $username = $f . ' ' . $l;
+                    $email = $data['user']['email'] ?? '';
+                    $phone = $data['user']['phone'] ?? '';
+
+                    /*
+                    {
+                    "error": "<ошибка с одним из значений ниже>",
+                    "error_description": "<описание ошибки. Передается в виде строки>",
+                    "state": "<строка, которая передана в изначальном запросе>"
+                    }
+                    */
+                    if (!empty($data['user']['error'])) {
+                        $errors[] = $data['user']['error'] . '. ' . $data['user']['error_description'];
+                    }
                 } else {
                     //$errors[] = 'Access token not received or state is invalid';
                     $errors[] = 'Ошибка! Попробуйте позже или зарегистрируйтесь с помощью формы на сайте';
@@ -99,9 +131,10 @@ trait VKLogin
         return [
             'error' => $errors,
             'data' => [
-                // 'username' => $data['user']['first_name'] . '_id_' . $data['user_id'],
-                'email' => $data['user']['email'] ?? '',
-                'phone' => $data['user']['phone'] ?? '',
+                "user_id" => $data['user']['user_id'] ?? '',
+                'username' => $username,
+                'email' => $email,
+                'phone' => $phone,
             ],
         ];
     }

@@ -42,20 +42,20 @@ class OfferFact
     private function getLocations()
     {
         $path_to_geo_db = realpath(APPDIR
-            .DIRECTORY_SEPARATOR
-            .'..'
-            .DIRECTORY_SEPARATOR
-            .'vendor'
-            .DIRECTORY_SEPARATOR
-            .'i-jurij'
-            .DIRECTORY_SEPARATOR
-            .'geolocation'
-            .DIRECTORY_SEPARATOR
-            .'src'
-            .DIRECTORY_SEPARATOR
-            .'sqlite'
-            .DIRECTORY_SEPARATOR
-            .'geolocation.db');
+            . DIRECTORY_SEPARATOR
+            . '..'
+            . DIRECTORY_SEPARATOR
+            . 'vendor'
+            . DIRECTORY_SEPARATOR
+            . 'i-jurij'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation'
+            . DIRECTORY_SEPARATOR
+            . 'src'
+            . DIRECTORY_SEPARATOR
+            . 'sqlite'
+            . DIRECTORY_SEPARATOR
+            . 'geolocation.db');
         $dsn = "sqlite:$path_to_geo_db";
         $sqlite = new Connection($dsn);
         $loc_sql = 'SELECT `id`, `region_id`, `name` FROM `geo_city`';
@@ -77,6 +77,8 @@ class OfferFact
             $loc_row = \array_rand($this->locations, 1);
             $price = Random::generate(5, '0-9');
             $message = \implode(' ', mb_str_split($this->random_word(200), 10));
+            $time = new \DateTime;
+            $end_time = $time->modify('+ 365 day');
 
             $res[] = [
                 'offers_type' => $offers_type,
@@ -87,6 +89,7 @@ class OfferFact
                 'price' => $price,
                 'message' => $message, // \mb_convert_encoding($message, 'UTF-8'),
                 'moderated' => 1,
+                'end_time' => $end_time
             ];
         }
 
@@ -129,7 +132,7 @@ class OfferFact
 }
 
 if (PHP_SAPI === 'cli') {
-    require __DIR__.'/../../vendor/autoload.php';
+    require __DIR__ . '/../../vendor/autoload.php';
 
     $container = App\Bootstrap::boot()
         ->createContainer();
@@ -144,7 +147,7 @@ if (PHP_SAPI === 'cli') {
             if (is_array($value)) {
                 print_r($value);
             } else {
-                echo $key.': '.$value."\n";
+                echo $key . ': ' . $value . "\n";
             }
         }
         exit(1);

@@ -59,12 +59,12 @@ final class SignPresenter extends \App\UI\BasePresenter
         usleep(200000);
         try {
             $user = $this->getUser();
-            if (!empty($data->phone)) {
+            if (!empty($data->username)) {
+                $user_pen = htmlspecialchars($data->username);
+            } elseif (!empty($data->phone)) {
                 $user_pen = $this->cf->searchBy('phone', PhoneNumber::toDb($data->phone), true)->username;
             } elseif (!empty($data->email)) {
                 $user_pen = $this->cf->searchBy('email', htmlspecialchars($data->email))->username;
-            } elseif (!empty($data->username)) {
-                $user_pen = htmlspecialchars($data->username);
             }
 
             if (!empty($user_pen)) {
@@ -72,7 +72,7 @@ final class SignPresenter extends \App\UI\BasePresenter
                 $this->restoreRequest($this->backlink);
                 $this->redirect(':Home:');
             } else {
-                $form->addError('Необходимо ввести телефон, почту или имя.');
+                $form->addError('Необходимо ввести имя, телефон или почту');
             }
         } catch (Nette\Security\AuthenticationException $e) {
             sleep(1);
@@ -94,7 +94,8 @@ final class SignPresenter extends \App\UI\BasePresenter
         {
             $user_data['data'] = [
                 'email' => 'vvvvv@gmail.com',
-                'phone' => '+7 (944) 509 14 56',
+                // 'phone' => '+7 (944) 509 14 56',
+                'username' => 'bbbbbb'
             ];
             $this->oauthLogin($user_data);
             $this->restoreRequest($this->backlink);

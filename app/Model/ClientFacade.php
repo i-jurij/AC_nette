@@ -12,6 +12,7 @@ use Nette\Database\Table\Selection;
 use Nette\Database\UniqueConstraintViolationException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
+use Nette\Utils\Strings;
 
 /**
  * Manages user-related operations such as authentication and adding new users.
@@ -99,7 +100,7 @@ class ClientFacade
 
         // $email = !empty($data->email) ? $data->email : $data->username.'@'.$data->username.'.com';
         $data_array = [
-            self::ColumnName => $username ?? $phone ?? null,
+            self::ColumnName => (!empty($username)) ? $username : ((!empty($phone)) ? $phone : ((!empty($email)) ? Strings::before($email, '@', 1) : null)), // здесь нужно еще почистить первую часть имейла, чтобы оставить только буквы и цифры
             self::ColumnPasswordHash => $this->passwords->hash($data->password),
             self::ColumnImage => $data->image ?? null,
             self::ColumnPhone => $phone ?? null,

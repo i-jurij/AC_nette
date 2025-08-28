@@ -32,9 +32,10 @@ trait TelegramLogin
         $data = checkTelegramAuthorization($_GET);
         if (!empty($data)) {
             $d = [
-                'username' => $data['username'] . '_id_' . $data['id'],
-                // 'email' => $data['default_email'] ?? '',
-                // 'phone' => $data['default_phone']['number'] ?? '',
+                'id' => $data['id'] ?? '',
+                'username' => $data['username'] ?? '',
+                'email' => $data['default_email'] ?? '',
+                'phone' => $data['default_phone']['number'] ?? '',
             ];
         }
 

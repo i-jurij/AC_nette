@@ -66,7 +66,9 @@ trait YandexLogin
 
         if (isset($info) && $info !== false) {
             $data = json_decode($info, true);
-            // $username = $data['login'] ?? '';
+            $id = $data['id'] ?? '';
+            $username = $data['login'] ?? '';
+            $psuid = $data['psuid'] ?? '';
             $phone = $data['default_phone']['number'] ?? '';
             $email = $data['default_email'] ?? '';
         } else {
@@ -74,14 +76,16 @@ trait YandexLogin
             return ['error' => $errors, 'data' => []];
         }
 
-        if (empty($phone) && empty($email)) {
+        if (empty($username) && empty($phone) && empty($email)) {
             $errors[] = 'Ошибка! Не получены данные пользователя';
             return ['error' => $errors, 'data' => []];
         } else {
             return [
                 'error' => $errors,
                 'data' => [
-                    // 'username' => $data['login'] . '_id_' . $data['id'],
+                    'id' => $id,
+                    'username' => $username,
+                    'psuid' => $psuid,
                     'email' => $email,
                     'phone' => $phone,
                 ],
