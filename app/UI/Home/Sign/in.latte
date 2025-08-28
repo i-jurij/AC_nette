@@ -23,21 +23,24 @@
         <div class="tabs three" id="phone_email_name_fields_signin_form">
             <input id='name_tab_signin_form' type='radio' name='signin_form_tab_input' checked>
             <label class="pseudo button toggle my2" for="name_tab_signin_form">👤</label>
-            или
+            |
             <input id='phone_tab_signin_form' type='radio' name='signin_form_tab_input' />
             <label class="pseudo button toggle my2" for="phone_tab_signin_form">☎</label>
-            или
+            |
             <input id='email_tab_signin_form' type='radio' name='signin_form_tab_input'>
             <label class="pseudo button toggle my2" for="email_tab_signin_form">📧</label>
+
             <div class="row my2" id="phone_email_name_inputs_div">
                 <div>
                     {label username}Имя:{input username}{/label}
                     <span class=error n:ifcontent>{inputError username}</span>
                 </div>
+
                 <div>
                     {label phone}Телефон:{input phone}{/label}
                     <span class=error n:ifcontent>{inputError phone}</span>
                 </div>
+
                 <div>
                     {label email}Почта:{input email}{/label}
                     <span class=error n:ifcontent>{inputError email}</span>

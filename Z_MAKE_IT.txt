@@ -3,11 +3,9 @@ MAKE
 opengraph add
 social network akkaunt with grab? offer tg max vk ok ...
 
+Переписать регистрацию на имя пароль плюс необзательно номер тлф и почта
 
 Доделать вход через сторонние сервисы
-
-into oauthlogin write username getting and search in db by name then (or) detail by phone and email
-
 при входе через сторонние сервисы - пробовать получить имя, телефон и имейл, (если нет - логин в сервисе 
 для связи через этот сервис и выдавать ссылку вроде tg/username eg)
 в добавлении объявлений проверять существование номера телефона и выводить поле для его ввода,
