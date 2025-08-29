@@ -169,7 +169,7 @@ class ClientFacade
             $this->db->rollBack();
             \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
 
-            return 'Пользователь с таким именем (номером телефона) уже существует.';
+            return 'Пользователь с таким именем или номером телефона или адресом электронной почты уже существует.';
         } catch (Nette\Database\DriverException $e) {
             $this->db->rollBack();
             \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
