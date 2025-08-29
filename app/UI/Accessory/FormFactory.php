@@ -52,7 +52,12 @@ final class FormFactory
     private function emailAdd()
     {
         $this->form->addEmail('email', '')
-            ->setHtmlAttribute('placeholder', '📧 Email:');
+            ->setHtmlAttribute('placeholder', '📧 Email:')
+            ->addRule($this->form::Email, 'Введите правильный адрес электронной почты.')
+            ->addFilter(function ($value) {
+                return filter_var($value, FILTER_SANITIZE_EMAIL);
+            });
+        ;
     }
 
     private function passwordAdd()
@@ -99,9 +104,9 @@ final class FormFactory
         $form = $this->create();
         $form->addProtection('Ошибка. Почистите куки, закройте вкладку и откройте ее снова');
         $form->addGroup('');
+        $this->nameAdd();
         $this->phoneAdd();
         $this->emailAdd();
-        $this->nameAdd();
         $this->passwordAdd();
 
         return $form;
