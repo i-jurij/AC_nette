@@ -45,8 +45,8 @@ final class FormFactory
             ->setHtmlAttribute('placeholder', '👤 Имя:')
             // ->setRequired('Имя обязательно.')
             ->addRule($this->form::MinLength, 'Имя длиной не менее %d символов', 3)
-            ->addRule($this->form::Pattern, 'Имя только из букв, цифр, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_]{3,25}$')
-            ->setMaxLength(25);
+            ->addRule($this->form::Pattern, 'Имя только из букв, цифр, пробелов, дефисов и подчеркиваний', '^[a-zA-Zа-яА-ЯёЁ0-9\-_ ]{3,125}$')
+            ->setMaxLength(125);
     }
 
     private function emailAdd()

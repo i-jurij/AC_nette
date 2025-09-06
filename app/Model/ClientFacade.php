@@ -90,7 +90,7 @@ class ClientFacade
             $email = $data->email;
         }
 
-        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_ ]{3,25}$/', $data->username)) {
+        if (!empty($data->username) && \preg_match('/^[a-zA-Zа-яА-ЯёЁ0-9\-_ ]{3,125}$/u', $data->username)) {
             $username = $data->username;
         }
 
