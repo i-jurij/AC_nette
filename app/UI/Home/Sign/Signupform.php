@@ -16,22 +16,12 @@ final class Signupform
     {
         $form = $this->formFactory->createHomeLoginForm();
         //        unset($form['username']);
-        $form->setHtmlAttribute('id', 'signupform')
+        $form->setHtmlAttribute('id', 'signUpForm')
+            ->setHtmlAttribute('name', 'signUpForm')
             ->setHtmlAttribute('class', 'form mb2 mr2 center');
         $form->addGroup('');
-        $form['username']->setRequired();
-        /*
-        $form['phone']->setRequired();
-        $form['email']
-            ->addRule($form::Email, 'Введите правильный адрес электронной почты.')
-            ->addFilter(function ($value) {
-                return filter_var($value, FILTER_SANITIZE_EMAIL);
-            });
-        //->setRequired('Введите адрес электронной почты.');
-        */
         $form->addGroup('');
         $form->addCaptcha('captcha', 'Ошибка в капче. Повторите ввод.');
-
         $form->addGroup('');
         $form->addSubmit('send', 'Зарегистрироваться');
 

@@ -17,13 +17,15 @@ final class RoleFacade
     public Selection $table;
     public Selection $role;
     public Selection $role_permission;
-    private Selection $role_user;
+    public Selection $role_user;
+    public Selection $role_client;
 
-    public function __construct(public Explorer $sqlite)
+    public function __construct(public Explorer $db)
     {
-        $this->role = $this->sqlite->table('role');
-        $this->role_permission = $this->sqlite->table('role_permission');
-        $this->role_user = $this->sqlite->table('role_user');
+        $this->role = $this->db->table('role');
+        $this->role_permission = $this->db->table('role_permission');
+        $this->role_user = $this->db->table('role_user');
+        $this->role_client = $this->db->table('role_client');
     }
 
     public function add(array $data): string
@@ -40,6 +42,34 @@ final class RoleFacade
         return $role->role_name;
     }
 
+    public function getRole(string $role_name): ?\Nette\Database\Table\ActiveRow
+    {
+        return $this->role->where('role_name', $role_name)->fetch();
+    }
+
+    public function addRoleClient($client_id, $role_id)
+    {
+        if (empty($client_id) || empty($role_id)) {
+            return false;
+        }
+
+        $data = ['user_id' => $client_id, 'role_id' => $role_id];
+
+        if (!empty($this->role_client->where($data)->user_id)) {
+            return false;
+        }
+
+        $res = $this->role_client->insert([
+            'user_id' => $client_id,
+            'role_id' => $role_id,
+        ]);
+
+        if ($res !== false) {
+            return true;
+        }
+
+        return false;
+    }
     public function delete(array $data): int
     {
         $role = $this->role->where('id', $data['role'])->delete() or throw new \Exception('Role(s) NOT deleted');

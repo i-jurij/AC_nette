@@ -27,7 +27,7 @@ trait VKLogin
             'code_challenge_method' => 'S256',
         ];
 
-        $url = 'https://id.vk.com/authorize?' . urldecode(http_build_query($params));
+        $url = 'https://id.vk.ru/authorize?' . urldecode(http_build_query($params));
 
         return $url;
     }
@@ -50,7 +50,7 @@ trait VKLogin
                     'code_verifier' => Session::get('code_verifier'),
                 ];
 
-                $ch = curl_init('https://id.vk.com/oauth2/auth');
+                $ch = curl_init('https://id.vk.ru/oauth2/auth');
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
@@ -72,7 +72,7 @@ trait VKLogin
                         'client_id' => VKLOGIN_ID,
                         'access_token' => $d['access_token'],
                     ];
-                    $ch = curl_init('https://id.vk.com/oauth2/user_info');
+                    $ch = curl_init('https://id.vk.ru/oauth2/user_info');
                     curl_setopt($ch, CURLOPT_POST, 1);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);

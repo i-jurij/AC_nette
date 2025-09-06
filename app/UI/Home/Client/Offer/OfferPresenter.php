@@ -4,6 +4,7 @@ namespace App\UI\Home\Client\Offer;
 
 use App\Model\OfferFacade;
 use App\Model\ServiceFacade;
+use App\Model\RoleFacade;
 use \App\Model\ChatFacade;
 use App\UI\Accessory\IsBot;
 use Nette\Application\UI\Form;
@@ -32,6 +33,7 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
 
     public function __construct(
         protected OfferFacade $of,
+        protected RoleFacade $rf,
         protected ServiceFacade $sf,
         protected ChatFacade $chat
     ) {
@@ -266,6 +268,15 @@ final class OfferPresenter extends \App\UI\Home\BasePresenter
                 if (!empty($offer_service_res)) {
                     $this->flashMessage('Услуги успешно добавлены', 'success');
                 }
+
+                // adding role of client by offers type
+                if ($form_data->offers_type === "serviceoffer") {
+                    $role_name = 'executor';
+                } else {
+                    $role_name = 'customer';
+                }
+                $role_id = $this->rf->getRole($role_name)->id;
+                $this->rf->addRoleClient($form_data->client_id, $role_id);
 
                 $this->imagesAdd($new_offer_id);
             } else {

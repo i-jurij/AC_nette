@@ -11,6 +11,7 @@ use Ijurij\Geolocation\Lib\Csrf;
 use Nette;
 use Nette\Application\Attributes\Persistent;
 use Nette\Application\UI\Form;
+use Nette\Security\SimpleIdentity;
 
 final class SignPresenter extends \App\UI\BasePresenter
 {
@@ -53,7 +54,6 @@ final class SignPresenter extends \App\UI\BasePresenter
         return $form;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
     private function userLogin(Form $form, \stdClass $data): void
     {
         usleep(200000);
@@ -133,21 +133,31 @@ final class SignPresenter extends \App\UI\BasePresenter
     public function createComponentSignUpForm()
     {
         $form = (new Signupform($this->formFactory))->get();
-
+        /*
+        $form->onValidate[] = function (Form $form) {
+            $values = $form->getValues();
+            if (empty($values->username) && empty($values->phone) && empty($values->email)) {
+                $form->addError('Укажите хотя бы одно: имя пользователя, телефон или email.');
+            }
+        };
+        */
         $form->onSuccess[] = $this->processSignUpForm(...);
 
         return $form;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
     private function processSignUpForm(Form $form, \stdClass $data): void
     {
         $data->roles = 'client';
         $res = $this->cf->add($data);
-        if ($res === 'ok') {
-            $this->flashMessage('Вы зарегистрированы', 'success');
-            $this->redirect(':Home:Sign:in');
-        } else {
+        if (is_array($res)) {
+            unset($res[1][$this->cf::ColumnPasswordHash]);
+            $roles = $this->cf->getRoless($res[$this->cf::ColumnId]);
+            $identity = new SimpleIdentity($res[$this->cf::ColumnId], $roles, $res);
+            $this->flashMessage('Вы зарегистрированы: имя "' . $res['username'] . '", пароль "' . $data->password . '"', 'success');
+            $this->getUser()->login($identity);
+            $this->redirect(':Home:default');
+        } elseif (is_string($res)) {
             $form->addError($res);
         }
     }
@@ -159,16 +169,38 @@ final class SignPresenter extends \App\UI\BasePresenter
         $this->redirect(':Home:');
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+    #[Nette\Application\Attributes\Requires(methods: 'POST', sameOrigin: true)]
     public function actionCheckPhoneInDb(): void
     {
+        $resp = '';
         $httpRequest = $this->getHttpRequest();
+        $username = $httpRequest->getPost('username');
         $phone = $httpRequest->getPost('phone');
-        $res = $this->cf->searchBy('phone', $phone);
-        if (!empty($res->id)) {
-            $this->sendJson(1);
+        $email = $httpRequest->getPost('email');
+
+        if (!empty($username)) {
+            $res_username = $this->cf->searchBy('username', $username, true);
+            if (!empty($res_username->id)) {
+                $resp = $resp . " Пользователь с таким именем уже существует.";
+            }
         }
-        $this->sendJson(0);
+
+        if (!empty($phone)) {
+            $res_phone = $this->cf->searchBy('phone', $phone, true);
+            if (!empty($res_phone->id)) {
+                $resp = $resp . " Пользователь с таким номером телефона уже существует.";
+            }
+        }
+
+        if (!empty($email)) {
+            $res_email = $this->cf->searchBy('email', $email, true);
+            if (!empty($res_email->id)) {
+                $resp = $resp . " Пользователь с таким адресом электронной почты уже существует.";
+            }
+        }
+
+
+        $this->sendJson($resp);
     }
 
     protected function createComponentRestoreForm(): Form
@@ -194,7 +226,19 @@ final class SignPresenter extends \App\UI\BasePresenter
         return $form;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+    /**
+     * The `postRestore` function in PHP filters and validates an email address, sends a password
+     * restoration link via email if the email exists in the database, and handles error messages
+     * accordingly.
+     * 
+     * @param Form form The `postRestore` function you provided seems to be handling a form submission for
+     * restoring a password. The function takes two parameters: `` of type `Form` and `` of type
+     * `\stdClass`.
+     * @param \stdClass data The `data` parameter in the `postRestore` function is expected to be an object
+     * of type `\stdClass`. It is used to retrieve the email address for password restoration. The email
+     * address is then sanitized and validated before further processing. If the email is valid and
+     * associated with an existing user, a
+     */
     public function postRestore(Form $form, \stdClass $data): void
     {
         $email = filter_var($data->email, FILTER_SANITIZE_EMAIL);

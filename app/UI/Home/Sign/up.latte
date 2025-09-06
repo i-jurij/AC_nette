@@ -7,18 +7,12 @@
 <div class="flex flex-column items-center ">
     <div class="bgcontent m2 px2 round center h6">
         <p>
-            Войдите с помощью сторонних сервисов
+            Зарегистрируйтесь с помощью сторонних сервисов
             <br>
-            или зарегистрируйтесь, отправив данные из формы ниже:
+            или отправив имя, или телефон, или почту, или все вместе из формы ниже.
         </p>
         <p>
-            имя и пароль обязательно;
-        </p>
-        <p>
-            номер телефона не обязательно, но при подаче объявлений его не придется набирать вручную;
-        </p>
-        <p>
-            адрес электронной почты не обязательно, но с его помощью вы сможете восстановить доступ к учетной записи.
+            Адрес электронной почты поможет восстановить доступ к учетной записи.
         </p>
     </div>
 
@@ -70,9 +64,9 @@
 <script n:syntax="double">
     let url_for_check_phone_in_db = {{link :Home:Sign:checkPhoneInDb}}
 
-function fetchRequest(phone) {
+function fetchRequest(field, data) {
     const formData = new FormData();
-    formData.set("phone", phone);
+    formData.set(field, data);
 
     return {
         method: 'POST',
@@ -85,27 +79,63 @@ function fetchRequest(phone) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelector('form[name="signUpForm"]'); 
+    if (forms) {
+        forms.addEventListener('submit', function (e) { 
+            const username = forms.querySelector('input[name="username"]')?.value.trim() || ''; 
+            const phone = forms.querySelector('input[name="phone"]')?.value.trim() || ''; 
+            const email = forms.querySelector('input[name="email"]')?.value.trim() || ''; 
+            if (!username && !phone && !email) { 
+                e.preventDefault();
+                window.Main.jsModaFlash('Пожалуйста, укажите хотя бы одно: имя пользователя, телефон или email.', window.Main.elements); 
+            }
+        });
+    }
+
     const phone_elem = window.Main.phone_elem;
     if (phone_elem){ 
-        phone_elem.addEventListener('change',
-            function () {
-                //const reg = /(\+7|8)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
+        phone_elem.addEventListener('change', function () {
                 const reg = /(\+?7)\s?[\(]{0,1}?\d{3}[\)]{0,1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?\d{1}\s?[\-]{0,1}?/;
                 let user_phone_pre = phone_elem.value;                
                 if (reg.test(user_phone_pre)){
                     let user_phone_in_db = user_phone_pre.replace(/[^0-9]/g, '');
-                    fetch(url_for_check_phone_in_db, fetchRequest(user_phone_in_db))
+                    fetch(url_for_check_phone_in_db, fetchRequest('phone', user_phone_in_db))
                     .then((response) => response.ok === true ? response.json() : false)
                     .then(check => {
-                        if (check > 0){
-                            let error_text = '<p>Пользователь с таким номером уже зарегистрирован.</p>\
-                                <p>Нажмите "Забыли пароль?", чтобы восстановить доступ.</p>';
-                            window.Main.jsModaFlash(error_text, window.Main.elements);
+                        if (check != '' && check != 'undefined'){
+                            window.Main.jsModaFlash(check, window.Main.elements);
                         }
                     });
-                }
+                } 
             }
         )
     }
+    
+    const username = forms.querySelector('input[name="username"]');
+    if (username){
+        username.addEventListener('change', function () {
+            fetch(url_for_check_phone_in_db, fetchRequest("username", username.value))
+            .then((response) => response.ok === true ? response.json() : false)
+            .then(check => {
+                if (check != '' && check != 'undefined'){
+                    window.Main.jsModaFlash(check, window.Main.elements);
+                }
+            });
+        });
+    }
+    
+    const email = forms.querySelector('input[name="email"]');
+    if (email){
+        email.addEventListener('change', function () {
+            fetch(url_for_check_phone_in_db, fetchRequest("email", email.value))
+            .then((response) => response.ok === true ? response.json() : false)
+            .then(check => {
+                if (check != '' && check != 'undefined'){
+                    window.Main.jsModaFlash(check, window.Main.elements);
+                }
+            });
+        });
+    }
+    
 });
 </script>

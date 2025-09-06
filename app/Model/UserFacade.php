@@ -31,7 +31,7 @@ class UserFacade
         $this->table_role_user = 'role_' . TABLE;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function getAllUsersData(): Selection
     {
         $users_data = $this->db->table($this->table)->select($this->getColumns());
@@ -39,7 +39,7 @@ class UserFacade
         return $users_data;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function getUserData($id): ActiveRow
     {
         $user_data = $this->db->table($this->table)->select($this->getColumns())->get($id);
@@ -47,7 +47,7 @@ class UserFacade
         return $user_data;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function deleteUserData($id): void
     {
         try {
@@ -58,7 +58,7 @@ class UserFacade
         }
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function countUsers()
     {
         return $count = count($this->db->table($this->table));
@@ -185,7 +185,7 @@ class UserFacade
         }
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function update($id, $data): void
     {
         if (!empty($data['email'])) {

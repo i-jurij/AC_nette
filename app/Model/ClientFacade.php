@@ -50,7 +50,7 @@ class ClientFacade
         return \implode(', ', $column_array);
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function getAllClientsData(): Selection
     {
         $clients_data = $this->db->table($this->table)->select($this->getColumns());
@@ -58,7 +58,7 @@ class ClientFacade
         return $clients_data;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function getClientData($id): ActiveRow
     {
         $client_data = $this->db->table($this->table)->select($this->getColumns())->get($id);
@@ -66,7 +66,7 @@ class ClientFacade
         return $client_data;
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function deleteClientData($id): void
     {
         try {
@@ -78,7 +78,7 @@ class ClientFacade
         }
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function countClients()
     {
         return $count = count($this->db->table($this->table));
@@ -100,7 +100,7 @@ class ClientFacade
 
         // $email = !empty($data->email) ? $data->email : $data->username.'@'.$data->username.'.com';
         $data_array = [
-            self::ColumnName => (!empty($username)) ? $username : ((!empty($phone)) ? $phone : ((!empty($email)) ? Strings::before($email, '@', 1) : null)), // здесь нужно еще почистить первую часть имейла, чтобы оставить только буквы и цифры
+            self::ColumnName => (!empty($username)) ? $username : ((!empty($phone)) ? $phone : ((!empty($email)) ? Strings::before($email, '@', 1) : null)),
             self::ColumnPasswordHash => $this->passwords->hash($data->password),
             self::ColumnImage => $data->image ?? null,
             self::ColumnPhone => $phone ?? null,
@@ -116,12 +116,12 @@ class ClientFacade
         return array_filter($data_array);
     }
 
-    public function add($data): string
+    public function add($data): array|string
     {
         $prepared_data = $this->prepareAddFormData($data);
 
         if (empty($prepared_data[self::ColumnName])) {
-            return 'Имя пользователя не указано или содержит недопустимые символы.';
+            return 'Имя, телефон, почта не указаны или содержат недопустимые символы.';
         }
 
         $this->db->beginTransaction();
@@ -164,12 +164,13 @@ class ClientFacade
             }
             $this->db->commit();
 
-            return 'ok';
+            // return 'ok';
+            return $new_user->toArray();
         } catch (UniqueConstraintViolationException $e) {
             $this->db->rollBack();
             \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
 
-            return 'Пользователь с таким именем или номером телефона или адресом электронной почты уже существует.';
+            return 'Пользователь с таким именем, или номером телефона, или адресом электронной почты уже существует.';
         } catch (Nette\Database\DriverException $e) {
             $this->db->rollBack();
             \Tracy\Debugger::log($e, \Tracy\Debugger::EXCEPTION);
@@ -178,7 +179,7 @@ class ClientFacade
         }
     }
 
-    #[Requires(methods: 'POST', sameOrigin: true)]
+
     public function update(int $id, array $data): void
     {
         if (!empty($data['email'])) {
@@ -331,19 +332,16 @@ class ClientFacade
 
     public function searchBy($field, $data, $strict = true): ?ActiveRow
     {
-        $like = ' LIKE ?';
-        $pro = '%';
-
-        if ($strict) {
-            $like = '';
-            $pro = '';
-        }
         if ($field === 'phone') {
             $data = PhoneNumber::toDb($data);
         }
         $query = $this->db->table($this->table);
 
-        return $query->where($field . $like, $pro . $data . $pro)->fetch();
+        if ($strict) {
+            return $query->where($field, $data)->fetch();
+        } else {
+            return $query->where($field . ' LIKE ?', '%' . $data . '%')->fetch();
+        }
     }
 
     /**
