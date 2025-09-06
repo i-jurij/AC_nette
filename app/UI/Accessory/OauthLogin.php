@@ -48,15 +48,14 @@ trait OauthLogin
                 $data = (object) $condition;
                 $user = $this->getUser();
                 if (empty($user_isset->id)) {
-                    // then add user to db: $res = $this->cf->add($data);user_data['data']
                     $data->roles = 'client';
                     $data->password = Random::generate(10);
                     $res = $this->cf->add($data);
-                    if ($res === 'ok') {
+                    if (is_array($res)) {
                         $this->flashMessage("Вы можете входить на сайт используя имя $un и пароль $data->password или дальше использовать вход через сторонние сервисы.", 'success');
 
                         $user->login($un, $data->password);
-                    } else {
+                    } elseif (is_string($res)) {
                         $this->flashMessage("Ошибка. $res", 'error');
                     }
                 } else {
@@ -71,7 +70,7 @@ trait OauthLogin
                 $this->flashMessage('Не получены данные пользователя', 'error');
             }
         } else {
-            $this->flashMessage('Не получены данные пользователя', 'error');
+            $this->flashMessage('Не получены имя, телефон или почта пользователя', 'error');
         }
     }
 }
