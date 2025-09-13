@@ -1,22 +1,32 @@
 {block loginFromOther}
-<div class="form center mb2 mr2">
-    <p class="full">Войти через:</p>
+<div class="form  mb2 mr2">
+    <p class="full center">Войти через:</p>
 
     <!-- <a href="https://localhost/redirectoauth">localredirect </a> -->
 
+    <p>
+        <a href="{$yandexLoginUrl}" class="block border rounded px3 py1">
+            <svg class="align-middle" width="32" height="32" viewBox="0 0 44 44" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="44" height="44" rx="22" fill="#FC3F1D"></rect>
+                <path
+                    d="M25.2438 12.3208H23.0173C19.2005 12.3208 17.292 14.2292 17.292 17.0919C17.292 20.2726 18.5643 21.863 21.427 23.7714L23.6535 25.3618L17.292 35.222H12.2029L18.2463 26.316C14.7475 23.7714 12.839 21.5449 12.839 17.41C12.839 12.3208 16.3378 8.82202 23.0173 8.82202H29.6969V35.222H25.2438V12.3208Z"
+                    fill="white"></path>
+            </svg>
+            <span class="center fit inline-block mx-auto">&ensp;Яндекс ID</span>
+        </a>
+    </p>
 
-    <a href="{$yandexLoginUrl}">
-        <svg width="45" height="45" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="44" height="44" rx="22" fill="#FC3F1D"></rect>
-            <path
-                d="M25.2438 12.3208H23.0173C19.2005 12.3208 17.292 14.2292 17.292 17.0919C17.292 20.2726 18.5643 21.863 21.427 23.7714L23.6535 25.3618L17.292 35.222H12.2029L18.2463 26.316C14.7475 23.7714 12.839 21.5449 12.839 17.41C12.839 12.3208 16.3378 8.82202 23.0173 8.82202H29.6969V35.222H25.2438V12.3208Z"
-                fill="white"></path>
-        </svg>
-    </a>
+    <p>
+        <a href="{$vkLoginUrl}" class="block rounded px3 py1" style="background-color: #0077FF">
+            <img class="align-middle" src="{$basePath}/images/social/vk2.png" width="32" />
+            <span class="center fit inline-block mx-auto">&ensp;VK ID</span>
+        </a>
+    </p>
 
-    <a href="{$vkLoginUrl}" class="brand">
-        <img class="logo" src="{$basePath}/images/vk.svg" width="48" />
-    </a>
-    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="ACNetteBot" data-size="large"
-        data-auth-url="{link :Home:Sign:telegramLogin}" data-request-access="write"></script>
+    <p>
+        <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="rujobaroundbot"
+            data-size="large" data-auth-url="{link :Home:Sign:telegramLogin}" data-request-access="write">
+        </script>
+    </p>
 </div>
